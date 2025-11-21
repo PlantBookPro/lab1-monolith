@@ -2,19 +2,27 @@ package com.plantarena.tournaments.adapter.in.web;
 
 import com.plantarena.shared.web.ApiError;
 import com.plantarena.shared.web.TraceIdFilter;
+import com.plantarena.tournaments.application.ActiveGlobalEntryExistsException;
+import com.plantarena.tournaments.application.ClusterNotFoundException;
 import com.plantarena.tournaments.application.DuplicateInvitationException;
 import com.plantarena.tournaments.application.EntryNotInWindowException;
+import com.plantarena.tournaments.application.GlobalEntryNotFoundException;
+import com.plantarena.tournaments.application.GlobalEntryNotWithdrawableException;
 import com.plantarena.tournaments.application.ImageAlreadyReservedException;
 import com.plantarena.tournaments.application.InvitationNotFoundException;
 import com.plantarena.tournaments.application.InvitedPlantNotFoundException;
+import com.plantarena.tournaments.application.LocationRequiredException;
+import com.plantarena.tournaments.application.PlantNotApprovedException;
 import com.plantarena.tournaments.application.PlantNotReservableException;
 import com.plantarena.tournaments.application.RegistrationClosedException;
 import com.plantarena.tournaments.application.SelfVoteForbiddenException;
+import com.plantarena.tournaments.application.SubmittedPlantNotFoundException;
 import com.plantarena.tournaments.application.TagAlreadyExistsException;
 import com.plantarena.tournaments.application.TagInUseException;
 import com.plantarena.tournaments.application.TagNotFoundException;
 import com.plantarena.tournaments.application.TournamentNotFoundException;
 import com.plantarena.tournaments.application.TournamentStateConflictException;
+import com.plantarena.tournaments.application.UnknownGlobalScopeException;
 import com.plantarena.tournaments.application.UnknownStatusFilterException;
 import com.plantarena.tournaments.application.UnknownUserException;
 import com.plantarena.tournaments.application.UnknownVoteValueException;
@@ -157,6 +165,54 @@ public class TournamentsExceptionHandler {
     public ResponseEntity<ApiError> unknownVoteValue(UnknownVoteValueException e,
                                                      HttpServletRequest request) {
         return respond(HttpStatus.BAD_REQUEST, "UNKNOWN_VOTE_VALUE", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(SubmittedPlantNotFoundException.class)
+    public ResponseEntity<ApiError> submittedPlantNotFound(SubmittedPlantNotFoundException e,
+                                                           HttpServletRequest request) {
+        return respond(HttpStatus.NOT_FOUND, "PLANT_NOT_FOUND", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(GlobalEntryNotFoundException.class)
+    public ResponseEntity<ApiError> globalEntryNotFound(GlobalEntryNotFoundException e,
+                                                        HttpServletRequest request) {
+        return respond(HttpStatus.NOT_FOUND, "GLOBAL_ENTRY_NOT_FOUND", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(ClusterNotFoundException.class)
+    public ResponseEntity<ApiError> clusterNotFound(ClusterNotFoundException e,
+                                                    HttpServletRequest request) {
+        return respond(HttpStatus.NOT_FOUND, "CLUSTER_NOT_FOUND", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(PlantNotApprovedException.class)
+    public ResponseEntity<ApiError> plantNotApproved(PlantNotApprovedException e,
+                                                     HttpServletRequest request) {
+        return respond(HttpStatus.CONFLICT, "PLANT_NOT_APPROVED", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(LocationRequiredException.class)
+    public ResponseEntity<ApiError> locationRequired(LocationRequiredException e,
+                                                     HttpServletRequest request) {
+        return respond(HttpStatus.CONFLICT, "LOCATION_REQUIRED", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(ActiveGlobalEntryExistsException.class)
+    public ResponseEntity<ApiError> activeGlobalEntryExists(ActiveGlobalEntryExistsException e,
+                                                             HttpServletRequest request) {
+        return respond(HttpStatus.CONFLICT, "GLOBAL_ENTRY_ACTIVE", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(GlobalEntryNotWithdrawableException.class)
+    public ResponseEntity<ApiError> globalEntryNotWithdrawable(
+            GlobalEntryNotWithdrawableException e, HttpServletRequest request) {
+        return respond(HttpStatus.CONFLICT, "ENTRY_IN_WINDOW", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(UnknownGlobalScopeException.class)
+    public ResponseEntity<ApiError> unknownGlobalScope(UnknownGlobalScopeException e,
+                                                       HttpServletRequest request) {
+        return respond(HttpStatus.BAD_REQUEST, "GLOBAL_SCOPE_UNKNOWN", e.getMessage(), request);
     }
 
     private ResponseEntity<ApiError> respond(HttpStatus status, String code, String detail,
