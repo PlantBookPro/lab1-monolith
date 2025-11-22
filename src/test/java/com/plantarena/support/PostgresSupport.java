@@ -11,7 +11,12 @@ public final class PostgresSupport {
         new PostgreSQLContainer("postgres:17.5-alpine")
             .withDatabaseName("plantarena")
             .withUsername("postgres")
-            .withPassword("postgres");
+            .withPassword("postgres")
+            // один контейнер на JVM для всех IT: ~15 кэшированных тест-контекстов
+            // (полные @SpringBootTest + @DataJpaTest-слайсы) держат пулы Hikari
+            // открытыми; дефолтных max_connections=100 не хватает («too many
+            // clients already»)
+            .withCommand("postgres", "-c", "max_connections=400");
 
     static {
         POSTGRES.start();
