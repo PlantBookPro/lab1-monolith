@@ -16,6 +16,12 @@ docker compose up --build
 # Swagger UI: http://localhost:8080/swagger-ui/index.html
 ```
 
+## Демо-сценарии
+
+Пошаговый порядок демонстрации всех сценариев через Swagger UI:
+[`docs/demo/scenarios.md`](docs/demo/scenarios.md) — от запуска и
+bootstrap-админа до ленты и гостевых сессий.
+
 ## Демо-идентификация (ADR-005)
 
 В профилях `dev`/`test` пользователь передаётся заголовком `X-Demo-User-Id: <UUID>`
@@ -184,8 +190,21 @@ scheduler идемпотентен — рестарт не убивает пов
 
 Запускает: unit- и application-тесты (Surefire), ArchUnit-правила границ,
 интеграционные/приёмочные тесты на Testcontainers PostgreSQL (Failsafe),
-отчёт и gate JaCoCo (LINE ≥ 70%). Настоящий ONNX-инференс — отдельно:
+ отчёт и gate JaCoCo (LINE ≥ 70%). Настоящий ONNX-инференс — отдельно:
 `./mvnw verify -P inference`.
+
+### Готовность лабы №1 (раздел 17)
+
+- [x] `./mvnw verify` зелёный: unit, application, контрактные, приёмочные,
+      конкурентные, ArchUnit; JaCoCo gate LINE ≥ 70%
+- [x] ArchUnit: нет циклов и запрещённых межконтекстных зависимостей
+- [x] Каждое допущение раздела 3 и инвариант `aggregates.md` покрыто
+      именованным тестом (таблица в `aggregates.md`)
+- [x] `docker compose up --build` из чистого состояния; сценарии — через
+      Swagger UI (`docs/demo/scenarios.md`)
+- [x] Inference продемонстрирован: `./mvnw verify -P inference`
+- [x] Docs: глоссарий, context map, агрегаты, ADR, ER-диаграмма
+      (`docs/domain/er-diagram.md`), процедура выделения сервиса
 
 ## Git workflow
 
