@@ -35,3 +35,5 @@ plantarena:
       root: ${MEDIA_STORAGE_ROOT:./storage/media} # Docker volume; file-service/S3 — лаба №4
   moderation:
     model-path: ${MODERATION_MODEL_PATH:target/models/mobilenetv2-1.0.onnx} # MobileNetV2 ONNX, ADR-009
+  geo:
+    geohash-precision: 4 # точность geohash-сетки, фиксируется в версии политики (раздел 8)
