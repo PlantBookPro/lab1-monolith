@@ -89,7 +89,7 @@ class VotingConcurrencyIT extends AbstractIntegrationTest {
                 }
                 jobs.add(pool.submit(() -> {
                     start.await();
-                    voting.cast(actor(voter), setup.windowId, target, "LIKE");
+                    voting.cast(actor(voter), null, setup.windowId, target, "LIKE");
                     ok.incrementAndGet();
                     return null;
                 }));
@@ -129,7 +129,7 @@ class VotingConcurrencyIT extends AbstractIntegrationTest {
         Future<?> voter = pool.submit(() -> {
             start.await();
             try {
-                voting.cast(actor(setup.user1), setup.windowId, setup.entry2, "LIKE");
+                voting.cast(actor(setup.user1), null, setup.windowId, setup.entry2, "LIKE");
                 accepted.incrementAndGet();
             } catch (com.plantarena.tournaments.application.VotingClosedException e) {
                 rejected.incrementAndGet();

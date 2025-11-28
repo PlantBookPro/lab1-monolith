@@ -45,4 +45,22 @@ public class OpenApiConfig {
             return operation;
         };
     }
+
+    /**
+     * Заголовок гостевого токена (раздел 9): X-Guest-Token от POST
+     * /guest-sessions; для идентифицированного пользователя игнорируется.
+     */
+    @Bean
+    public OperationCustomizer guestTokenHeaderCustomizer() {
+        return (Operation operation, org.springframework.web.method.HandlerMethod handlerMethod) -> {
+            operation.addParametersItem(new Parameter()
+                .in("header")
+                .name("X-Guest-Token")
+                .description("Гостевой токен (POST /guest-sessions): голосование и лента в "
+                    + "глобальных окнах. Для идентифицированного пользователя игнорируется.")
+                .required(false)
+                .schema(new StringSchema()));
+            return operation;
+        };
+    }
 }
