@@ -20,6 +20,24 @@
 | tournaments | `GuestSession` | tokenHash (SHA-256), createdAt, expiresAt | Хранится только хэш токена; активна пока `now < expiresAt`; неизменяема после создания | issue (создать сессию) | — | `GuestSessionTest` (фабрика/активность/неизменяемость), `GuestSessionsApiIT` (через HTTP: 201/429/401) |
 | geo | `ClusterSnapshot` | epochId, clusterKey, policyVersion, состав | Состав и версия политики неизменны после фиксации эпохи | зафиксировать состав эпохи | — | `ClusterSnapshotTest` (неизменность после фиксации), `GeohashClusteringPolicyTest`, `GeohashTest` |
 
+## Допущения раздела 3 → защищающие тесты
+
+Каждое предлагаемое допущение покрыто именованным тестом (раздел 17).
+Проверено итерацией 9 (аудит соответствия).
+
+| # | Допущение (раздел 3) | Защищающий тест |
+|---|---|---|
+| 1 | Гибель относится к экземпляру; DEAD необратим; повторная загрузка — новый экземпляр | `PlantTest` («гибель необратима и фиксирует момент»), `PlantsApiIT` («погибшее растение не воскресает, повторная загрузка создаёт новый экземпляр»), `PlantServiceTest` (подача/запреты) |
+| 2 | Закрытый турнир → PERMANENT; глобальный → COOLDOWN 24 ч; PERMANENT приоритетнее | `ImageReusePolicyTest` («постоянный запрет приоритетнее временного»), `CloseVotingWindowServiceTest` («закрытие due-окна: … гибель PERMANENT»), `AdvanceGlobalCompetitionServiceTest` (COOLDOWN 24 ч в «одновременных границах»), `GlobalApiIT` («квалификация (top-1, гибель+COOLDOWN)») |
+| 3 | Область запрета — пара (ownerId, fingerprint), чужое поражение не блокирует | `PlantServiceTest` («чужое поражение не блокирует фотографию у всех» — допущение 3), `ImageRestrictionRepositoryContractTest` («чужая пара — пустая история (допущение 3: область запрета)»), `PlantsApiIT` (тот же сценарий через HTTP), `ImageReusePolicyTest` (правила kind/expiresAt) |
+| 4 | Одно изображение не участвует одновременно в нескольких турнирах (резерв) | `PlantReservationRepositoryContractTest` («второй активный резерв пары отклоняется (допущение 4)») + `JpaPlantReservationRepositoryContractIT` (частичный индекс `plant_reservation_active_pair_uidx`), `InvitationServiceTest` («accept: конфликт резерва … — 409»), `PlantsApiIT` («резерв изображения идемпотентен по ключу и одиночен на пару») |
+| 5 | Одно активное глобальное участие на пользователя | `SubmitGlobalEntryServiceTest` («второе активное участие — 409 GLOBAL_ENTRY_ACTIVE (допущение 5)»), `TournamentEntryRepositoryContractTest` + `JpaTournamentEntryRepositoryContractIT` (частичный индекс `tournament_entry_one_active_global_uidx`), `GlobalApiIT` (GLOBAL_ENTRY_ACTIVE через HTTP) |
+| 6 | Самоголосование запрещено для идентифицированного | `VotingWindowTest` («самоголосование запрещено для идентифицированного пользователя (допущение 6)»), `VotingServiceTest` («самоголосование запрещено (допущение 6)»), `VotingApiIT`/`GlobalApiIT` (403 в HTTP-сценариях) |
+| 7 | Голос привязан к окну; смена/удаление; новое окно — новый счёт | `VoteValueTest` (дельты переходов previous → next), `VotingWindowTest` (дельты, score-инвариант, удаление), `VotingServiceTest` («LIKE → DISLIKE даёт −2», «удаление компенсирует вклад и идемпотентно»), `CloseVotingWindowServiceTest` (следующий раунд — счёт с нуля), `VotingApiIT` (полный цикл с дельтами) |
+| 8 | Ничья: score DESC, joinedAt ASC, entryId ASC | `ParticipantRankingTest` («score DESC», «равный счёт → joinedAt ASC», «равный счёт и время → entryId ASC; без голосов — тот же порядок»), `VotingWindowTest` («ничья решается детерминированно: score DESC, joinedAt ASC, entryId ASC») |
+| 9 | Выбывший закрытого турнира голосует до завершения | `VotingServiceTest` («выбывший участник продолжает голосовать до завершения (допущение 9)»), `VotingApiIT` (выбывший голосует в полном цикле), `TournamentEntryRepositoryContractTest` («турниры участника, включая выбывшего (допущение 9)») |
+| 10 | Модерация после дедлайна не даёт задним числом права | `PlantModerationReactionServiceTest` («APPROVED после дедлайна: заявка не меняется»), `TournamentsApiIT` (не принявший — EXPIRED после старта; accept после дедлайна — 409) |
+
 ## Доменные сервисы и политики (чистый Java)
 
 - `EliminationAlgorithm` (стратегия; реализация `RoundElimination`: `min(n − 1, max(1, floor(n · f)))` худших) — реализован: `RoundEliminationTest`
