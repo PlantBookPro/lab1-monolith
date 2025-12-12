@@ -44,3 +44,6 @@ plantarena:
     session-ttl: 24h # срок действия гостевой сессии (раздел 9)
     session-creation-limit-per-minute: 10 # лимит выдачи сессий на IP (429, ADR-013)
     vote-limit-per-minute: 30 # лимит голосов гостя на сессию (429, ADR-013)
+  feed:
+    cursor-secret: ${FEED_CURSOR_SECRET:dev-only-cursor-secret} # HMAC курсора ленты (раздел 9)
+    cursor-ttl: 1h # срок действия курсора; истёкший — 410 с новой лентой
