@@ -8,5 +8,5 @@ import jakarta.validation.constraints.Size;
  * запрещены (раздел 13). Неизвестные поля JSON игнорируются.
  */
 public record UpdateUserRequest(
-        @NotBlank @Size(min = 1, max = 100) String displayName) {
+        @NotBlank @Size(max = 100) String displayName) {
 }
