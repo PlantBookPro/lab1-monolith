@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,5 +43,19 @@ class ApiExceptionHandlerTest {
 
         assertThat(response.getStatusCode().value()).isEqualTo(400);
         assertThat(response.getBody().code()).isEqualTo("INVALID_PAGINATION");
+    }
+
+    @Test
+    void некорректный_тип_параметра_запроса_даёт_400_invalid_parameter() {
+        MethodArgumentTypeMismatchException mismatch =
+            new MethodArgumentTypeMismatchException("abc", Integer.class, "page", null,
+                new NumberFormatException("abc"));
+
+        ResponseEntity<ApiError> response = handler.invalidParameter(mismatch, request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo("INVALID_PARAMETER");
+        assertThat(response.getBody().detail()).contains("page");
     }
 }

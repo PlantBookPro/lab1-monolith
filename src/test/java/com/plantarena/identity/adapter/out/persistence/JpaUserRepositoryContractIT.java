@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -64,6 +65,6 @@ class JpaUserRepositoryContractIT extends UserRepositoryContractTest {
         User duplicate = User.registerUser(new Email("dup@example.com"), "Second", "hash");
 
         assertThatThrownBy(() -> repository().save(duplicate))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 }
