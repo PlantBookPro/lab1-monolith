@@ -18,7 +18,7 @@ graph TD
 
     plants -->|ACL: метаданные asset, команды задействованности| media
     moderation -->|ACL: PlantSubmitted / recordDecision| plants
-    moderation -->|ACL: asset| media
+    moderation -->|ACL: loadContent (байты)| media
     tournaments -->|ACL: CurrentActor, профиль| identity
     tournaments -->|ACL: PlantEligibility, PlantLifecycle| plants
     tournaments -->|ACL: ClusteringGateway| geo
@@ -36,7 +36,7 @@ graph TD
 | media | — | Upstream для plants, moderation, feed |
 | geo | — | Upstream для tournaments; получает координаты во входной команде, сам identity не читает |
 | plants | media | Customer–Supplier; ACL над `MediaAsset`, команды задействованности `MediaAssetClaims` (ADR-008) |
-| moderation | plants, media | Downstream: подписан на `PlantSubmitted`, отдаёт решение командой в plants.api |
+| moderation | plants, media | Downstream: подписан на `PlantSubmitted` (adapter.in.events), решение командой `plants.api.PlantModeration.recordDecision`; байты файла — `media.api.MediaAssets.loadContent` (ACL adapter.out.media) |
 | tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `ParticipantDirectory`, `ClusteringGateway` |
 | feed | tournaments, plants, media, identity | Downstream, только чтение через read-порты |
 
