@@ -20,10 +20,8 @@ import com.plantarena.tournaments.domain.VoteValue;
 import com.plantarena.tournaments.domain.VotingSubject;
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.WindowStatus;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -47,7 +45,6 @@ class CloseVotingWindowServiceTest {
     private final FakePlantEligibilityGateway eligibility = new FakePlantEligibilityGateway();
     private final FakePlantLifecycleGateway plantLifecycle = new FakePlantLifecycleGateway();
     private final FakeEventPublisher eventPublisher = new FakeEventPublisher();
-    private final Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
 
     private UUID tournamentId;
     private UUID entry1;
@@ -77,7 +74,7 @@ class CloseVotingWindowServiceTest {
         entry3 = admit(UUID.randomUUID(), reservation3 = UUID.randomUUID(), plant3 = UUID.randomUUID());
 
         service = new CloseVotingWindowService(windows, tournaments, entries, eligibility,
-            plantLifecycle, eventPublisher, clock, txTemplate());
+            plantLifecycle, eventPublisher, txTemplate());
     }
 
     @Test
