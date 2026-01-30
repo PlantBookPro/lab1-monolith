@@ -2,6 +2,8 @@ package com.plantarena.tournaments.application;
 
 import com.plantarena.shared.event.IntegrationEventPublisher;
 import com.plantarena.tournaments.api.event.EntryEliminatedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowClosedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
 import com.plantarena.tournaments.application.port.in.AdvanceGlobalCompetitionUseCase;
 import com.plantarena.tournaments.application.port.out.ClusteringGateway;
 import com.plantarena.tournaments.application.port.out.ParticipantLocationsGateway;
@@ -110,6 +112,7 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
         }
         VotingWindow.QualificationCloseOutcome outcome = window.closeQualification(now);
         windows.save(window);
+        publishClosed(window, now);
 
         TournamentEntry promoted = findEntry(outcome.promotedEntryId());
         promoted.promoteToFinalPending();
@@ -154,6 +157,7 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
         }
         VotingWindow.FinalCloseOutcome outcome = window.closeFinal(now);
         windows.save(window);
+        publishClosed(window, now);
         for (TournamentEntry entry : eliminatedSorted(outcome.eliminatedEntryIds())) {
             entry.eliminateFromGlobal();
             entries.save(entry);
@@ -184,8 +188,14 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
             int nextSequence = windows
                 .findLatestByTournamentIdAndScope(GlobalCompetitionId.VALUE, WindowScope.FINAL)
                 .map(VotingWindow::sequence).orElse(0) + 1;
-            windows.save(VotingWindow.openFinal(GlobalCompetitionId.VALUE, nextSequence,
-                seeds(finalists), now, now.plus(settings.finalWindowDuration()), now));
+            VotingWindow finalWindow = VotingWindow.openFinal(GlobalCompetitionId.VALUE,
+                nextSequence, seeds(finalists), now, now.plus(settings.finalWindowDuration()),
+                now);
+            windows.save(finalWindow);
+            publishOpened(finalWindow, finalists.stream()
+                .map(entry -> new VotingWindowOpenedEvent.Participant(entry.id(),
+                    entry.userId(), entry.plantId(), entry.joinedAt()))
+                .toList(), now);
             return true;
         });
         return Boolean.TRUE.equals(opened) ? 1 : 0;
@@ -227,9 +237,14 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
                     entry.startQualifying();
                     entries.save(entry);
                 }
-                windows.save(VotingWindow.openQualification(GlobalCompetitionId.VALUE, epochId,
-                    cluster.clusterId(), cluster.clusterKey(), nextSequence,
-                    seeds(clusterEntries), now, closesAt, now));
+                VotingWindow window = VotingWindow.openQualification(GlobalCompetitionId.VALUE,
+                    epochId, cluster.clusterId(), cluster.clusterKey(), nextSequence,
+                    seeds(clusterEntries), now, closesAt, now);
+                windows.save(window);
+                publishOpened(window, clusterEntries.stream()
+                    .map(entry -> new VotingWindowOpenedEvent.Participant(entry.id(),
+                        entry.userId(), entry.plantId(), entry.joinedAt()))
+                    .toList(), now);
             }
             return true;
         });
@@ -250,6 +265,29 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
             EntryEliminatedEvent.SCHEMA_VERSION, window.id(), window.version(), now, eventId,
             new EntryEliminatedEvent.Payload(window.tournamentId(), entry.id(), entry.userId(),
                 entry.plantId(), window.sequence())));
+    }
+
+    /** Проекция ленты (раздел 9): состав открытого окна. */
+    private void publishOpened(VotingWindow window,
+                               List<VotingWindowOpenedEvent.Participant> participants,
+                               Instant now) {
+        UUID eventId = UUID.randomUUID();
+        eventPublisher.publish(new VotingWindowOpenedEvent(eventId,
+            VotingWindowOpenedEvent.TYPE, VotingWindowOpenedEvent.SCHEMA_VERSION,
+            window.id(), window.version(), now, eventId,
+            new VotingWindowOpenedEvent.Payload(window.id(), window.tournamentId(),
+                window.scope().name(), window.sequence(), window.epochId(), window.clusterId(),
+                window.clusterKey(), window.opensAt(), window.closesAt(), participants)));
+    }
+
+    /** Проекция ленты (раздел 9): карточки закрытого окна удаляются. */
+    private void publishClosed(VotingWindow window, Instant now) {
+        UUID eventId = UUID.randomUUID();
+        eventPublisher.publish(new VotingWindowClosedEvent(eventId,
+            VotingWindowClosedEvent.TYPE, VotingWindowClosedEvent.SCHEMA_VERSION,
+            window.id(), window.version(), now, eventId,
+            new VotingWindowClosedEvent.Payload(window.id(), window.tournamentId(),
+                window.scope().name(), window.sequence())));
     }
 
     private List<TournamentEntry> eliminatedSorted(List<UUID> entryIds) {

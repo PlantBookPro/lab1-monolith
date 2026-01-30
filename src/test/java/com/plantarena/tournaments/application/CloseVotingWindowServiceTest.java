@@ -3,6 +3,8 @@ package com.plantarena.tournaments.application;
 import com.plantarena.shared.event.IntegrationEventPublisher;
 import com.plantarena.tournaments.api.event.EntryEliminatedEvent;
 import com.plantarena.tournaments.api.event.TournamentFinishedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowClosedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
 import com.plantarena.tournaments.application.port.out.PlantEligibilityGateway;
 import com.plantarena.tournaments.application.port.out.PlantLifecycleGateway;
 import com.plantarena.tournaments.application.support.FakeEventPublisher;
@@ -105,6 +107,14 @@ class CloseVotingWindowServiceTest {
         assertThat(eligibility.isReleased(reservation2)).isFalse();
         assertThat(eventPublisher.published).anySatisfy(event ->
             assertThat(event).isInstanceOf(EntryEliminatedEvent.class));
+        assertThat(eventPublisher.published).anySatisfy(event ->
+            assertThat(event).isInstanceOf(VotingWindowClosedEvent.class));
+        VotingWindowClosedEvent closed = eventPublisher.published.stream()
+            .filter(VotingWindowClosedEvent.class::isInstance)
+            .map(VotingWindowClosedEvent.class::cast)
+            .findFirst().orElseThrow();
+        assertThat(closed.payload().windowId()).isEqualTo(window.id());
+        assertThat(closed.payload().scope()).isEqualTo("PRIVATE");
 
         // следующий раунд: sequence 2, выжившие, счёт с нуля, OPEN
         VotingWindow next = windows.findLatestByTournamentId(tournamentId).orElseThrow();
@@ -183,6 +193,38 @@ class CloseVotingWindowServiceTest {
             .isEqualTo(WindowStatus.OPEN);
         assertThat(statusOf(entry1)).isEqualTo(EntryStatus.ACTIVE);
         assertThat(plantLifecycle.calls).isEmpty();
+    }
+
+    @Test
+    @DisplayName("закрытие публикует Closed, а при выживших ≥ 2 — Opened раунда 2 с составом выживших")
+    void закрытие_публикует_события_окна() {
+        // n=3, 0 голосов: рейтинг детерминирован (joinedAt, entryId) → выбывает 1
+        openDueWindow();
+
+        service.closeDue(NOW, 10);
+
+        VotingWindowClosedEvent closed = eventPublisher.published.stream()
+            .filter(VotingWindowClosedEvent.class::isInstance)
+            .map(VotingWindowClosedEvent.class::cast)
+            .findFirst().orElseThrow();
+        assertThat(closed.payload().scope()).isEqualTo("PRIVATE");
+        assertThat(closed.payload().sequence()).isEqualTo(1);
+
+        VotingWindowOpenedEvent opened = eventPublisher.published.stream()
+            .filter(VotingWindowOpenedEvent.class::isInstance)
+            .map(VotingWindowOpenedEvent.class::cast)
+            .findFirst().orElseThrow();
+        assertThat(opened.payload().sequence()).isEqualTo(2);
+        List<UUID> survivors = entries.entries.values().stream()
+            .filter(e -> e.status() == EntryStatus.ACTIVE)
+            .map(TournamentEntry::id)
+            .toList();
+        assertThat(survivors).hasSize(2);
+        assertThat(opened.payload().participants())
+            .extracting(VotingWindowOpenedEvent.Participant::entryId)
+            .containsExactlyInAnyOrderElementsOf(survivors);
+        assertThat(opened.payload().participants())
+            .allSatisfy(p -> assertThat(p.plantId()).isNotNull());
     }
 
     private VotingWindow openDueWindow() {

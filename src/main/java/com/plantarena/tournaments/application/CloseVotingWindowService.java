@@ -3,6 +3,8 @@ package com.plantarena.tournaments.application;
 import com.plantarena.shared.event.IntegrationEventPublisher;
 import com.plantarena.tournaments.api.event.EntryEliminatedEvent;
 import com.plantarena.tournaments.api.event.TournamentFinishedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowClosedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
 import com.plantarena.tournaments.application.port.in.CloseVotingWindowUseCase;
 import com.plantarena.tournaments.application.port.out.PlantEligibilityGateway;
 import com.plantarena.tournaments.application.port.out.PlantLifecycleGateway;
@@ -94,6 +96,7 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
             EliminationAlgorithms.forKind(tournament.algorithm()),
             tournament.eliminationFraction());
         windows.save(window);
+        publishClosed(window, now);
 
         List<TournamentEntry> eliminated = outcome.eliminatedEntryIds().stream()
             .map(this::findEntry)
@@ -119,20 +122,21 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
             tournaments.save(tournament);
             publishFinished(tournament, winner, now);
         } else {
-            windows.save(VotingWindow.open(tournament.id(), window.sequence() + 1,
-                seedsFor(outcome.survivedEntryIds()), now,
-                now.plus(tournament.roundDuration()), now));
+            List<TournamentEntry> survived = outcome.survivedEntryIds().stream()
+                .map(this::findEntry)
+                .toList();
+            VotingWindow next = VotingWindow.open(tournament.id(), window.sequence() + 1,
+                survived.stream()
+                    .map(entry -> new VotingWindow.ParticipantSeed(entry.id(), entry.userId(),
+                        entry.joinedAt()))
+                    .toList(),
+                now, now.plus(tournament.roundDuration()), now);
+            windows.save(next);
+            publishOpened(next, survived.stream()
+                .map(entry -> new VotingWindowOpenedEvent.Participant(entry.id(), entry.userId(),
+                    entry.plantId(), entry.joinedAt()))
+                .toList(), now);
         }
-    }
-
-    private List<VotingWindow.ParticipantSeed> seedsFor(List<UUID> entryIds) {
-        return entryIds.stream()
-            .map(entryId -> {
-                TournamentEntry entry = findEntry(entryId);
-                return new VotingWindow.ParticipantSeed(entry.id(), entry.userId(),
-                    entry.joinedAt());
-            })
-            .toList();
     }
 
     private void publishEliminated(VotingWindow window, Tournament tournament,
@@ -150,6 +154,29 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
             TournamentFinishedEvent.SCHEMA_VERSION, tournament.id(), tournament.version(),
             now, eventId, new TournamentFinishedEvent.Payload(tournament.id(), winner.id(),
                 winner.userId(), winner.plantId())));
+    }
+
+    /** Проекция ленты (раздел 9): состав окна следующего раунда. */
+    private void publishOpened(VotingWindow window,
+                               List<VotingWindowOpenedEvent.Participant> participants,
+                               Instant now) {
+        UUID eventId = UUID.randomUUID();
+        eventPublisher.publish(new VotingWindowOpenedEvent(eventId,
+            VotingWindowOpenedEvent.TYPE, VotingWindowOpenedEvent.SCHEMA_VERSION,
+            window.id(), window.version(), now, eventId,
+            new VotingWindowOpenedEvent.Payload(window.id(), window.tournamentId(),
+                window.scope().name(), window.sequence(), window.epochId(), window.clusterId(),
+                window.clusterKey(), window.opensAt(), window.closesAt(), participants)));
+    }
+
+    /** Проекция ленты (раздел 9): карточки закрытого окна удаляются. */
+    private void publishClosed(VotingWindow window, Instant now) {
+        UUID eventId = UUID.randomUUID();
+        eventPublisher.publish(new VotingWindowClosedEvent(eventId,
+            VotingWindowClosedEvent.TYPE, VotingWindowClosedEvent.SCHEMA_VERSION,
+            window.id(), window.version(), now, eventId,
+            new VotingWindowClosedEvent.Payload(window.id(), window.tournamentId(),
+                window.scope().name(), window.sequence())));
     }
 
     private TournamentEntry findEntry(UUID entryId) {
