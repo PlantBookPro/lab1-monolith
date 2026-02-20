@@ -7,10 +7,13 @@ import com.plantarena.tournaments.api.TournamentData;
 import com.plantarena.tournaments.application.port.in.CancelTournamentUseCase;
 import com.plantarena.tournaments.application.port.in.CreateTournamentUseCase;
 import com.plantarena.tournaments.application.port.in.DeleteTournamentUseCase;
+import com.plantarena.tournaments.application.port.in.GetLeaderboardUseCase;
 import com.plantarena.tournaments.application.port.in.GetTournamentUseCase;
 import com.plantarena.tournaments.application.port.in.InviteUserUseCase;
 import com.plantarena.tournaments.application.port.in.ListEntriesUseCase;
 import com.plantarena.tournaments.application.port.in.ListInvitationsUseCase;
+import com.plantarena.tournaments.application.port.in.ListResultsUseCase;
+import com.plantarena.tournaments.application.port.in.ListRoundsUseCase;
 import com.plantarena.tournaments.application.port.in.ListTournamentsUseCase;
 import com.plantarena.tournaments.application.port.in.OpenRegistrationUseCase;
 import com.plantarena.tournaments.application.port.in.RevokeInvitationUseCase;
@@ -58,6 +61,9 @@ public class TournamentController {
     private final InviteUserUseCase inviteUser;
     private final RevokeInvitationUseCase revokeInvitation;
     private final ListInvitationsUseCase listInvitations;
+    private final ListRoundsUseCase listRounds;
+    private final GetLeaderboardUseCase getLeaderboard;
+    private final ListResultsUseCase listResults;
     private final CurrentActorProvider currentActorProvider;
 
     public TournamentController(CreateTournamentUseCase createTournament,
@@ -72,6 +78,9 @@ public class TournamentController {
                                 InviteUserUseCase inviteUser,
                                 RevokeInvitationUseCase revokeInvitation,
                                 ListInvitationsUseCase listInvitations,
+                                ListRoundsUseCase listRounds,
+                                GetLeaderboardUseCase getLeaderboard,
+                                ListResultsUseCase listResults,
                                 CurrentActorProvider currentActorProvider) {
         this.createTournament = createTournament;
         this.updateTournament = updateTournament;
@@ -85,6 +94,9 @@ public class TournamentController {
         this.inviteUser = inviteUser;
         this.revokeInvitation = revokeInvitation;
         this.listInvitations = listInvitations;
+        this.listRounds = listRounds;
+        this.getLeaderboard = getLeaderboard;
+        this.listResults = listResults;
         this.currentActorProvider = currentActorProvider;
     }
 
@@ -230,5 +242,51 @@ public class TournamentController {
         return ResponseEntity.ok()
             .header("X-Total-Count", String.valueOf(result.total()))
             .body(result.items().stream().map(EntryResponse::from).toList());
+    }
+
+    @GetMapping("/{id}/rounds")
+    @Operation(operationId = "tournaments-list-rounds",
+        summary = "История раундов турнира (X-Total-Count)")
+    public ResponseEntity<List<RoundResponse>> rounds(@PathVariable UUID id,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        CurrentActor actor = currentActorProvider.currentActor();
+        PaginationParams pagination = PaginationParams.of(page, size);
+        ListRoundsUseCase.RoundListResult result =
+            listRounds.listRounds(actor, id, pagination.page(), pagination.size());
+        return ResponseEntity.ok()
+            .header("X-Total-Count", String.valueOf(result.total()))
+            .body(result.items().stream().map(RoundResponse::from).toList());
+    }
+
+    @GetMapping("/{id}/leaderboard")
+    @Operation(operationId = "tournaments-get-leaderboard",
+        summary = "Счёт окна (без windowId — текущее/последнее; X-Total-Count)")
+    public ResponseEntity<LeaderboardResponse> leaderboard(@PathVariable UUID id,
+            @RequestParam(required = false) UUID windowId,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        CurrentActor actor = currentActorProvider.currentActor();
+        PaginationParams pagination = PaginationParams.of(page, size);
+        GetLeaderboardUseCase.LeaderboardResult result =
+            getLeaderboard.get(actor, id, windowId, pagination.page(), pagination.size());
+        return ResponseEntity.ok()
+            .header("X-Total-Count", String.valueOf(result.total()))
+            .body(LeaderboardResponse.from(result));
+    }
+
+    @GetMapping("/{id}/results")
+    @Operation(operationId = "tournaments-list-results",
+        summary = "Итоги: победитель и выбывшие (X-Total-Count)")
+    public ResponseEntity<ResultResponse> results(@PathVariable UUID id,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        CurrentActor actor = currentActorProvider.currentActor();
+        PaginationParams pagination = PaginationParams.of(page, size);
+        ListResultsUseCase.ResultListResult result =
+            listResults.listResults(actor, id, pagination.page(), pagination.size());
+        return ResponseEntity.ok()
+            .header("X-Total-Count", String.valueOf(result.total()))
+            .body(ResultResponse.from(result));
     }
 }

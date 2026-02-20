@@ -3,11 +3,13 @@ package com.plantarena.tournaments.adapter.in.web;
 import com.plantarena.shared.web.ApiError;
 import com.plantarena.shared.web.TraceIdFilter;
 import com.plantarena.tournaments.application.DuplicateInvitationException;
+import com.plantarena.tournaments.application.EntryNotInWindowException;
 import com.plantarena.tournaments.application.ImageAlreadyReservedException;
 import com.plantarena.tournaments.application.InvitationNotFoundException;
 import com.plantarena.tournaments.application.InvitedPlantNotFoundException;
 import com.plantarena.tournaments.application.PlantNotReservableException;
 import com.plantarena.tournaments.application.RegistrationClosedException;
+import com.plantarena.tournaments.application.SelfVoteForbiddenException;
 import com.plantarena.tournaments.application.TagAlreadyExistsException;
 import com.plantarena.tournaments.application.TagInUseException;
 import com.plantarena.tournaments.application.TagNotFoundException;
@@ -15,6 +17,9 @@ import com.plantarena.tournaments.application.TournamentNotFoundException;
 import com.plantarena.tournaments.application.TournamentStateConflictException;
 import com.plantarena.tournaments.application.UnknownStatusFilterException;
 import com.plantarena.tournaments.application.UnknownUserException;
+import com.plantarena.tournaments.application.UnknownVoteValueException;
+import com.plantarena.tournaments.application.VotingClosedException;
+import com.plantarena.tournaments.application.WindowNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
@@ -122,6 +127,36 @@ public class TournamentsExceptionHandler {
     public ResponseEntity<ApiError> unknownStatusFilter(UnknownStatusFilterException e,
                                                         HttpServletRequest request) {
         return respond(HttpStatus.BAD_REQUEST, "UNKNOWN_STATUS_FILTER", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(WindowNotFoundException.class)
+    public ResponseEntity<ApiError> windowNotFound(WindowNotFoundException e,
+                                                   HttpServletRequest request) {
+        return respond(HttpStatus.NOT_FOUND, "WINDOW_NOT_FOUND", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(EntryNotInWindowException.class)
+    public ResponseEntity<ApiError> entryNotInWindow(EntryNotInWindowException e,
+                                                     HttpServletRequest request) {
+        return respond(HttpStatus.NOT_FOUND, "ENTRY_NOT_IN_WINDOW", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(VotingClosedException.class)
+    public ResponseEntity<ApiError> votingClosed(VotingClosedException e,
+                                                 HttpServletRequest request) {
+        return respond(HttpStatus.CONFLICT, "VOTING_CLOSED", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(SelfVoteForbiddenException.class)
+    public ResponseEntity<ApiError> selfVoteForbidden(SelfVoteForbiddenException e,
+                                                      HttpServletRequest request) {
+        return respond(HttpStatus.FORBIDDEN, "SELF_VOTE_FORBIDDEN", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(UnknownVoteValueException.class)
+    public ResponseEntity<ApiError> unknownVoteValue(UnknownVoteValueException e,
+                                                     HttpServletRequest request) {
+        return respond(HttpStatus.BAD_REQUEST, "UNKNOWN_VOTE_VALUE", e.getMessage(), request);
     }
 
     private ResponseEntity<ApiError> respond(HttpStatus status, String code, String detail,
