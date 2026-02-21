@@ -1,15 +1,19 @@
 package com.plantarena.media.application;
 
+import com.plantarena.media.api.AssetInUseException;
 import com.plantarena.media.application.support.FakeImageAnalyzer;
+import com.plantarena.media.application.support.InMemoryAssetClaimRepository;
 import com.plantarena.media.application.support.InMemoryFileStorage;
 import com.plantarena.media.application.support.InMemoryMediaAssetRepository;
 import com.plantarena.media.domain.AnalyzedImage;
+import com.plantarena.media.domain.AssetClaim;
 import com.plantarena.media.domain.ImageFormat;
 import com.plantarena.shared.security.AccessDeniedException;
 import com.plantarena.shared.security.AppRole;
 import com.plantarena.shared.security.CurrentActor;
 import com.plantarena.shared.security.NotIdentifiedException;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -21,12 +25,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("Use cases media: загрузка, скачивание, удаление")
 class MediaAssetServiceTest {
 
+    private static final Instant NOW = Instant.parse("2026-09-25T10:00:00Z");
+
     private final InMemoryMediaAssetRepository repository = new InMemoryMediaAssetRepository();
     private final InMemoryFileStorage storage = new InMemoryFileStorage();
+    private final InMemoryAssetClaimRepository claims = new InMemoryAssetClaimRepository();
     private final FakeImageAnalyzer analyzer = new FakeImageAnalyzer(
         new AnalyzedImage(ImageFormat.PNG, 2, 1, new int[] {0xFF000000, 0xFF112233}));
     private final MediaAssetService service =
-        new MediaAssetService(repository, analyzer, storage, new MediaAccessPolicy(), Clock.systemUTC());
+        new MediaAssetService(repository, analyzer, storage, claims,
+            new MediaAccessPolicy(), Clock.systemUTC());
 
     private final UUID ownerId = UUID.randomUUID();
     private final CurrentActor owner = CurrentActor.identified(ownerId, Set.of(AppRole.USER));
@@ -129,5 +137,30 @@ class MediaAssetServiceTest {
         service.delete(admin, uploaded.id());
 
         assertThat(repository.assets).isEmpty();
+    }
+
+    @Test
+    void удаление_задействованного_файла_запрещено() {
+        MediaAssetResult uploaded = service.upload(owner, new byte[] {1, 2, 3});
+        claims.save(AssetClaim.claimed(uploaded.id(), UUID.randomUUID(), false, NOW));
+
+        assertThatThrownBy(() -> service.delete(owner, uploaded.id()))
+            .isInstanceOf(AssetInUseException.class);
+        assertThat(repository.assets).hasSize(1);   // файл не удалён
+        assertThat(storage.deletedKeys).isEmpty();
+    }
+
+    @Test
+    void чужой_видит_файл_только_публично_задействованный() {
+        MediaAssetResult uploaded = service.upload(owner, new byte[] {1, 2, 3});
+        UUID plantId = UUID.randomUUID();
+
+        claims.save(AssetClaim.claimed(uploaded.id(), plantId, false, NOW));
+        assertThatThrownBy(() -> service.download(other, uploaded.id()))
+            .isInstanceOf(MediaAssetNotFoundException.class); // занят, но не публичен
+
+        claims.save(AssetClaim.claimed(uploaded.id(), plantId, true, NOW));
+        var downloaded = service.download(other, uploaded.id());
+        assertThat(downloaded.assetId()).isEqualTo(uploaded.id()); // APPROVED-растение
     }
 }

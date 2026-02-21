@@ -8,9 +8,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
- * Права доступа media (раздел 13): загрузка — любой идентифицированный
- * пользователь; скачивание — только владелец (чужие файлы скрыты, 404);
- * удаление — владелец или админ (чужим — 403).
+ * Права доступа media (раздел 13 + ADR-008): загрузка — любой
+ * идентифицированный пользователь; скачивание — владелец всегда, чужие —
+ * только публично задействованный файл (APPROVED-растение, иначе 404);
+ * удаление — владелец или админ (чужим — 403), но не задействованный файл.
  */
 @Component
 public class MediaAccessPolicy {
@@ -22,12 +23,12 @@ public class MediaAccessPolicy {
         }
     }
 
-    public void requireViewer(CurrentActor actor, UUID ownerId) {
+    public void requireViewer(CurrentActor actor, UUID ownerId, boolean publiclyVisible) {
         if (actor.isGuest()) {
             throw new NotIdentifiedException(
                 "Скачивание файлов доступно только идентифицированным пользователям");
         }
-        if (!actor.userId().equals(ownerId)) {
+        if (!actor.userId().equals(ownerId) && !publiclyVisible) {
             throw new MediaAssetNotFoundException("Файл не найден"); // скрыт приватностью
         }
     }
