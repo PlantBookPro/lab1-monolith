@@ -39,7 +39,7 @@ docker compose exec postgres psql -U postgres -d plantarena -t -A -c \
 ## 2. media — загрузка изображений
 
 1. `POST /api/v1/files` (alice, multipart `file`, JPEG/PNG ≤ 10 MiB) → 201:
-   `assetId`, метаданные (MIME по фактическому содержимому), без путей хранилища.
+   `id` (assetId), метаданные (MIME по фактическому содержимому), без путей хранилища.
 2. Негативные: текстовый файл с расширением .png → 415; > 10 MiB → 413;
    без заголовка → 401.
 3. `GET /api/v1/files/{assetId}` — владелец всегда; чужим файл доступен только
