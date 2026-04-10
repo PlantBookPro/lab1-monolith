@@ -188,6 +188,19 @@ class TournamentTest {
             .isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    @DisplayName("глобальный турнир никогда не завершается (раздел 8)")
+    void глобальный_не_завершается() {
+        UUID id = UUID.randomUUID();
+        Tournament global = Tournament.global(id, id,
+            Instant.parse("2026-09-27T10:00:00Z"));
+        assertThat(global.type()).isEqualTo(TournamentType.GLOBAL);
+        assertThat(global.status()).isEqualTo(TournamentStatus.RUNNING);
+        assertThatThrownBy(() -> global.finish(Instant.parse("2026-09-27T11:00:00Z")))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("никогда не завершается");
+    }
+
     private Tournament started() {
         Tournament tournament = draft();
         tournament.openRegistration(NOW);

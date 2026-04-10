@@ -58,6 +58,11 @@ public final class WindowParticipant {
         result = ParticipantResult.WINNER;
     }
 
+    void promote() {
+        requireActive();
+        result = ParticipantResult.PROMOTED;
+    }
+
     private void requireActive() {
         if (result != ParticipantResult.ACTIVE) {
             throw new IllegalStateException("Итог участника уже зафиксирован: " + result);

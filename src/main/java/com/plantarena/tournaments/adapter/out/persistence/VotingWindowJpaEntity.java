@@ -27,6 +27,18 @@ public class VotingWindowJpaEntity {
     private int sequence;
 
     @Column(nullable = false)
+    private String scope;
+
+    @Column(name = "epoch_id")
+    private UUID epochId;
+
+    @Column(name = "cluster_id")
+    private UUID clusterId;
+
+    @Column(name = "cluster_key")
+    private String clusterKey;
+
+    @Column(nullable = false)
     private String status;
 
     @Column(name = "opens_at", nullable = false)
@@ -55,6 +67,22 @@ public class VotingWindowJpaEntity {
 
     int getSequence() {
         return sequence;
+    }
+
+    String getScope() {
+        return scope;
+    }
+
+    UUID getEpochId() {
+        return epochId;
+    }
+
+    UUID getClusterId() {
+        return clusterId;
+    }
+
+    String getClusterKey() {
+        return clusterKey;
     }
 
     String getStatus() {
@@ -91,6 +119,22 @@ public class VotingWindowJpaEntity {
 
     void setSequence(int sequence) {
         this.sequence = sequence;
+    }
+
+    void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    void setEpochId(UUID epochId) {
+        this.epochId = epochId;
+    }
+
+    void setClusterId(UUID clusterId) {
+        this.clusterId = clusterId;
+    }
+
+    void setClusterKey(String clusterKey) {
+        this.clusterKey = clusterKey;
     }
 
     void setStatus(String status) {

@@ -117,4 +117,19 @@ class TournamentQueryServiceTest {
         assertThatThrownBy(() -> service.list(stranger, tournamentId, 0, 20))
             .isInstanceOf(TournamentNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("глобальный турнир скрыт из списка и просмотра (раздел 8)")
+    void глобальный_турнир_скрыт() {
+        UUID globalId = UUID.randomUUID();
+        tournaments.save(Tournament.global(globalId, UUID.randomUUID(), NOW));
+        UUID privateId = newTournament(null, NOW);
+
+        assertThat(service.list(admin, null, null, 0, 20).total()).isEqualTo(1);
+        assertThat(service.list(admin, null, null, 0, 20).items())
+            .extracting(com.plantarena.tournaments.api.TournamentData::id)
+            .containsExactly(privateId);
+        assertThatThrownBy(() -> service.get(admin, globalId))
+            .isInstanceOf(TournamentNotFoundException.class);
+    }
 }

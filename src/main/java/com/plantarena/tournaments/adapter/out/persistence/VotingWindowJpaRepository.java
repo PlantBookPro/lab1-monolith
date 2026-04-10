@@ -31,4 +31,23 @@ public interface VotingWindowJpaRepository extends JpaRepository<VotingWindowJpa
     Optional<VotingWindowJpaEntity> findFirstByTournamentIdOrderBySequenceDesc(UUID tournamentId);
 
     List<VotingWindowJpaEntity> findAllByTournamentIdOrderBySequence(UUID tournamentId);
+
+    @Query("select w.id from VotingWindowJpaEntity w "
+        + "where w.scope = :scope and w.status = 'OPEN' and w.closesAt <= :now "
+        + "order by w.closesAt")
+    List<UUID> findDueForCloseByScope(@Param("scope") String scope, @Param("now") Instant now,
+                                      Pageable pageable);
+
+    Optional<VotingWindowJpaEntity> findFirstByTournamentIdAndScopeAndStatusOrderBySequenceDesc(
+        UUID tournamentId, String scope, String status);
+
+    Optional<VotingWindowJpaEntity> findFirstByTournamentIdAndScopeOrderBySequenceDesc(
+        UUID tournamentId, String scope);
+
+    List<VotingWindowJpaEntity> findByEpochIdAndStatusOrderByClusterKeyAsc(UUID epochId,
+                                                                           String status);
+
+    Optional<VotingWindowJpaEntity> findByClusterIdAndStatus(UUID clusterId, String status);
+
+    long countByEpochIdAndStatus(UUID epochId, String status);
 }

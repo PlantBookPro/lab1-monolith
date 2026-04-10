@@ -7,6 +7,7 @@ import com.plantarena.tournaments.domain.VotingSubject;
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
 import com.plantarena.tournaments.domain.WindowParticipant;
+import com.plantarena.tournaments.domain.WindowScope;
 import com.plantarena.tournaments.domain.WindowStatus;
 import java.time.Instant;
 import java.util.List;
@@ -146,6 +147,43 @@ public abstract class VotingWindowRepositoryContractTest {
         assertThat(repository().countByTournamentId(tournamentId)).isEqualTo(2);
         assertThat(repository().findAllByTournamentId(tournamentId))
             .extracting(VotingWindow::sequence).containsExactly(1, 2);
+    }
+
+    @Test
+    @DisplayName("scope-запросы: due по scope, открытое/последнее по scope, эпоха/кластер")
+    void scope_запросы() {
+        VotingWindowRepository repository = repository();
+        UUID tournamentId = newTournamentId();
+        UUID epochId = UUID.randomUUID();
+        UUID clusterId = UUID.randomUUID();
+        UUID user1 = UUID.randomUUID();
+        Instant past = OPENS.minusSeconds(120);
+        VotingWindow qualification = VotingWindow.openQualification(tournamentId, epochId,
+            clusterId, "u4pu", 1, seeds(UUID.randomUUID(), UUID.randomUUID(), user1),
+            past, past.plusSeconds(60), past);
+        VotingWindow finalWindow = VotingWindow.openFinal(tournamentId, 1,
+            seeds(UUID.randomUUID(), UUID.randomUUID(), user1), past, past.plusSeconds(60), past);
+        repository.save(qualification);
+        repository.save(finalWindow);
+
+        assertThat(repository.findDueForCloseByScope(WindowScope.QUALIFICATION, OPENS, 10))
+            .containsExactly(qualification.id());
+        assertThat(repository.findDueForCloseByScope(WindowScope.FINAL, OPENS, 10))
+            .containsExactly(finalWindow.id());
+        assertThat(repository.findOpenByScope(tournamentId, WindowScope.FINAL))
+            .map(VotingWindow::id).contains(finalWindow.id());
+        assertThat(repository.findLatestByTournamentIdAndScope(tournamentId, WindowScope.FINAL))
+            .map(VotingWindow::id).contains(finalWindow.id());
+        assertThat(repository.findOpenByEpochId(epochId))
+            .extracting(VotingWindow::id).containsExactly(qualification.id());
+        assertThat(repository.findOpenByClusterId(clusterId))
+            .map(VotingWindow::id).contains(qualification.id());
+        assertThat(repository.countOpenByEpochId(epochId)).isEqualTo(1);
+
+        qualification.closeQualification(past.plusSeconds(60));
+        repository.save(qualification);
+        assertThat(repository.countOpenByEpochId(epochId)).isZero();
+        assertThat(repository.findOpenByClusterId(clusterId)).isEmpty();
     }
 
     private VotingWindow window(UUID user1, UUID entry1, UUID entry2) {

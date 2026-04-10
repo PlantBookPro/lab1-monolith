@@ -30,6 +30,12 @@
 | Субъект голосования | `VotingSubject` | tournaments | USER(userId) или GUEST(токен гостевой сессии) |
 | Дельта голоса | `VoteValue.transitionDelta` | tournaments | Изменение счёта при переходе голоса: +1/−1 новый, ±2 смена знака, 0 повтор, удаление — компенсация |
 | Эпоха отбора | `QualificationEpoch` | tournaments | Период глобального отбора с фиксированным составом |
+| Очередь глобального турнира | `EntryStatus.QUEUED` | tournaments | Принятая заявка, ожидающая следующей эпохи |
+| Квалификационное окно | `VotingWindow` scope QUALIFICATION | tournaments | Окно отбора одного кластера эпохи |
+| Финальное окно | `VotingWindow` scope FINAL | tournaments | Непрерывный финал глобального турнира |
+| Продвижение | `ParticipantResult.PROMOTED` | tournaments | Итог top-1 квалификации: проход в финал |
+| Снятие заявки | `TournamentEntry.withdraw()` | tournaments | QUEUED → WITHDRAWN до включения в окно |
 | Тег | `Tag` | tournaments | Тематика турнира (справочник); tagIds — параметры турнира (меняются только в DRAFT), удаление используемого тега запрещено |
 | Кластер, ячейка | `Cluster` / `ClusterSnapshot` | geo | Географическая группа участников эпохи |
+| Ячейка/ключ кластера | `clusterKey` (geohash) | geo | Обобщённое описание кластера наружу |
 | Лента | `Feed` | feed | Подборка карточек для голосования |

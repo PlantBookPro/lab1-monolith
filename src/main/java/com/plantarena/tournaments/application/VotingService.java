@@ -11,6 +11,7 @@ import com.plantarena.tournaments.domain.TournamentRepository;
 import com.plantarena.tournaments.domain.VoteValue;
 import com.plantarena.tournaments.domain.VotingSubject;
 import com.plantarena.tournaments.domain.VotingWindow;
+import com.plantarena.tournaments.domain.WindowScope;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
 import java.time.Clock;
 import java.util.Optional;
@@ -58,7 +59,7 @@ public class VotingService implements VotingUseCase {
         VotingSubject subject = subjectOf(actor);
         VoteValue voteValue = parseValue(value);
         VotingWindow window = lock(windowId);
-        requireVoter(actor, findTournament(window.tournamentId()));
+        requireVoter(actor, findTournament(window.tournamentId()), window);
         checkVote(window, entryId, actor);
         long score = window.castVote(subject, entryId, voteValue, clock.instant());
         windows.save(window);
@@ -70,7 +71,7 @@ public class VotingService implements VotingUseCase {
     public long remove(CurrentActor actor, UUID windowId, UUID entryId) {
         VotingSubject subject = subjectOf(actor);
         VotingWindow window = lock(windowId);
-        requireVoter(actor, findTournament(window.tournamentId()));
+        requireVoter(actor, findTournament(window.tournamentId()), window);
         checkVote(window, entryId, actor);
         long score = window.removeVote(subject, entryId, clock.instant());
         windows.save(window);
@@ -83,7 +84,7 @@ public class VotingService implements VotingUseCase {
         subjectOf(actor);
         VotingWindow window = windows.findById(windowId)
             .orElseThrow(() -> new WindowNotFoundException("Окно не найдено: " + windowId));
-        requireVoter(actor, findTournament(window.tournamentId()));
+        requireVoter(actor, findTournament(window.tournamentId()), window);
         if (!window.hasEntry(entryId)) {
             throw new EntryNotInWindowException("Участие не входит в окно: " + entryId);
         }
@@ -108,13 +109,19 @@ public class VotingService implements VotingUseCase {
         }
     }
 
-    private void requireVoter(CurrentActor actor, Tournament tournament) {
-        accessPolicy.requireTournamentViewer(actor, tournament,
-            visibleBeyondOrganizer(actor, tournament.id()));
-        if (!entries.existsByTournamentIdAndUserId(tournament.id(), actor.userId())) {
-            throw new AccessDeniedException(
-                "Голосовать может только участник, допущенный к старту (допущение 9)");
+    private void requireVoter(CurrentActor actor, Tournament tournament, VotingWindow window) {
+        if (window.scope() == WindowScope.PRIVATE) {
+            accessPolicy.requireTournamentViewer(actor, tournament,
+                visibleBeyondOrganizer(actor, tournament.id()));
+            if (!entries.existsByTournamentIdAndUserId(tournament.id(), actor.userId())) {
+                throw new AccessDeniedException(
+                    "Голосовать может только участник, допущенный к старту (допущение 9)");
+            }
+            return;
         }
+        // глобальные окна (раздел 2): любой идентифицированный пользователь;
+        // гость — 401 (GUEST — итерация 8)
+        accessPolicy.requireIdentified(actor);
     }
 
     private void checkVote(VotingWindow window, UUID entryId, CurrentActor actor) {

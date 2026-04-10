@@ -162,6 +162,28 @@ class VotingServiceTest {
     }
 
     @Test
+    @DisplayName("глобальное окно: посторонний идентифицированный голосует; сам — 403; гость — 401")
+    void глобальное_окно_права() {
+        tournaments.save(Tournament.global(GlobalCompetitionId.VALUE, organizer, NOW));
+        VotingWindow qualification = VotingWindow.openQualification(GlobalCompetitionId.VALUE,
+            UUID.randomUUID(), UUID.randomUUID(), "u4v2", 1,
+            java.util.List.of(new VotingWindow.ParticipantSeed(entry1, user1, NOW)),
+            NOW.minusSeconds(60), NOW.plusSeconds(3600), NOW.minusSeconds(60));
+        windows.save(qualification);
+
+        UUID stranger = UUID.randomUUID();
+        assertThat(service.cast(actor(stranger), qualification.id(), entry1, "LIKE"))
+            .isEqualTo(1L);
+        assertThat(service.myVote(actor(stranger), qualification.id(), entry1))
+            .contains("LIKE");
+        assertThatThrownBy(() -> service.cast(actor(user1), qualification.id(), entry1, "LIKE"))
+            .isInstanceOf(SelfVoteForbiddenException.class);
+        CurrentActor guest = new CurrentActor(null, Set.of(), true);
+        assertThatThrownBy(() -> service.cast(guest, qualification.id(), entry1, "LIKE"))
+            .isInstanceOf(com.plantarena.shared.security.NotIdentifiedException.class);
+    }
+
+    @Test
     @DisplayName("LIKE → DISLIKE даёт −2 (дельта применяется к счёту участника)")
     void смена_знака() {
         assertThat(service.cast(actor(user1), windowId, entry2, "LIKE")).isEqualTo(1L);

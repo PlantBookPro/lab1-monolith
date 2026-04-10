@@ -35,7 +35,7 @@ public class TournamentEntryJpaEntity {
     @Column(name = "reservation_id", nullable = false)
     private UUID reservationId;
 
-    @Column(name = "status", nullable = false, length = 10)
+    @Column(name = "status", nullable = false, length = 15)
     private String status;
 
     @Column(name = "joined_at", nullable = false)

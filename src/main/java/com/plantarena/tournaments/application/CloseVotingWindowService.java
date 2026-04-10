@@ -13,6 +13,7 @@ import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import com.plantarena.tournaments.domain.TournamentRepository;
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
+import com.plantarena.tournaments.domain.WindowScope;
 import com.plantarena.tournaments.domain.WindowStatus;
 import java.time.Instant;
 import java.util.Comparator;
@@ -82,6 +83,9 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
     private void closeOne(UUID windowId, Instant now) {
         VotingWindow window = windows.findByIdForUpdate(windowId)
             .orElseThrow(() -> new WindowNotFoundException("Окно не найдено: " + windowId));
+        if (window.scope() != WindowScope.PRIVATE) {
+            return; // глобальные окна закрывает AdvanceGlobalCompetitionService (раздел 8)
+        }
         if (window.status() != WindowStatus.OPEN || now.isBefore(window.closesAt())) {
             return; // уже закрыто (идемпотентность повтора) или ещё не due
         }

@@ -5,6 +5,7 @@ import com.plantarena.tournaments.domain.Tournament;
 import com.plantarena.tournaments.domain.TournamentRepository;
 import com.plantarena.tournaments.domain.TournamentRepository.TournamentFilter;
 import com.plantarena.tournaments.domain.TournamentStatus;
+import com.plantarena.tournaments.domain.TournamentType;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -89,6 +90,7 @@ public class InMemoryTournamentRepository implements TournamentRepository {
 
     private java.util.stream.Stream<Tournament> filtered(TournamentFilter filter) {
         return tournaments.values().stream()
+            .filter(tournament -> tournament.type() == TournamentType.PRIVATE)
             .filter(tournament -> filter.admin()
                 || filter.userId() == null // системный вызов без пользователя
                 || tournament.creatorId().equals(filter.userId())

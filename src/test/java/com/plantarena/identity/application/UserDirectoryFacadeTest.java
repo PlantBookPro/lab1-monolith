@@ -34,4 +34,21 @@ class UserDirectoryFacadeTest {
     void неизвестный_id_пустой_результат() {
         assertThat(facade.findById(UUID.randomUUID())).isEmpty();
     }
+
+    @Test
+    @DisplayName("findLocation: координаты и версия профиля; без координат — пусто")
+    void find_location_координаты_и_версия() {
+        User located = User.registerUser(new Email("geo@example.com"), "Geo", "hash");
+        located.moveTo(new com.plantarena.identity.domain.GeoPoint(55.7558, 37.6173));
+        repository.save(located);
+        User plain = User.registerUser(new Email("plain@example.com"), "Plain", "hash");
+        repository.save(plain);
+
+        UserDirectory.UserLocation location = facade.findLocation(located.id()).orElseThrow();
+        assertThat(location.latitude()).isEqualTo(55.7558);
+        assertThat(location.longitude()).isEqualTo(37.6173);
+        assertThat(location.locationVersion()).isEqualTo(located.version());
+        assertThat(facade.findLocation(plain.id())).isEmpty();
+        assertThat(facade.findLocation(UUID.randomUUID())).isEmpty();
+    }
 }
