@@ -2,6 +2,7 @@ package com.plantarena.tournaments.domain;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /** Порт репозитория агрегата TournamentEntry (уникальность пары — БД). */
@@ -24,4 +25,7 @@ public interface TournamentEntryRepository {
 
     /** Участия турнира в статусе (глобальная оркестрация, раздел 8). */
     List<TournamentEntry> findByTournamentIdAndStatus(UUID tournamentId, EntryStatus status);
+
+    /** Турниры, где пользователь был допущен к старту (лента, раздел 9). */
+    Set<UUID> findTournamentIdsByUserId(UUID userId);
 }

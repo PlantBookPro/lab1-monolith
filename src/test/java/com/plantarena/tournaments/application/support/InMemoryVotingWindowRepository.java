@@ -2,13 +2,16 @@ package com.plantarena.tournaments.application.support;
 
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
+import com.plantarena.tournaments.domain.WindowParticipant;
 import com.plantarena.tournaments.domain.WindowScope;
 import com.plantarena.tournaments.domain.WindowStatus;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -123,5 +126,21 @@ public class InMemoryVotingWindowRepository implements VotingWindowRepository {
             .filter(window -> epochId.equals(window.epochId())
                 && window.status() == WindowStatus.OPEN)
             .count();
+    }
+
+    @Override
+    public Set<UUID> findVotedEntryIdsInOpenWindows(String subjectKey) {
+        Set<UUID> voted = new HashSet<>();
+        for (VotingWindow window : windows.values()) {
+            if (window.status() != WindowStatus.OPEN) {
+                continue;
+            }
+            for (WindowParticipant participant : window.participants()) {
+                if (window.myVote(subjectKey, participant.entryId()) != null) {
+                    voted.add(participant.entryId());
+                }
+            }
+        }
+        return voted;
     }
 }

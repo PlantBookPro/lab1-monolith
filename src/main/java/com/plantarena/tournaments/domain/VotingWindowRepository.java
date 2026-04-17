@@ -3,6 +3,7 @@ package com.plantarena.tournaments.domain;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /** Порт репозитория агрегата VotingWindow (разделы 9, 12.1). */
@@ -49,4 +50,7 @@ public interface VotingWindowRepository {
 
     /** Сколько открытых окон осталось у эпохи (закрытие эпохи). */
     long countOpenByEpochId(UUID epochId);
+
+    /** Entry, оценённые субъектом в открытых окнах (лента, раздел 9). */
+    Set<UUID> findVotedEntryIdsInOpenWindows(String subjectKey);
 }

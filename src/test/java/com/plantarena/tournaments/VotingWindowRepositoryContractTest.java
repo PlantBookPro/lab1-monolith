@@ -186,6 +186,34 @@ public abstract class VotingWindowRepositoryContractTest {
         assertThat(repository.findOpenByClusterId(clusterId)).isEmpty();
     }
 
+    @Test
+    @DisplayName("findVotedEntryIdsInOpenWindows: только голоса субъекта в открытых окнах")
+    void голоса_субъекта_в_открытых_окнах() {
+        UUID user1 = UUID.randomUUID();
+        UUID user2 = UUID.randomUUID();
+        UUID entry1 = UUID.randomUUID();
+        UUID entry2 = UUID.randomUUID();
+        UUID entry3 = UUID.randomUUID();
+        UUID tournamentId = newTournamentId();
+        VotingWindow open = VotingWindow.open(tournamentId, 1, List.of(
+            new VotingWindow.ParticipantSeed(entry1, user1, OPENS),
+            new VotingWindow.ParticipantSeed(entry2, user2, OPENS)),
+            OPENS, CLOSES, OPENS);
+        open.castVote(VotingSubject.user(user1), entry2, VoteValue.LIKE, OPENS);
+        repository().save(open);
+        VotingWindow closed = VotingWindow.open(tournamentId, 2, List.of(
+            new VotingWindow.ParticipantSeed(entry1, user1, OPENS),
+            new VotingWindow.ParticipantSeed(entry3, user2, OPENS)),
+            OPENS, CLOSES, OPENS);
+        closed.castVote(VotingSubject.user(user1), entry3, VoteValue.DISLIKE, OPENS);
+        closed.close(CLOSES, new RoundElimination(), 0.5);
+        repository().save(closed);
+
+        assertThat(repository().findVotedEntryIdsInOpenWindows(
+                VotingSubject.user(user1).subjectKey()))
+            .containsExactly(entry2); // голос в закрытом окне не считается
+    }
+
     private VotingWindow window(UUID user1, UUID entry1, UUID entry2) {
         return VotingWindow.open(newTournamentId(), 1,
             seeds(entry1, entry2, user1), OPENS, CLOSES, OPENS);
