@@ -11,6 +11,10 @@ spring:
     open-in-view: false
   flyway:
     enabled: false # миграции по схемам контекстов выполняет config.SchemaMigrationConfig (ADR-003)
+  servlet:
+    multipart:
+      max-file-size: 10MB   # предел раздела 6; нарушение → 413 FILE_TOO_LARGE (MediaExceptionHandler)
+      max-request-size: 10MB
 
 server:
   port: ${SERVER_PORT:8080}
@@ -26,3 +30,6 @@ plantarena:
     email: ${BOOTSTRAP_ADMIN_EMAIL:}
     password: ${BOOTSTRAP_ADMIN_PASSWORD:}
     display-name: ${BOOTSTRAP_ADMIN_DISPLAY_NAME:Admin}
+  media:
+    storage:
+      root: ${MEDIA_STORAGE_ROOT:./storage/media} # Docker volume; file-service/S3 — лаба №4

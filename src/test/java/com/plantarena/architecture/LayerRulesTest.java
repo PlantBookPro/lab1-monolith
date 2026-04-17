@@ -1,5 +1,7 @@
 package com.plantarena.architecture;
 
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
@@ -70,11 +72,23 @@ public class LayerRulesTest {
 
     @ArchTest
     static void контроллеры_не_обращаются_к_домену_и_репозиториям(JavaClasses classes) {
+        // Раздел 13: доменные исключения (Throwable) переводятся в ProblemDetail-подобное
+        // тело advice-классами adapter.in.web — это не доступ к доменной логике.
+        // Запрещено всё из domain, кроме исключений, и весь adapter.out.persistence.
+        DescribedPredicate<JavaClass> domainExceptExceptions =
+            JavaClass.Predicates.resideInAnyPackage("com.plantarena..domain..")
+                .and(new DescribedPredicate<JavaClass>("не являются исключениями") {
+                    @Override
+                    public boolean test(JavaClass javaClass) {
+                        return !javaClass.isAssignableTo(Throwable.class);
+                    }
+                });
+        DescribedPredicate<JavaClass> forbidden =
+            domainExceptExceptions.or(JavaClass.Predicates.resideInAnyPackage(
+                "com.plantarena..adapter.out.persistence.."));
         noClasses()
             .that().resideInAPackage("com.plantarena..adapter.in.web..")
-            .should().dependOnClassesThat().resideInAnyPackage(
-                "com.plantarena..domain..",
-                "com.plantarena..adapter.out.persistence..")
+            .should().dependOnClassesThat(forbidden)
             .check(classes);
 
         noClasses()
