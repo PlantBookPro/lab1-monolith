@@ -110,7 +110,32 @@ minParticipants → RUNNING (участия ACTIVE, не-READY → EXPIRED, ре
   (sequence + 1, выжившие, счёт с нуля).
 - Раунды и итоги — `GET /api/v1/tournaments/{id}/rounds|leaderboard|results`
   (организатор/админ или приглашённый/участник; X-Total-Count).
-- Глобальный турнир и geo-кластеры — итерация 7.
+
+## Глобальный турнир (global)
+
+Постоянный глобальный турнир (раздел 8): заявка `POST /api/v1/global/entries`
+(своё APPROVED-растение, координаты в профиле обязательны — `PUT /me/location`;
+одно активное участие на пользователя) → очередь → эпоха отбора раз в
+`plantarena.global.epoch-duration` (по умолчанию 24 ч): гео-кластеры
+(geohash, `plantarena.geo.geohash-precision`), квалификационное окно на
+непустой кластер. Закрытие: top-1 — в финал (PROMOTED), остальные — гибель +
+суточный запрет совпавшей картинки (COOLDOWN 24 ч, `retryAt`) + освобождение
+резерва. Финал — непрерывные окна `final-window-duration`: из n ≥ 2 выбывает
+max(1, floor(n/2)) худших, единственный лидер остаётся; новых финалистов
+включает следующее окно. Порядок одновременных границ фиксирован (алгоритм 6);
+scheduler идемпотентен — рестарт не убивает повторно (ADR-012).
+
+- Конфигурация и текущие окна — `GET /api/v1/global` (публично).
+- Кластеры эпохи — `GET /api/v1/global/clusters`; отбор кластера —
+  `GET /api/v1/global/clusters/{id}/leaderboard`; финал —
+  `GET /api/v1/global/leaderboard?scope=FINAL` (scope, windowId, closesAt, asOf).
+- Своё участие — `GET /api/v1/me/global-entry`; снятие из очереди —
+  `DELETE /api/v1/global/entries/{id}` (только QUEUED, иначе 409).
+- Голосовать в глобальных окнах может любой идентифицированный пользователь
+  (гость — итерация 8); самоголосование запрещено.
+- Диагностика: `POST /api/v1/internal/demo/jobs/run-due` дополнительно
+  продвигает границы (ответ: globalQualificationClosed/globalFinalClosed/
+  globalFinalsOpened/globalEpochsOpened).
 
 ## Голосование (voting)
 
