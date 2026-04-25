@@ -167,4 +167,20 @@ public final class Invitation {
     public long version() {
         return version;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Invitation other)) {
+            return false;
+        }
+        return id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

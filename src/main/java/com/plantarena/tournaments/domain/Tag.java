@@ -50,4 +50,20 @@ public final class Tag {
     public Instant createdAt() {
         return createdAt;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Tag other)) {
+            return false;
+        }
+        return id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }
