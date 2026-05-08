@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,29 @@ class FeedApiIT extends AbstractIntegrationTest {
         }
     }
 
+    /**
+     * Свежий мир на каждый тест (раздел 9): глобальный турнир — синглтон, и
+     * открытая эпоха (PT2M) не даст следующему тесту открыть свою — чистим
+     * мир турниров/проекции целиком, как контрактные IT (урок итерации 2).
+     */
+    @BeforeEach
+    void очистить_мир_турниров() {
+        jdbcTemplate.update("delete from feed.feed_card");
+        jdbcTemplate.update("delete from tournaments.vote");
+        jdbcTemplate.update("delete from tournaments.window_participant");
+        jdbcTemplate.update("delete from tournaments.voting_window");
+        jdbcTemplate.update("delete from geo.cluster_member");
+        jdbcTemplate.update("delete from geo.cluster_snapshot");
+        jdbcTemplate.update("delete from tournaments.qualification_epoch");
+        jdbcTemplate.update("delete from tournaments.tournament_tag");
+        jdbcTemplate.update("delete from tournaments.invitation");
+        jdbcTemplate.update("delete from tournaments.tournament_entry");
+        // глобальный турнир — синглтон (bootstrap): строка остаётся, мир вокруг чист
+        jdbcTemplate.update("delete from tournaments.tournament where id <> '"
+            + "00000007-10ba-4000-8000-000000000001'");
+        jdbcTemplate.update("delete from tournaments.tag");
+    }
+
     @Test
     @DisplayName("лента пользователя смешивает глобальные и закрытый турнир; гость и посторонний — только глобальные; без total")
     void лента_смешивает_и_фильтрует_по_правам() throws Exception {
@@ -135,7 +159,7 @@ class FeedApiIT extends AbstractIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(header().doesNotExist("X-Total-Count"))
             .andExpect(jsonPath("$.hasNext").value(false))
-            .andExpect(jsonPath("$.nextCursor").value(nullValue()))
+            .andExpect(jsonPath("$.nextCursor").doesNotExist())
             .andReturn().getResponse().getContentAsString();
         assertThat(entryIds(guestFeed)).containsExactlyInAnyOrder(e2.toString(), e3.toString());
     }
@@ -158,19 +182,20 @@ class FeedApiIT extends AbstractIntegrationTest {
 
         String token = createGuestSession();
         String votePath = "/api/v1/windows/" + windowId + "/entries/" + e2 + "/vote";
+        String myVotePath = "/api/v1/windows/" + windowId + "/entries/" + e2 + "/my-vote";
 
         // LIKE → 1; смена на DISLIKE → −1 (дельта −2); удаление → 0 (раздел 9)
         mockMvc.perform(put(votePath).header(GUEST_TOKEN_HEADER, token)
                 .contentType(MediaType.APPLICATION_JSON).content("{\"value\":\"LIKE\"}"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.score").value(1));
-        mockMvc.perform(get(votePath + "/my-vote").header(GUEST_TOKEN_HEADER, token))
+        mockMvc.perform(get(myVotePath).header(GUEST_TOKEN_HEADER, token))
             .andExpect(status().isOk()).andExpect(jsonPath("$.value").value("LIKE"));
         mockMvc.perform(put(votePath).header(GUEST_TOKEN_HEADER, token)
                 .contentType(MediaType.APPLICATION_JSON).content("{\"value\":\"DISLIKE\"}"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.score").value(-1));
         mockMvc.perform(delete(votePath).header(GUEST_TOKEN_HEADER, token))
             .andExpect(status().isNoContent());
-        mockMvc.perform(get(votePath + "/my-vote").header(GUEST_TOKEN_HEADER, token))
+        mockMvc.perform(get(myVotePath).header(GUEST_TOKEN_HEADER, token))
             .andExpect(status().isOk()).andExpect(jsonPath("$.value").value(nullValue()));
 
         // без токена и с неизвестным токеном — 401
@@ -187,7 +212,7 @@ class FeedApiIT extends AbstractIntegrationTest {
                 .header(GUEST_TOKEN_HEADER, token)
                 .contentType(MediaType.APPLICATION_JSON).content("{\"value\":\"LIKE\"}"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.score").value(1));
-        mockMvc.perform(get(votePath + "/my-vote").header(DEMO_HEADER, stranger.toString()))
+        mockMvc.perform(get(myVotePath).header(DEMO_HEADER, stranger.toString()))
             .andExpect(status().isOk()).andExpect(jsonPath("$.value").value("LIKE"));
 
         // закрытое окно для гостя — 404 (турнир скрыт, раздел 13)
@@ -220,9 +245,14 @@ class FeedApiIT extends AbstractIntegrationTest {
         setLocation(u1, LAT_MOSCOW, LON_MOSCOW);
         setLocation(u2, LAT_MOSCOW, LON_MOSCOW);
         setLocation(u3, LAT_SPB, LON_SPB);
-        submitGlobalEntry(u1, approvedPlantOf(u1, "Фикус u1"));
-        submitGlobalEntry(u2, approvedPlantOf(u2, "Фикус u2"));
-        submitGlobalEntry(u3, approvedPlantOf(u3, "Фикус u3"));
+        // растения пре-апрувятся до подач: иначе шедулер границ (fixedDelay 2с)
+        // откроет эпоху между подачами — и оставшиеся заявки застрянут в QUEUED
+        UUID p1 = approvedPlantOf(u1, "Фикус u1");
+        UUID p2 = approvedPlantOf(u2, "Фикус u2");
+        UUID p3 = approvedPlantOf(u3, "Фикус u3");
+        submitGlobalEntry(u1, p1);
+        submitGlobalEntry(u2, p2);
+        submitGlobalEntry(u3, p3);
         awaitGlobalCards(3);
 
         // u4 — участник закрытого (u4+u5): 4-я карточка
@@ -252,7 +282,7 @@ class FeedApiIT extends AbstractIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.items.length()").value(2))
             .andExpect(jsonPath("$.hasNext").value(false))
-            .andExpect(jsonPath("$.nextCursor").value(nullValue()))
+            .andExpect(jsonPath("$.nextCursor").doesNotExist())
             .andReturn().getResponse().getContentAsString();
 
         Set<String> union = Set.copyOf(entryIds(page1));
@@ -292,9 +322,14 @@ class FeedApiIT extends AbstractIntegrationTest {
         setLocation(u1, LAT_MOSCOW, LON_MOSCOW);
         setLocation(u2, LAT_MOSCOW, LON_MOSCOW);
         setLocation(u3, LAT_SPB, LON_SPB);
-        UUID e1 = submitGlobalEntry(u1, approvedPlantOf(u1, "Фикус u1"));
-        UUID e2 = submitGlobalEntry(u2, approvedPlantOf(u2, "Фикус u2"));
-        UUID e3 = submitGlobalEntry(u3, approvedPlantOf(u3, "Фикус u3"));
+        // растения пре-апрувятся до подач: иначе шедулер границ (fixedDelay 2с)
+        // откроет эпоху между подачами — и оставшиеся заявки застрянут в QUEUED
+        UUID p1 = approvedPlantOf(u1, "Фикус u1");
+        UUID p2 = approvedPlantOf(u2, "Фикус u2");
+        UUID p3 = approvedPlantOf(u3, "Фикус u3");
+        UUID e1 = submitGlobalEntry(u1, p1);
+        UUID e2 = submitGlobalEntry(u2, p2);
+        UUID e3 = submitGlobalEntry(u3, p3);
         awaitGlobalCards(3);
 
         UUID u4 = newUser("cut-u4@example.com", "Cut4");
@@ -334,7 +369,7 @@ class FeedApiIT extends AbstractIntegrationTest {
             .andExpect(jsonPath("$.items.length()").value(1))
             .andExpect(jsonPath("$.hasNext").value(false))
             .andReturn().getResponse().getContentAsString();
-        Set<String> continuation = Set.copyOf(entryIds(page1));
+        Set<String> continuation = new java.util.HashSet<>(entryIds(page1));
         continuation.addAll(entryIds(page2));
         assertThat(continuation).isEqualTo(before); // новые не появились, старые не потеряны
 
@@ -416,15 +451,16 @@ class FeedApiIT extends AbstractIntegrationTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         List<Map<String, Object>> mine = JsonPath.read(body,
-            "$.items[?(@.userId == '" + user + "')]");
+            "$[?(@.userId == '" + user + "')]");
         assertThat(mine).hasSize(1);
         return UUID.fromString((String) mine.get(0).get("id"));
     }
 
     private String createGuestSession() throws Exception {
-        return mockMvc.perform(post("/api/v1/guest-sessions"))
+        String body = mockMvc.perform(post("/api/v1/guest-sessions"))
             .andExpect(status().isCreated())
             .andReturn().getResponse().getContentAsString();
+        return JsonPath.read(body, "$.token");
     }
 
     private void awaitGlobalCards(int expected) throws Exception {
@@ -450,7 +486,13 @@ class FeedApiIT extends AbstractIntegrationTest {
                         roundDurationSeconds)))
             .andExpect(status().isCreated())
             .andReturn().getResponse().getContentAsString();
-        return UUID.fromString(JsonPath.read(body, "$.id"));
+        UUID tournamentId = UUID.fromString(JsonPath.read(body, "$.id"));
+        // DRAFT → REGISTRATION_OPEN: без этого accept приглашений — 409 REGISTRATION_CLOSED
+        mockMvc.perform(post("/api/v1/tournaments/" + tournamentId + "/open-registration")
+                .header(DEMO_HEADER, adminId().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value("REGISTRATION_OPEN"));
+        return tournamentId;
     }
 
     private void invite(UUID tournamentId, UUID userId) throws Exception {
@@ -466,7 +508,7 @@ class FeedApiIT extends AbstractIntegrationTest {
                 .header(DEMO_HEADER, user.toString()))
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
-        UUID invitationId = UUID.fromString(JsonPath.read(mine, "$.items[0].id"));
+        UUID invitationId = UUID.fromString(JsonPath.read(mine, "$[0].id"));
         mockMvc.perform(post("/api/v1/invitations/" + invitationId + "/accept")
                 .header(DEMO_HEADER, user.toString())
                 .contentType(MediaType.APPLICATION_JSON)

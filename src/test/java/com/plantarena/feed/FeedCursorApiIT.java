@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.UUID;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,29 @@ class FeedCursorApiIT extends AbstractIntegrationTest {
         }
     }
 
+    /**
+     * Свежий мир на каждый тест (раздел 9): глобальный турнир — синглтон, и
+     * открытая эпоха (PT2M) не даст следующему тесту открыть свою — чистим
+     * мир турниров/проекции целиком, как контрактные IT (урок итерации 2).
+     */
+    @BeforeEach
+    void очистить_мир_турниров() {
+        jdbcTemplate.update("delete from feed.feed_card");
+        jdbcTemplate.update("delete from tournaments.vote");
+        jdbcTemplate.update("delete from tournaments.window_participant");
+        jdbcTemplate.update("delete from tournaments.voting_window");
+        jdbcTemplate.update("delete from geo.cluster_member");
+        jdbcTemplate.update("delete from geo.cluster_snapshot");
+        jdbcTemplate.update("delete from tournaments.qualification_epoch");
+        jdbcTemplate.update("delete from tournaments.tournament_tag");
+        jdbcTemplate.update("delete from tournaments.invitation");
+        jdbcTemplate.update("delete from tournaments.tournament_entry");
+        // глобальный турнир — синглтон (bootstrap): строка остаётся, мир вокруг чист
+        jdbcTemplate.update("delete from tournaments.tournament where id <> '"
+            + "00000007-10ba-4000-8000-000000000001'");
+        jdbcTemplate.update("delete from tournaments.tag");
+    }
+
     @Test
     @DisplayName("невалидный курсор — 400 FEED_CURSOR_INVALID")
     void невалидный_курсор() throws Exception {
@@ -84,7 +108,8 @@ class FeedCursorApiIT extends AbstractIntegrationTest {
             .andReturn().getResponse().getContentAsString();
         String cursor = JsonPath.read(page1, "$.nextCursor");
 
-        Awaitility.await().atLeast(Duration.ofSeconds(3)).until(() -> true); // TTL 2 секунды истёк
+        // TTL 2 секунды истёк: pollDelay держит ожидание минимум 3 секунды
+        Awaitility.await().pollDelay(Duration.ofSeconds(3)).until(() -> true);
 
         mockMvc.perform(get("/api/v1/feed")
                 .header(DEMO_HEADER, user.toString()).queryParam("cursor", cursor))
@@ -99,15 +124,19 @@ class FeedCursorApiIT extends AbstractIntegrationTest {
 
     // ---------- helpers ----------
 
-    /** Пользователь с двумя глобальными карточками в ленте (для limit=1 → hasNext). */
+    /** Зритель с двумя глобальными карточками в ленте (для limit=1 → hasNext). */
     private UUID newUserWithGlobalCard() throws Exception {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         UUID u1 = newUser("cursor-u1-" + suffix + "@example.com", "Cursor1");
         UUID u2 = newUser("cursor-u2-" + suffix + "@example.com", "Cursor2");
         putLocation(u1);
         putLocation(u2);
-        submitGlobal(u1);
-        submitGlobal(u2);
+        // растения пре-апрувятся до подач: иначе шедулер границ (fixedDelay 2с)
+        // откроет эпоху между подачами — и вторая заявка застрянет в QUEUED
+        UUID p1 = approvedPlantOf(u1);
+        UUID p2 = approvedPlantOf(u2);
+        submitGlobal(u1, p1);
+        submitGlobal(u2, p2);
         Awaitility.await().atMost(Duration.ofSeconds(20)).pollInterval(Duration.ofMillis(500))
             .untilAsserted(() -> {
                 runDue();
@@ -115,7 +144,8 @@ class FeedCursorApiIT extends AbstractIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.items.length()").value(2));
             });
-        return u1;
+        // зритель без своих карточек: своя карточка из ленты исключается (раздел 9)
+        return newUser("cursor-viewer-" + suffix + "@example.com", "Viewer");
     }
 
     private void putLocation(UUID user) throws Exception {
@@ -126,7 +156,15 @@ class FeedCursorApiIT extends AbstractIntegrationTest {
             .andExpect(status().isOk());
     }
 
-    private void submitGlobal(UUID user) throws Exception {
+    private void submitGlobal(UUID user, UUID plantId) throws Exception {
+        mockMvc.perform(post("/api/v1/global/entries")
+                .header(DEMO_HEADER, user.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"plantId\":\"%s\"}".formatted(plantId)))
+            .andExpect(status().isCreated());
+    }
+
+    private UUID approvedPlantOf(UUID user) throws Exception {
         UUID assetId = uploadGreen(user);
         String plantBody = mockMvc.perform(post("/api/v1/plants")
                 .header(DEMO_HEADER, user.toString())
@@ -142,11 +180,7 @@ class FeedCursorApiIT extends AbstractIntegrationTest {
                         .header(DEMO_HEADER, user.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.moderationStatus").value("APPROVED")));
-        mockMvc.perform(post("/api/v1/global/entries")
-                .header(DEMO_HEADER, user.toString())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"plantId\":\"%s\"}".formatted(plantId)))
-            .andExpect(status().isCreated());
+        return plantId;
     }
 
     private UUID uploadGreen(UUID user) throws Exception {

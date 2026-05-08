@@ -127,10 +127,19 @@ class FeedServiceTest {
         GetFeedUseCase.FeedPage page2 = service.get(
             com.plantarena.shared.security.CurrentActor.identified(viewer, Set.of()),
             null, 2, page1.nextCursor());
-        assertThat(page2.items()).extracting(GetFeedUseCase.FeedItem::entryId)
-            .containsExactly(idOf("g3"));
+        // порядок псевдослучайный (seed): продолжение — оставшаяся карточка,
+        // без повторов и пропусков (keyset), а не конкретный id
+        assertThat(page2.items()).hasSize(1);
         assertThat(page2.hasNext()).isFalse();
         assertThat(page2.nextCursor()).isNull();
+        Set<UUID> page1Ids = page1.items().stream()
+            .map(GetFeedUseCase.FeedItem::entryId).collect(java.util.stream.Collectors.toSet());
+        Set<UUID> page2Ids = page2.items().stream()
+            .map(GetFeedUseCase.FeedItem::entryId).collect(java.util.stream.Collectors.toSet());
+        assertThat(page1Ids).doesNotContainAnyElementsOf(page2Ids);
+        Set<UUID> union = new java.util.HashSet<>(page1Ids);
+        union.addAll(page2Ids);
+        assertThat(union).containsExactlyInAnyOrder(idOf("g1"), idOf("g2"), idOf("g3"));
     }
 
     @Test

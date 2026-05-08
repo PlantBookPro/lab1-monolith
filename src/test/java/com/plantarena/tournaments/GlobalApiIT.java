@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,29 @@ class GlobalApiIT extends AbstractIntegrationTest {
         PlantClassifier deterministicPlantClassifier() {
             return new DeterministicPlantClassifier();
         }
+    }
+
+    /**
+     * Свежий мир на каждый тест: глобальный турнир — синглтон, и открытая
+     * эпоха (например, PT2M от ленточных IT того же JVM) не даст открыть
+     * свою — чистим мир турниров/проекции, как контрактные IT.
+     */
+    @BeforeEach
+    void очистить_мир_турниров() {
+        jdbcTemplate.update("delete from feed.feed_card");
+        jdbcTemplate.update("delete from tournaments.vote");
+        jdbcTemplate.update("delete from tournaments.window_participant");
+        jdbcTemplate.update("delete from tournaments.voting_window");
+        jdbcTemplate.update("delete from geo.cluster_member");
+        jdbcTemplate.update("delete from geo.cluster_snapshot");
+        jdbcTemplate.update("delete from tournaments.qualification_epoch");
+        jdbcTemplate.update("delete from tournaments.tournament_tag");
+        jdbcTemplate.update("delete from tournaments.invitation");
+        jdbcTemplate.update("delete from tournaments.tournament_entry");
+        // глобальный турнир — синглтон (bootstrap): строка остаётся
+        jdbcTemplate.update("delete from tournaments.tournament where id <> '"
+            + "00000007-10ba-4000-8000-000000000001'");
+        jdbcTemplate.update("delete from tournaments.tag");
     }
 
     @Test
