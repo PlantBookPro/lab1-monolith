@@ -8,14 +8,20 @@ import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Контракт MediaAssetRepository (раздел 14.2): одинаковые гарантии у in-memory
  * фейка (application-тесты) и JPA + PostgreSQL (adapter-тесты) — честность фейка.
+ *
+ * <p>@Transactional обязателен на самом базовом классе: аннотация из @DataJpaTest
+ * на подклассе не применяется к наследуемым тест-методам, и без неё JPA-контрактные
+ * тесты протекали бы в общую БД между контекстами (см. UserRepositoryContractTest).
  */
 @DisplayName("Контракт MediaAssetRepository")
+@Transactional
 public abstract class MediaAssetRepositoryContractTest {
 
     protected abstract MediaAssetRepository repository();

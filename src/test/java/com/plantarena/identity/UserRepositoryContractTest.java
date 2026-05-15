@@ -12,14 +12,21 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Контракт порта UserRepository (раздел 14.2): fake и JPA-адаптер ведут себя
  * одинаково. Сравнение по полям — доменные объекты не переопределяют equals.
+ *
+ * <p>@Transactional обязателен на самом базовом классе: аннотация из @DataJpaTest
+ * на подклассе не применяется к наследуемым тест-методам (Spring ищет её от метода
+ * вверх по иерархии объявившего класса), и без неё JPA-контрактные тесты писали бы
+ * в общей БД в auto-commit, протекая между контекстами.
  */
 @DisplayName("Контракт UserRepository: fake и JPA ведут себя одинаково")
+@Transactional
 public abstract class UserRepositoryContractTest {
 
     protected abstract UserRepository repository();
