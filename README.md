@@ -16,6 +16,12 @@ docker compose up --build
 # Swagger UI: http://localhost:8080/swagger-ui/index.html
 ```
 
+## Демо-сценарии
+
+Пошаговый порядок демонстрации всех сценариев через Swagger UI:
+[`docs/demo/scenarios.md`](docs/demo/scenarios.md) — от запуска и
+bootstrap-админа до ленты и гостевых сессий.
+
 ## Демо-идентификация (ADR-005)
 
 В профилях `dev`/`test` пользователь передаётся заголовком `X-Demo-User-Id: <UUID>`
