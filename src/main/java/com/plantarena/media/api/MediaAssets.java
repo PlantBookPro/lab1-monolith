@@ -11,4 +11,7 @@ import java.util.UUID;
 public interface MediaAssets {
 
     Optional<MediaAssetData> findById(UUID assetId);
+
+    /** Байты файла по id для внутреннего потребителя (moderation, ADR-009). */
+    Optional<MediaContent> loadContent(UUID assetId);
 }
