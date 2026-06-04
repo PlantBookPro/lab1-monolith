@@ -1,0 +1,10 @@
+# Профиль test (IT на Testcontainers): пул Hikari уменьшен — каждый
+# кэшированный Spring-контекст IT держит максимум пула соединений открытым,
+# а контейнер PostgreSQL один на JVM (PostgresSupport, singleton) с
+# max_connections=100 по умолчанию; ~15 контекстов × 10 соединений
+# исчерпывают лимит («FATAL: sorry, too many clients already»).
+# IT последовательны (MockMvc + poller), 4 соединений на контекст достаточно.
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 4
