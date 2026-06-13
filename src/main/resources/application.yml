@@ -33,3 +33,5 @@ plantarena:
   media:
     storage:
       root: ${MEDIA_STORAGE_ROOT:./storage/media} # Docker volume; file-service/S3 — лаба №4
+  moderation:
+    model-path: ${MODERATION_MODEL_PATH:target/models/mobilenetv2-1.0.onnx} # MobileNetV2 ONNX, ADR-009
