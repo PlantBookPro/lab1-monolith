@@ -11,8 +11,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * JPA-модель tournament_entry (раздел 11): создаётся при старте, в итерации 5
- * не мутирует (переходы — итерация 6) — без version.
+ * JPA-модель tournament_entry (раздел 11): создаётся при старте; статус
+ * мутирует с итерации 6 (eliminate/winner при закрытии окон) — без version
+ * (писатель один: закрытие окна под FOR UPDATE).
  */
 @Entity
 @Table(name = "tournament_entry", schema = "tournaments")
@@ -80,5 +81,9 @@ public class TournamentEntryJpaEntity {
 
     public Instant getJoinedAt() {
         return joinedAt;
+    }
+
+    void setStatus(String status) {
+        this.status = status;
     }
 }

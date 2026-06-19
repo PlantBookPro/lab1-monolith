@@ -42,6 +42,9 @@ class JpaInvitationRepositoryContractIT extends InvitationRepositoryContractTest
 
     @BeforeEach
     void очистить_приглашения_от_предыдущих_контекстов() {
+        jdbcTemplate.update("delete from tournaments.vote");
+        jdbcTemplate.update("delete from tournaments.window_participant");
+        jdbcTemplate.update("delete from tournaments.voting_window");
         jdbcTemplate.update("delete from tournaments.tournament_tag");
         jdbcTemplate.update("delete from tournaments.invitation");
         jdbcTemplate.update("delete from tournaments.tournament_entry");

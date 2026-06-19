@@ -3,6 +3,7 @@ package com.plantarena.tournaments.adapter.in.web;
 import com.plantarena.shared.security.CurrentActor;
 import com.plantarena.shared.security.CurrentActorProvider;
 import com.plantarena.tournaments.application.TournamentsAccessPolicy;
+import com.plantarena.tournaments.application.port.in.CloseVotingWindowUseCase;
 import com.plantarena.tournaments.application.port.in.StartTournamentUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,14 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class DemoJobsController {
 
     private final StartTournamentUseCase startTournament;
+    private final CloseVotingWindowUseCase closeVotingWindow;
     private final TournamentsAccessPolicy accessPolicy;
     private final CurrentActorProvider currentActorProvider;
     private final Clock clock;
 
     public DemoJobsController(StartTournamentUseCase startTournament,
+                              CloseVotingWindowUseCase closeVotingWindow,
                               TournamentsAccessPolicy accessPolicy,
                               CurrentActorProvider currentActorProvider, Clock clock) {
         this.startTournament = startTournament;
+        this.closeVotingWindow = closeVotingWindow;
         this.accessPolicy = accessPolicy;
         this.currentActorProvider = currentActorProvider;
         this.clock = clock;
@@ -41,10 +45,12 @@ public class DemoJobsController {
 
     @PostMapping("/run-due")
     @Operation(operationId = "demo-run-due-jobs",
-        summary = "Обработать наступившие дедлайны турниров (dev/test, M/A)")
+        summary = "Обработать наступившие дедлайны турниров и окон (dev/test, M/A)")
     public Map<String, Integer> runDue() {
         CurrentActor actor = currentActorProvider.currentActor();
         accessPolicy.requireModeratorOrAdmin(actor);
-        return Map.of("processed", startTournament.startDue(clock.instant(), 10));
+        return Map.of(
+            "processed", startTournament.startDue(clock.instant(), 10),
+            "closedWindows", closeVotingWindow.closeDue(clock.instant(), 10));
     }
 }

@@ -5,6 +5,7 @@ import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -61,5 +62,10 @@ public class InMemoryTournamentEntryRepository implements TournamentEntryReposit
         return entries.values().stream()
             .anyMatch(entry -> entry.tournamentId().equals(tournamentId)
                 && entry.userId().equals(userId));
+    }
+
+    @Override
+    public Optional<TournamentEntry> findById(UUID id) {
+        return Optional.ofNullable(entries.get(id));
     }
 }

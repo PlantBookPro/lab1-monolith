@@ -1,5 +1,6 @@
 package com.plantarena.tournaments;
 
+import com.plantarena.tournaments.domain.EntryStatus;
 import com.plantarena.tournaments.domain.Tournament;
 import com.plantarena.tournaments.domain.TournamentEntry;
 import com.plantarena.tournaments.domain.TournamentEntryRepository;
@@ -49,6 +50,36 @@ public abstract class TournamentEntryRepositoryContractTest {
         assertThat(repository().existsByTournamentIdAndUserId(tournamentId, userId)).isTrue();
         assertThat(repository().existsByTournamentIdAndUserId(tournamentId,
             UUID.randomUUID())).isFalse();
+    }
+
+    @Test
+    @DisplayName("findById возвращает сохранённое участие")
+    void findById_возвращает_сохранённое_участие() {
+        UUID tournamentId = newTournamentId();
+        TournamentEntry entry = TournamentEntry.admit(tournamentId, UUID.randomUUID(),
+            UUID.randomUUID(), UUID.randomUUID(), NOW);
+        repository().save(entry);
+
+        assertThat(repository().findById(entry.id())).isPresent();
+        assertThat(repository().findById(entry.id()).orElseThrow().userId())
+            .isEqualTo(entry.userId());
+    }
+
+    @Test
+    @DisplayName("save после eliminate не теряет статус (перезагрузка видит ELIMINATED)")
+    void save_сохраняет_статус_участия() {
+        UUID tournamentId = newTournamentId();
+        TournamentEntry entry = TournamentEntry.admit(tournamentId, UUID.randomUUID(),
+            UUID.randomUUID(), UUID.randomUUID(), NOW);
+        repository().save(entry);
+        assertThat(repository().findById(entry.id()).orElseThrow().status())
+            .isEqualTo(EntryStatus.ACTIVE);
+
+        entry.eliminate();
+        repository().save(entry);
+
+        assertThat(repository().findById(entry.id()).orElseThrow().status())
+            .isEqualTo(EntryStatus.ELIMINATED);
     }
 
     @Test
