@@ -94,7 +94,7 @@ public class ContextBoundaryTest {
     }
 
     @ArchTest
-    static void только_config_знает_несколько_контекстов_одновременно(JavaClasses classes) {
+    static void только_config_и_acl_адаптеры_знают_несколько_контекстов(JavaClasses classes) {
         classes.stream()
             .filter(javaClass -> javaClass.getPackageName().startsWith("com.plantarena"))
             .filter(javaClass -> !javaClass.getPackageName().startsWith("com.plantarena.config"))
@@ -104,10 +104,41 @@ public class ContextBoundaryTest {
                     .map(ContextBoundaryTest::contextOf)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
-                assertThat(dependedContexts)
-                    .as("класс %s зависит от нескольких контекстов одновременно", javaClass.getName())
-                    .hasSizeLessThanOrEqualTo(1);
+                if (isAclAdapter(javaClass.getPackageName())) {
+                    // ACL-адаптер (раздел 4.3, Customer–Supplier): свой контекст
+                    // + upstream из ALLOWED_UPSTREAM, чужой контекст — только api
+                    // (правило адаптеров выше). Больше никому несколько контекстов.
+                    String own = ownContextOf(javaClass.getPackageName());
+                    assertThat(dependedContexts)
+                        .as("ACL-адаптер %s выходит за свой контекст и допустимый upstream",
+                            javaClass.getName())
+                        .isSubsetOf(allowedFor(own));
+                } else {
+                    assertThat(dependedContexts)
+                        .as("класс %s зависит от нескольких контекстов одновременно",
+                            javaClass.getName())
+                        .hasSizeLessThanOrEqualTo(1);
+                }
             });
+    }
+
+    /** adapter.out — выходные адаптеры: ACL к чужим контекстам живут здесь. */
+    private static boolean isAclAdapter(String packageName) {
+        return ownContextOf(packageName) != null
+            && packageName.matches("com\\.plantarena\\.(\\w+)\\.adapter\\.out\\..*");
+    }
+
+    private static String ownContextOf(String packageName) {
+        return CONTEXTS.stream()
+            .filter(context -> packageName.startsWith("com.plantarena." + context + "."))
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static Set<String> allowedFor(String ownContext) {
+        Set<String> allowed = new java.util.HashSet<>(ALLOWED_UPSTREAM.get(ownContext));
+        allowed.add(ownContext);
+        return allowed;
     }
 
     private static String contextOf(String packageName) {

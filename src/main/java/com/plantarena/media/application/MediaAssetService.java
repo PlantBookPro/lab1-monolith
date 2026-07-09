@@ -1,10 +1,13 @@
 package com.plantarena.media.application;
 
+import com.plantarena.media.api.AssetInUseException;
 import com.plantarena.media.application.port.in.DeleteMediaUseCase;
 import com.plantarena.media.application.port.in.DownloadMediaUseCase;
 import com.plantarena.media.application.port.in.UploadMediaUseCase;
+import com.plantarena.media.application.port.out.AssetClaimRepository;
 import com.plantarena.media.application.port.out.MediaAssetRepository;
 import com.plantarena.media.domain.AnalyzedImage;
+import com.plantarena.media.domain.AssetClaim;
 import com.plantarena.media.domain.FileStorage;
 import com.plantarena.media.domain.ImageAnalyzer;
 import com.plantarena.media.domain.ImageFingerprint;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Service;
  * Use cases media (раздел 6). Транзакции по разделу 12: файл сохраняется
  * в хранилище ДО короткой транзакции регистрации метаданных (в адаптере);
  * сбой регистрации компенсируется удалением сиротского файла.
+ * Задействованность (ADR-008): удаление занятого файла — 409 ASSET_IN_USE;
+ * скачивание чужих — только публичная задействованность (APPROVED-растение).
  */
 @Service
 public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCase, DeleteMediaUseCase {
@@ -28,15 +33,18 @@ public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCa
     private final MediaAssetRepository repository;
     private final ImageAnalyzer imageAnalyzer;
     private final FileStorage fileStorage;
+    private final AssetClaimRepository claims;
     private final MediaAccessPolicy accessPolicy;
     private final Clock clock;
     private final ImageFingerprinter fingerprinter = new ImageFingerprinter();
 
     public MediaAssetService(MediaAssetRepository repository, ImageAnalyzer imageAnalyzer,
-                             FileStorage fileStorage, MediaAccessPolicy accessPolicy, Clock clock) {
+                             FileStorage fileStorage, AssetClaimRepository claims,
+                             MediaAccessPolicy accessPolicy, Clock clock) {
         this.repository = repository;
         this.imageAnalyzer = imageAnalyzer;
         this.fileStorage = fileStorage;
+        this.claims = claims;
         this.accessPolicy = accessPolicy;
         this.clock = clock;
     }
@@ -66,7 +74,10 @@ public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCa
     @Override
     public DownloadedMedia download(CurrentActor actor, UUID assetId) {
         MediaAsset asset = find(assetId);
-        accessPolicy.requireViewer(actor, asset.ownerId());
+        boolean publiclyVisible = claims.findByAssetId(asset.id())
+            .map(AssetClaim::publiclyVisible)
+            .orElse(false);
+        accessPolicy.requireViewer(actor, asset.ownerId(), publiclyVisible);
         return new DownloadedMedia(asset.id(), asset.format().mimeType(),
             fileStorage.read(asset.storageKey()));
     }
@@ -75,6 +86,10 @@ public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCa
     public void delete(CurrentActor actor, UUID assetId) {
         MediaAsset asset = find(assetId);
         accessPolicy.requireDeleter(actor, asset.ownerId());
+        claims.findByAssetId(asset.id()).ifPresent(claim -> {
+            throw new AssetInUseException( // 409: сначала архивируйте растение (ADR-008)
+                "Файл задействован растением: " + claim.plantId());
+        });
         repository.delete(asset.id());           // короткая транзакция
         fileStorage.delete(asset.storageKey());  // метаданные уже удалены — «висячих» ссылок нет
     }
