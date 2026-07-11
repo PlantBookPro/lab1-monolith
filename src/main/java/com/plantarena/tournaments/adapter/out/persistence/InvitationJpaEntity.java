@@ -53,7 +53,7 @@ public class InvitationJpaEntity {
 
     @Version
     @Column(name = "version", nullable = false)
-    private long version;
+    private Long version;
 
     protected InvitationJpaEntity() {
     }
@@ -118,7 +118,7 @@ public class InvitationJpaEntity {
         return submissionKey;
     }
 
-    public long getVersion() {
+    public Long getVersion() {
         return version;
     }
 }

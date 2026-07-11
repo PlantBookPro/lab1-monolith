@@ -55,6 +55,7 @@ public abstract class InvitationRepositoryContractTest {
         assertThat(loaded.reservationId()).isEqualTo(invitation.reservationId());
         assertThat(loaded.submissionKey()).isEqualTo(invitation.submissionKey());
         assertThat(loaded.respondedAt()).isEqualTo(NOW);
+        assertThat(loaded.version()).isEqualTo(invitation.version());
     }
 
     @Test
