@@ -40,3 +40,7 @@ plantarena:
   global:
     epoch-duration: 24h # длительность эпохи отбора (раздел 8)
     final-window-duration: 6h # длительность финального окна (раздел 8)
+  guests:
+    session-ttl: 24h # срок действия гостевой сессии (раздел 9)
+    session-creation-limit-per-minute: 10 # лимит выдачи сессий на IP (429, ADR-013)
+    vote-limit-per-minute: 30 # лимит голосов гостя на сессию (429, ADR-013)
