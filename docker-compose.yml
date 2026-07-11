@@ -28,6 +28,7 @@ services:
       BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
       BOOTSTRAP_ADMIN_DISPLAY_NAME: ${BOOTSTRAP_ADMIN_DISPLAY_NAME:-Admin}
       MEDIA_STORAGE_ROOT: ${MEDIA_STORAGE_ROOT:-/app/storage/media}
+      FEED_CURSOR_SECRET: ${FEED_CURSOR_SECRET:-dev-only-cursor-secret}
     ports:
       - "8080:8080"
     volumes:

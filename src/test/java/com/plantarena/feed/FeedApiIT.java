@@ -333,8 +333,9 @@ class FeedApiIT extends AbstractIntegrationTest {
         awaitGlobalCards(3);
 
         UUID u4 = newUser("cut-u4@example.com", "Cut4");
-        // u4 голосует за e2 — карточка исчезает из его ленты (раздел 9)
-        UUID windowId = UUID.fromString(JsonPath.read(feedOf(u4), "$.items[0].windowId"));
+        // u4 голосует за e2 — карточка исчезает из его ленты (раздел 9);
+        // окно ищем по владельцу u2: порядок карточек псевдослучайный
+        UUID windowId = windowIdOf(feedOf(u4), u2);
         mockMvc.perform(put("/api/v1/windows/" + windowId + "/entries/" + e2 + "/vote")
                 .header(DEMO_HEADER, u4.toString())
                 .contentType(MediaType.APPLICATION_JSON).content("{\"value\":\"LIKE\"}"))

@@ -37,7 +37,7 @@ graph TD
 | geo | — | Upstream для tournaments; получает координаты во входной команде, сам identity не читает |
 | plants | media | Customer–Supplier; ACL над `MediaAsset`, команды задействованности `MediaAssetClaims` (ADR-008) |
 | moderation | plants, media | Downstream: подписан на `PlantSubmitted` (adapter.in.events), решение командой `plants.api.PlantModeration.recordDecision`; байты файла — `media.api.MediaAssets.loadContent` (ACL adapter.out.media) |
-| tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `PlantDirectory`, `ParticipantDirectory`, `ClusteringGateway` (geo — итерация 7); подписан на `PlantModerationDecided` (adapter.in.events, та же tx — ADR-010); публикует `TournamentStarted`, `EntryEliminated`, `TournamentFinished` (в tx старта/закрытия окна — ADR-010/011) |
+| tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `PlantDirectory`, `ParticipantDirectory`, `ClusteringGateway` (geo — итерация 7); подписан на `PlantModerationDecided` (adapter.in.events, та же tx — ADR-010); публикует `TournamentStarted`, `EntryEliminated`, `TournamentFinished` (в tx старта/закрытия окна — ADR-010/011) и `VotingWindowOpened`, `VotingWindowClosed` (в tx открытия/закрытия окна — проекция feed, итерация 8) |
 | feed | tournaments, plants, media, identity | Downstream, только чтение через read-порты |
 
 Правило: контекст использует **только пакет `api`** другого контекста и только
@@ -80,7 +80,7 @@ graph TD
 | tournaments | plants | `PlantLifecycle.registerDeath` (закрытие окна: гибель выбывшего + PERMANENT-запрет, устойчивый порядок по plantId) | команда | синхронно, в транзакции закрытия окна (ADR-011) | надёжная команда с повтором (идемпотентность — DEAD-статус plants) | Kafka `plant.lifecycle.v1` |
 | tournaments | geo | `ClusteringGateway.assignClusters` (кластеризация состава эпохи + неизменные снимки, ADR-012) | команда | синхронно, в транзакции открытия эпохи | Feign + идемпотентный повтор по epochId | Kafka-команды |
 | scheduler (tournaments) | `AdvanceGlobalCompetitionUseCase` | границы глобального режима (закрытие квалификации/финала, открытие финала/эпохи — фиксированный порядок, ADR-012) | вызов use case (fixedDelay 2с, идемпотентен) | in-process | scheduler сервиса | scheduler сервиса |
-| feed | tournaments | проекция карточек по событиям | события | in-process | события внутри tournament-service | Kafka → проекция |
+| feed | tournaments | проекция карточек по событиям `VotingWindowOpened`/`VotingWindowClosed` (создание/удаление карточек окна); read `FeedDirectory` (оцененные entry, турниры участия), `GuestSessionDirectory` (активная сессия по токену) | события + read-порты | синхронно in-process (та же tx — ADR-011) | события внутри tournament-service | outbox → Kafka → проекция |
 | feed | plants | публичные данные растения | запрос через `plants.api` | синхронно | Feign | Feign |
 | feed | media | URL изображения по assetId | запрос через `media.api` | синхронно | Feign | Feign |
 | feed | identity | минимальные публичные сведения о владельце | запрос через `identity.api` | синхронно | Feign | Feign |
