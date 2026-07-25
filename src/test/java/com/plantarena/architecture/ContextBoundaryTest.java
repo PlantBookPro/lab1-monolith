@@ -122,10 +122,12 @@ public class ContextBoundaryTest {
             });
     }
 
-    /** adapter.out — выходные адаптеры: ACL к чужим контекстам живут здесь. */
+    /** adapter.out — выходные ACL-адаптеры; adapter.in.events — входные
+     *  подписчики на события чужих api (context map, раздел 4.3). */
     private static boolean isAclAdapter(String packageName) {
         return ownContextOf(packageName) != null
-            && packageName.matches("com\\.plantarena\\.(\\w+)\\.adapter\\.out\\..*");
+            && (packageName.matches("com\\.plantarena\\.(\\w+)\\.adapter\\.out\\..*")
+                || packageName.matches("com\\.plantarena\\.(\\w+)\\.adapter\\.in\\.events(\\..*)?"));
     }
 
     private static String ownContextOf(String packageName) {
