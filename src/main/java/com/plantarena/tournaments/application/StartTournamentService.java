@@ -14,8 +14,11 @@ import com.plantarena.tournaments.domain.TournamentEntry;
 import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import com.plantarena.tournaments.domain.TournamentRepository;
 import com.plantarena.tournaments.domain.TournamentStatus;
+import com.plantarena.tournaments.domain.VotingWindow;
+import com.plantarena.tournaments.domain.VotingWindowRepository;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -41,6 +44,7 @@ public class StartTournamentService implements StartTournamentUseCase {
     private final TournamentRepository tournaments;
     private final InvitationRepository invitations;
     private final TournamentEntryRepository entries;
+    private final VotingWindowRepository windows;
     private final PlantEligibilityGateway eligibility;
     private final TournamentsAccessPolicy accessPolicy;
     private final IntegrationEventPublisher eventPublisher;
@@ -50,6 +54,7 @@ public class StartTournamentService implements StartTournamentUseCase {
     public StartTournamentService(TournamentRepository tournaments,
                                   InvitationRepository invitations,
                                   TournamentEntryRepository entries,
+                                  VotingWindowRepository windows,
                                   PlantEligibilityGateway eligibility,
                                   TournamentsAccessPolicy accessPolicy,
                                   IntegrationEventPublisher eventPublisher, Clock clock,
@@ -57,6 +62,7 @@ public class StartTournamentService implements StartTournamentUseCase {
         this.tournaments = tournaments;
         this.invitations = invitations;
         this.entries = entries;
+        this.windows = windows;
         this.eligibility = eligibility;
         this.accessPolicy = accessPolicy;
         this.eventPublisher = eventPublisher;
@@ -125,10 +131,19 @@ public class StartTournamentService implements StartTournamentUseCase {
         }
         tournament.start(now, ready.size());
         tournaments.save(tournament);
+        List<TournamentEntry> admitted = new ArrayList<>();
         for (Invitation invitation : ready) {
-            entries.save(TournamentEntry.admit(tournament.id(), invitation.userId(),
-                invitation.submittedPlantId(), invitation.reservationId(), now));
+            admitted.add(entries.save(TournamentEntry.admit(tournament.id(),
+                invitation.userId(), invitation.submittedPlantId(),
+                invitation.reservationId(), now)));
         }
+        // первый раунд (раздел 7): состав зафиксирован, счёт с нуля
+        windows.save(VotingWindow.open(tournament.id(), 1,
+            admitted.stream()
+                .map(entry -> new VotingWindow.ParticipantSeed(entry.id(), entry.userId(),
+                    entry.joinedAt()))
+                .toList(),
+            now, now.plus(tournament.roundDuration()), now));
         expireNotReady(tournament.id(), now);
         publishStarted(tournament, now);
         return TournamentAssembler.toData(tournament);
