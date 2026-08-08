@@ -37,7 +37,7 @@ graph TD
 | geo | — | Upstream для tournaments; получает координаты во входной команде, сам identity не читает |
 | plants | media | Customer–Supplier; ACL над `MediaAsset`, команды задействованности `MediaAssetClaims` (ADR-008) |
 | moderation | plants, media | Downstream: подписан на `PlantSubmitted` (adapter.in.events), решение командой `plants.api.PlantModeration.recordDecision`; байты файла — `media.api.MediaAssets.loadContent` (ACL adapter.out.media) |
-| tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `PlantDirectory`, `ParticipantDirectory`, `ClusteringGateway` (geo — итерация 7); подписан на `PlantModerationDecided` (adapter.in.events, та же tx — ADR-010) |
+| tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `PlantDirectory`, `ParticipantDirectory`, `ClusteringGateway` (geo — итерация 7); подписан на `PlantModerationDecided` (adapter.in.events, та же tx — ADR-010); публикует `TournamentStarted`, `EntryEliminated`, `TournamentFinished` (в tx старта/закрытия окна — ADR-010/011) |
 | feed | tournaments, plants, media, identity | Downstream, только чтение через read-порты |
 
 Правило: контекст использует **только пакет `api`** другого контекста и только
@@ -76,7 +76,7 @@ graph TD
 | tournaments | plants | `PlantDirectory.findById` (read, проверка APPROVED при принятии) | запрос через `plants.api` | синхронно | Feign | Feign |
 | tournaments | identity | `UserDirectory.findById` (известный активный пользователь) | запрос через `identity.api` | синхронно | Feign | Feign |
 | plants | tournaments | публикация `PlantModerationDecided` (перевод заявки) | событие | синхронно, в tx решения (ADR-010) | outbox → идемпотентная команда | Kafka `plant.moderation.v1` |
-| tournaments | plants | `PlantLifecycle.registerDeath` | команда | синхронно, в транзакции закрытия окна | saga-команда | Kafka `plant.lifecycle.v1` |
+| tournaments | plants | `PlantLifecycle.registerDeath` (закрытие окна: гибель выбывшего + PERMANENT-запрет, устойчивый порядок по plantId) | команда | синхронно, в транзакции закрытия окна (ADR-011) | надёжная команда с повтором (идемпотентность — DEAD-статус plants) | Kafka `plant.lifecycle.v1` |
 | tournaments | geo | `ClusteringGateway` (состав эпохи) | команда/запрос | синхронно | Feign/R2DBC | Feign |
 | feed | tournaments | проекция карточек по событиям | события | in-process | события внутри tournament-service | Kafka → проекция |
 | feed | plants | публичные данные растения | запрос через `plants.api` | синхронно | Feign | Feign |

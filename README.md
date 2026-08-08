@@ -99,9 +99,29 @@ minParticipants → RUNNING (участия ACTIVE, не-READY → EXPIRED, ре
 - Старт/отмена — `POST /api/v1/tournaments/{id}/start|cancel`; участники —
   `GET /api/v1/tournaments/{id}/entries`.
 - Диагностика (dev/test, M/A): `POST /api/v1/internal/demo/jobs/run-due` —
-  тот же use case, что scheduler, без обхода правил.
-- Окна голосования, выбывание, FINISHED — итерация 6; глобальный турнир и
-  geo-кластеры — итерация 7.
+  тот же use case, что scheduler, без обхода правил; ответ — `processed`
+  (стартовавшие/отменённые турниры) и `closedWindows` (закрытые окна).
+- Старт создаёт первый раунд `VotingWindow` (sequence 1, длительность
+  roundDuration, счёт с нуля). Закрытие по дедлайну — scheduler (fixedDelay
+  2с) или demo-ручка. Выбывание: `min(n−1, max(1, floor(n·f)))` худших по
+  рейтингу (score DESC, joinedAt ASC, entryId ASC); выбывшие — гибель +
+  PERMANENT-запрет + освобождение резерва. Один выживший — WINNER, турнир
+  FINISHED, резерв победителя освобождён; иначе — следующий раунд
+  (sequence + 1, выжившие, счёт с нуля).
+- Раунды и итоги — `GET /api/v1/tournaments/{id}/rounds|leaderboard|results`
+  (организатор/админ или приглашённый/участник; X-Total-Count).
+- Глобальный турнир и geo-кластеры — итерация 7.
+
+## Голосование (voting)
+
+`PUT /api/v1/windows/{windowId}/entries/{entryId}/vote` (LIKE/DISLIKE),
+`DELETE .../vote`, `GET .../my-vote` — текущий голос субъекта. Голосовать
+может участник, допущенный к старту (выбывший — тоже, допущение 9);
+постороннему турнир скрыт (404), организатор-не-участник — 403, гость — 401
+(GUEST-субъект — итерация 8). Самоголосование запрещено (403, допущение 6).
+Окно принимает голоса в интервале `[opensAt, closesAt)`; после дедлайна —
+409 `VOTING_CLOSED`. Дельты счёта: новый голос +1/−1, смена знака ±2, повтор 0,
+удаление — компенсация.
 
 ## Проверка (единственная команда)
 
