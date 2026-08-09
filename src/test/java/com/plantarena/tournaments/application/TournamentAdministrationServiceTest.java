@@ -98,6 +98,18 @@ class TournamentAdministrationServiceTest {
     }
 
     @Test
+    @DisplayName("update: описание отменённого турнира — 409, не 500")
+    void update_описание_отменённого() {
+        UUID tournamentId = createDraft();
+        service.cancel(organizer, tournamentId);
+
+        assertThatThrownBy(() -> service.update(organizer, tournamentId,
+            new UpdateTournamentUseCase.UpdateTournamentCommand(null, "Новое", null,
+                null, null, null, null)))
+            .isInstanceOf(TournamentStateConflictException.class);
+    }
+
+    @Test
     @DisplayName("delete: пустой DRAFT удаляется; с приглашениями или после открытия — 409")
     void delete_правила() {
         UUID empty = createDraft();

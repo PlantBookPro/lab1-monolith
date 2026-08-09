@@ -75,6 +75,13 @@ public class TournamentAdministrationService implements CreateTournamentUseCase,
         Tournament tournament = find(tournamentId);
         accessPolicy.requireOrganizer(actor, tournament);
         if (command.description() != null) {
+            if (tournament.status() != TournamentStatus.DRAFT
+                    && tournament.status() != TournamentStatus.REGISTRATION_OPEN
+                    && tournament.status() != TournamentStatus.RUNNING) {
+                throw new TournamentStateConflictException(
+                    "Описание меняется только в DRAFT/REGISTRATION_OPEN/RUNNING, текущий статус: "
+                        + tournament.status());
+            }
             tournament.updateDescription(command.description());
         }
         if (isParameterUpdate(command)) {
