@@ -3,7 +3,6 @@ package com.plantarena.tournaments.application;
 import com.plantarena.shared.security.AccessDeniedException;
 import com.plantarena.shared.security.CurrentActor;
 import com.plantarena.tournaments.application.port.in.VotingUseCase;
-import com.plantarena.tournaments.domain.Invitation;
 import com.plantarena.tournaments.domain.InvitationRepository;
 import com.plantarena.tournaments.domain.InvitationStatus;
 import com.plantarena.tournaments.domain.Tournament;
