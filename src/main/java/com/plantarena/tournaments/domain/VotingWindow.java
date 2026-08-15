@@ -22,6 +22,10 @@ public final class VotingWindow {
     private final UUID id;
     private final UUID tournamentId;
     private final int sequence;
+    private final WindowScope scope;
+    private final UUID epochId;
+    private final UUID clusterId;
+    private final String clusterKey;
     private WindowStatus status;
     private final Instant opensAt;
     private final Instant closesAt;
@@ -30,7 +34,8 @@ public final class VotingWindow {
     private final Instant createdAt;
     private long version;
 
-    private VotingWindow(UUID id, UUID tournamentId, int sequence, WindowStatus status,
+    private VotingWindow(UUID id, UUID tournamentId, int sequence, WindowScope scope,
+                         UUID epochId, UUID clusterId, String clusterKey, WindowStatus status,
                          Instant opensAt, Instant closesAt, Instant createdAt, long version) {
         this.id = Objects.requireNonNull(id, "id");
         this.tournamentId = Objects.requireNonNull(tournamentId, "tournamentId");
@@ -43,6 +48,16 @@ public final class VotingWindow {
         this.closesAt = Objects.requireNonNull(closesAt, "closesAt");
         if (!opensAt.isBefore(closesAt)) {
             throw new IllegalArgumentException("opensAt < closesAt (полуоткрытый интервал)");
+        }
+        this.scope = Objects.requireNonNull(scope, "scope");
+        this.epochId = epochId;
+        this.clusterId = clusterId;
+        this.clusterKey = clusterKey;
+        if ((scope == WindowScope.QUALIFICATION) != (epochId != null)) {
+            throw new IllegalArgumentException("epochId обязателен только для квалификации");
+        }
+        if (scope != WindowScope.QUALIFICATION && (clusterId != null || clusterKey != null)) {
+            throw new IllegalArgumentException("Кластер — только у квалификационного окна");
         }
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
         this.version = version;
@@ -61,7 +76,55 @@ public final class VotingWindow {
                 "Окно private-турнира открывается минимум с двумя участниками");
         }
         VotingWindow window = new VotingWindow(UUID.randomUUID(), tournamentId, sequence,
-            WindowStatus.OPEN, opensAt, closesAt, now, 0L);
+            WindowScope.PRIVATE, null, null, null, WindowStatus.OPEN, opensAt, closesAt,
+            now, 0L);
+        for (ParticipantSeed seed : seeds) {
+            if (window.participantsByEntry.containsKey(seed.entryId())) {
+                throw new IllegalArgumentException("Дубликат участника в окне: " + seed.entryId());
+            }
+            window.participantsByEntry.put(seed.entryId(),
+                WindowParticipant.newParticipant(seed.entryId(), seed.userId(), seed.joinedAt()));
+        }
+        return window;
+    }
+
+    /**
+     * Квалификационное окно кластера эпохи (раздел 8, алгоритм 2): минимум
+     * один участник (алгоритм 4 — единственный проходит без голосов).
+     * sequence = номер эпохи; уникальность (epochId, clusterId) — БД.
+     */
+    public static VotingWindow openQualification(UUID tournamentId, UUID epochId,
+                                                 UUID clusterId, String clusterKey,
+                                                 int sequence, List<ParticipantSeed> seeds,
+                                                 Instant opensAt, Instant closesAt,
+                                                 Instant now) {
+        return openScoped(WindowScope.QUALIFICATION, tournamentId, sequence, seeds,
+            epochId, clusterId, clusterKey, opensAt, closesAt, now);
+    }
+
+    /**
+     * Финальное окно (раздел 8, алгоритм 6): выжившие предыдущего + новые
+     * финалисты; минимум один участник (n=1 — лидер, алгоритм 7).
+     */
+    public static VotingWindow openFinal(UUID tournamentId, int sequence,
+                                         List<ParticipantSeed> seeds, Instant opensAt,
+                                         Instant closesAt, Instant now) {
+        return openScoped(WindowScope.FINAL, tournamentId, sequence, seeds,
+            null, null, null, opensAt, closesAt, now);
+    }
+
+    private static VotingWindow openScoped(WindowScope scope, UUID tournamentId, int sequence,
+                                           List<ParticipantSeed> seeds, UUID epochId,
+                                           UUID clusterId, String clusterKey, Instant opensAt,
+                                           Instant closesAt, Instant now) {
+        Objects.requireNonNull(seeds, "seeds");
+        if (seeds.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Глобальное окно открывается минимум с одним участником");
+        }
+        VotingWindow window = new VotingWindow(UUID.randomUUID(), tournamentId, sequence,
+            scope, epochId, clusterId, clusterKey, WindowStatus.OPEN, opensAt, closesAt,
+            now, 0L);
         for (ParticipantSeed seed : seeds) {
             if (window.participantsByEntry.containsKey(seed.entryId())) {
                 throw new IllegalArgumentException("Дубликат участника в окне: " + seed.entryId());
@@ -74,12 +137,13 @@ public final class VotingWindow {
 
     /** Восстановление из хранилища (использует только persistence-адаптер). */
     public static VotingWindow restore(UUID id, UUID tournamentId, int sequence,
-                                       WindowStatus status, Instant opensAt, Instant closesAt,
-                                       Instant createdAt, long version,
+                                       WindowScope scope, UUID epochId, UUID clusterId,
+                                       String clusterKey, WindowStatus status, Instant opensAt,
+                                       Instant closesAt, Instant createdAt, long version,
                                        Collection<WindowParticipant> participants,
                                        Collection<Vote> votes) {
-        VotingWindow window = new VotingWindow(id, tournamentId, sequence, status,
-            opensAt, closesAt, createdAt, version);
+        VotingWindow window = new VotingWindow(id, tournamentId, sequence, scope, epochId,
+            clusterId, clusterKey, status, opensAt, closesAt, createdAt, version);
         participants.forEach(participant ->
             window.participantsByEntry.put(participant.entryId(), participant));
         votes.forEach(vote ->
@@ -159,6 +223,71 @@ public final class VotingWindow {
         return new CloseOutcome(List.copyOf(eliminated), List.copyOf(survived), winnerEntryId);
     }
 
+    /**
+     * Закрытие квалификационного окна (раздел 8, алгоритмы 3–5): top-1
+     * рейтинга — PROMOTED (в финал), остальные — ELIMINATED. Рейтинг:
+     * score DESC, joinedAt ASC, entryId ASC (допущение 8).
+     */
+    public QualificationCloseOutcome closeQualification(Instant now) {
+        requireScope(WindowScope.QUALIFICATION);
+        requireClosable(now);
+        status = WindowStatus.CLOSED;
+        List<WindowParticipant> ranked = ParticipantRanking.rank(participantsByEntry.values());
+        WindowParticipant top = ranked.get(0);
+        top.promote();
+        List<UUID> eliminated = new ArrayList<>(ranked.size() - 1);
+        for (int i = 1; i < ranked.size(); i++) {
+            WindowParticipant worst = ranked.get(i);
+            worst.eliminate();
+            eliminated.add(worst.entryId());
+        }
+        return new QualificationCloseOutcome(top.entryId(), List.copyOf(eliminated));
+    }
+
+    /**
+     * Закрытие финального окна (раздел 8, алгоритмы 7–8): n ≥ 2 — выбывает
+     * max(1, floor(n/2)) худших, выжившие SURVIVED; n = 1 — лидер остаётся
+     * (SURVIVED без выбывания). Повторное закрытие — ошибка состояния.
+     */
+    public FinalCloseOutcome closeFinal(Instant now) {
+        requireScope(WindowScope.FINAL);
+        requireClosable(now);
+        status = WindowStatus.CLOSED;
+        List<WindowParticipant> ranked = ParticipantRanking.rank(participantsByEntry.values());
+        if (ranked.size() == 1) {
+            ranked.get(0).survive();
+            return new FinalCloseOutcome(List.of(), List.of());
+        }
+        int eliminatedCount = Math.max(1, ranked.size() / 2);
+        List<UUID> eliminated = new ArrayList<>(eliminatedCount);
+        for (int i = 0; i < eliminatedCount; i++) {
+            WindowParticipant worst = ranked.get(ranked.size() - 1 - i);
+            worst.eliminate();
+            eliminated.add(worst.entryId());
+        }
+        List<UUID> survived = new ArrayList<>(ranked.size() - eliminatedCount);
+        for (int i = 0; i < ranked.size() - eliminatedCount; i++) {
+            ranked.get(i).survive();
+            survived.add(ranked.get(i).entryId());
+        }
+        return new FinalCloseOutcome(List.copyOf(eliminated), List.copyOf(survived));
+    }
+
+    private void requireScope(WindowScope expected) {
+        if (scope != expected) {
+            throw new IllegalStateException("Ожидается scope " + expected + ", текущий: " + scope);
+        }
+    }
+
+    private void requireClosable(Instant now) {
+        if (status != WindowStatus.OPEN) {
+            throw new IllegalStateException("Окно уже закрыто: " + id);
+        }
+        if (now.isBefore(closesAt)) {
+            throw new IllegalStateException("Окно открыто до " + closesAt);
+        }
+    }
+
     /** Текущий голос субъекта за участника (null — голоса нет). */
     public VoteValue myVote(String subjectKey, UUID entryId) {
         Vote vote = votesByKey.get(voteKey(subjectKey, entryId));
@@ -227,6 +356,22 @@ public final class VotingWindow {
         return sequence;
     }
 
+    public WindowScope scope() {
+        return scope;
+    }
+
+    public UUID epochId() {
+        return epochId;
+    }
+
+    public UUID clusterId() {
+        return clusterId;
+    }
+
+    public String clusterKey() {
+        return clusterKey;
+    }
+
     public WindowStatus status() {
         return status;
     }
@@ -254,6 +399,14 @@ public final class VotingWindow {
     /** Итог закрытия: выбывшие; выжившие (≥ 2 → следующий раунд) или победитель. */
     public record CloseOutcome(List<UUID> eliminatedEntryIds, List<UUID> survivedEntryIds,
                                UUID winnerEntryId) {
+    }
+
+    /** Итог квалификации: продвинутый в финал и выбывшие (алгоритмы 3–5). */
+    public record QualificationCloseOutcome(UUID promotedEntryId, List<UUID> eliminatedEntryIds) {
+    }
+
+    /** Итог финала: выбывшие и выжившие (n=1 — оба списка пусты, лидер жив). */
+    public record FinalCloseOutcome(List<UUID> eliminatedEntryIds, List<UUID> survivedEntryIds) {
     }
 
     /** Идентичность по id: JPA-адаптер пересобирает агрегат при чтении. */

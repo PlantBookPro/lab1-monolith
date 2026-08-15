@@ -65,6 +65,18 @@ public final class Tournament {
             eliminationFraction, minParticipants, null, tagIds, now, 0);
     }
 
+    /**
+     * Единственный глобальный турнир (раздел 8): фиксированный id, статус
+     * RUNNING навсегда; параметры private-режима — заглушки, тайминги — в
+     * конфигурации (дизайн итерации 7, решение 1). creator — системный UUID.
+     */
+    public static Tournament global(UUID id, UUID systemCreatorId, Instant now) {
+        return new Tournament(id, systemCreatorId, "Глобальный турнир", null,
+            TournamentType.GLOBAL, TournamentStatus.RUNNING,
+            EliminationAlgorithmKind.ROUND_ELIMINATION, now.plus(Duration.ofHours(1)),
+            Duration.ofHours(1), 0.5, 2, null, Set.of(), now, 0);
+    }
+
     /** Восстановление из хранилища (использует только persistence-адаптер). */
     public static Tournament restore(UUID id, UUID creatorId, String name, String description,
                                      TournamentType type, TournamentStatus status,
@@ -115,6 +127,9 @@ public final class Tournament {
 
     /** Завершение: победитель определён закрытием окна (раздел 7). */
     public void finish(Instant now) {
+        if (type == TournamentType.GLOBAL) {
+            throw new IllegalStateException("Глобальный турнир никогда не завершается (раздел 8)");
+        }
         requireStatus(TournamentStatus.RUNNING);
         status = TournamentStatus.FINISHED;
     }
