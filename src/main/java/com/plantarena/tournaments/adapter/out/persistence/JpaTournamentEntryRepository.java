@@ -63,6 +63,21 @@ public class JpaTournamentEntryRepository implements TournamentEntryRepository {
         return entries.findById(id).map(JpaTournamentEntryRepository::toDomain);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<TournamentEntry> findActiveGlobalByUserId(UUID tournamentId, UUID userId) {
+        return entries.findActiveGlobal(tournamentId, userId)
+            .map(JpaTournamentEntryRepository::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TournamentEntry> findByTournamentIdAndStatus(UUID tournamentId,
+                                                             EntryStatus status) {
+        return entries.findByTournamentIdAndStatus(tournamentId, status.name())
+            .stream().map(JpaTournamentEntryRepository::toDomain).toList();
+    }
+
     private static TournamentEntry toDomain(TournamentEntryJpaEntity entity) {
         return TournamentEntry.restore(entity.getId(), entity.getTournament().getId(),
             entity.getUserId(), entity.getPlantId(), entity.getReservationId(),

@@ -1,21 +1,17 @@
 package com.plantarena.tournaments.adapter.out.persistence;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-/** JPA-модель окна голосования (раздел 11); маппинг в домен — явный. */
+/** JPA-модель эпохи отбора (раздел 11); маппинг в домен — явный. */
 @Entity
-@Table(name = "voting_window", schema = "tournaments")
-public class VotingWindowJpaEntity {
+@Table(name = "qualification_epoch", schema = "tournaments")
+public class QualificationEpochJpaEntity {
 
     @Id
     private UUID id;
@@ -23,20 +19,8 @@ public class VotingWindowJpaEntity {
     @Column(name = "tournament_id", nullable = false)
     private UUID tournamentId;
 
-    @Column(name = "sequence", nullable = false)
-    private int sequence;
-
     @Column(nullable = false)
-    private String scope;
-
-    @Column(name = "epoch_id")
-    private UUID epochId;
-
-    @Column(name = "cluster_id")
-    private UUID clusterId;
-
-    @Column(name = "cluster_key")
-    private String clusterKey;
+    private int sequence;
 
     @Column(nullable = false)
     private String status;
@@ -54,9 +38,6 @@ public class VotingWindowJpaEntity {
     @Column(nullable = false)
     private Long version;
 
-    @OneToMany(mappedBy = "window", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WindowParticipantJpaEntity> participants = new ArrayList<>();
-
     UUID getId() {
         return id;
     }
@@ -67,22 +48,6 @@ public class VotingWindowJpaEntity {
 
     int getSequence() {
         return sequence;
-    }
-
-    String getScope() {
-        return scope;
-    }
-
-    UUID getEpochId() {
-        return epochId;
-    }
-
-    UUID getClusterId() {
-        return clusterId;
-    }
-
-    String getClusterKey() {
-        return clusterKey;
     }
 
     String getStatus() {
@@ -105,10 +70,6 @@ public class VotingWindowJpaEntity {
         return version;
     }
 
-    List<WindowParticipantJpaEntity> getParticipants() {
-        return participants;
-    }
-
     void setId(UUID id) {
         this.id = id;
     }
@@ -119,22 +80,6 @@ public class VotingWindowJpaEntity {
 
     void setSequence(int sequence) {
         this.sequence = sequence;
-    }
-
-    void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    void setEpochId(UUID epochId) {
-        this.epochId = epochId;
-    }
-
-    void setClusterId(UUID clusterId) {
-        this.clusterId = clusterId;
-    }
-
-    void setClusterKey(String clusterKey) {
-        this.clusterKey = clusterKey;
     }
 
     void setStatus(String status) {
