@@ -19,12 +19,13 @@
 | Spring Boot | 4.0.8 | Стабильная линия с OSS-патчами; совместима с Spring Cloud 2025.1.x (нужно в лабе №2) |
 | Spring Cloud (закладка на лабу №2) | 2025.1.3 | Официально поддерживает Boot 4.0.x |
 | springdoc-openapi | 3.1.1 | Ветка 3.x для Boot 4 |
-| Testcontainers | 2.0.5 | |
-| ArchUnit | 1.5.0 | |
-| JaCoCo | 0.8.13 | pin в pom |
-| PostgreSQL | 17 | image pin в Compose |
+| Testcontainers | 2.0.5 (BOM; модули `testcontainers-junit-jupiter`, `testcontainers-postgresql`) | |
+| ArchUnit | 1.5.0 (`archunit-junit6` — Boot 4.0.8 управляет JUnit Jupiter 6.0.3) | |
+| JaCoCo | 0.8.15 | pin в pom |
+| PostgreSQL | 17.5 | image `postgres:17.5-alpine` в Compose (тег проверен) |
 | ONNX Runtime | 1.30.0 | pin (проверено на Maven Central 2026-09-23); классификатор растений в JVM |
-| Flyway | из BOM Boot | |
+| Flyway | 11.14.1 | управляется BOM Boot; + `flyway-database-postgresql` |
+| Docker-образы | `maven:3.9.11-eclipse-temurin-21`, `eclipse-temurin:21-jre` | теги проверены | |
 
 Boot 4.1 не выбран: для него ещё нет Spring Cloud train. Boot 3.5 не выбран:
 OSS-EOL июнь 2026.
