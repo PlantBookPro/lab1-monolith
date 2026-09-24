@@ -2146,7 +2146,7 @@ Expected: PASS.
 ./mvnw -q verify
 ```
 
-Expected: FAIL только в `IdentityApiIT`; ArchUnit зелёный.
+Expected: surefire зелёный (ArchUnit, домен, application). В failsafe, помимо `IdentityApiIT`, ВСЕ `@SpringBootTest`-IT падают на старте контекста: бины `@Service` требуют `UserRepository`/`PasswordHasher`, которых ещё нет (появляются в Task 5 и 6) — это ожидаемое промежуточное состояние, оно самоликвидируется к Task 6.
 
 - [ ] **Step 10: Commit**
 
@@ -2724,7 +2724,7 @@ Expected: PASS оба (fake и JPA проходят один и тот же ко
 ./mvnw -q verify
 ```
 
-Expected: FAIL только в `IdentityApiIT` (контроллеров ещё нет; таблицы уже есть — `adminId()` больше не падает на отсутствии таблицы, но эндпоинты 404). ArchUnit зелёный (JPA только в `adapter.out.persistence`).
+Expected: FAIL в `IdentityApiIT` (эндпоинтов ещё нет; таблицы уже есть — `adminId()` больше не падает на отсутствии таблицы). Пока нет бина `PasswordHasher` (Task 6), остальные `@SpringBootTest`-IT тоже падают на старте контекста — ожидаемое промежуточное состояние. ArchUnit зелёный (JPA только в `adapter.out.persistence`).
 
 - [ ] **Step 10: Commit**
 
