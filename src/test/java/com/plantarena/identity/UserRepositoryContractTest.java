@@ -6,6 +6,10 @@ import com.plantarena.identity.domain.User;
 import com.plantarena.identity.domain.UserRepository;
 import com.plantarena.identity.domain.UserRole;
 import com.plantarena.identity.domain.UserStatus;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -62,6 +66,24 @@ public abstract class UserRepositoryContractTest {
         assertThat(repository().count()).isEqualTo(3);
         assertThat(repository().findAll(0, 2)).hasSize(2);
         assertThat(repository().findAll(2, 2)).hasSize(1);
+    }
+
+    @Test
+    void список_упорядочен_по_id_для_стабильной_пагинации() {
+        for (int i = 0; i < 5; i++) {
+            repository().save(User.registerUser(
+                new Email("ordered" + i + "@example.com"), "Ordered " + i, "hash"));
+        }
+
+        List<UUID> ids = new ArrayList<>();
+        repository().findAll(0, 3).forEach(user -> ids.add(user.id()));
+        repository().findAll(3, 3).forEach(user -> ids.add(user.id()));
+
+        assertThat(ids).hasSize(5);
+        assertThat(ids).doesNotHaveDuplicates();
+        // порядок сравнения UUID как строки совпадает с побайтовым порядком
+        // PostgreSQL uuid — оба наследника контракта упорядочены одинаково
+        assertThat(ids).isSortedAccordingTo(Comparator.comparing(UUID::toString));
     }
 
     @Test

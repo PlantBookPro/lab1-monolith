@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,8 +51,9 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll(int offset, int limit) {
-        // offset всегда page-aligned (PaginationParams: offset = page * size)
-        return users.findAll(PageRequest.of(offset / limit, limit)).stream()
+        // offset всегда page-aligned (PaginationParams: offset = page * size);
+        // сортировка по id — tie-break для детерминированной пагинации (раздел 13)
+        return users.findAll(PageRequest.of(offset / limit, limit, Sort.by("id"))).stream()
             .map(UserMapper::toDomain)
             .toList();
     }

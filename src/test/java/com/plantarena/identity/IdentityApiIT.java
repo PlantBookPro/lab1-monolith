@@ -287,6 +287,14 @@ class IdentityApiIT extends AbstractIntegrationTest {
         assertThat(me).doesNotContain("password");
     }
 
+    @Test
+    void некорректный_параметр_пагинации_типа_отклоняется() throws Exception {
+        mockMvc.perform(get("/api/v1/users")
+                .header(DEMO_HEADER, adminId().toString()).param("page", "abc"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").value("INVALID_PARAMETER"));
+    }
+
     private UUID adminId() {
         return userIdByEmail("admin@plantarena.local");
     }
