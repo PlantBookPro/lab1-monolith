@@ -2344,12 +2344,14 @@ import com.plantarena.identity.domain.Email;
 import com.plantarena.identity.domain.User;
 import com.plantarena.identity.domain.UserRepository;
 import com.plantarena.support.PostgresSupport;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -2358,6 +2360,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Контракт UserRepository на JPA + PostgreSQL (Testcontainers, раздел 14.2).
  * Миграции выполняет SchemaMigrationConfig (ADR-003), H2 не используется.
+ * Контейнер singleton на JVM: предыдущие @SpringBootTest-контексты коммитят
+ * bootstrap-админа в общую БД, поэтому перед каждым тестом таблицы чистятся
+ * (внутри откатываемой транзакции @DataJpaTest — данные восстанавливаются).
  */
 @DisplayName("Контракт UserRepository: JPA + PostgreSQL (Testcontainers)")
 @DataJpaTest
@@ -2375,6 +2380,15 @@ class JpaUserRepositoryContractIT extends UserRepositoryContractTest {
 
     @Autowired
     private JpaUserRepository repository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void очистить_пользователей_от_предыдущих_контекстов() {
+        jdbcTemplate.update("delete from identity.user_role");
+        jdbcTemplate.update("delete from identity.app_user");
+    }
 
     @Override
     protected UserRepository repository() {
