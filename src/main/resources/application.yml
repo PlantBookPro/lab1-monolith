@@ -20,3 +20,9 @@ management:
     web:
       exposure:
         include: health
+
+plantarena:
+  bootstrap-admin:
+    email: ${BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+    display-name: ${BOOTSTRAP_ADMIN_DISPLAY_NAME:Admin}
