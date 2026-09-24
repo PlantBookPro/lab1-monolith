@@ -1,5 +1,7 @@
 package com.plantarena.shared.web;
 
+import com.plantarena.shared.security.AccessDeniedException;
+import com.plantarena.shared.security.NotIdentifiedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
@@ -12,9 +14,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * Переводит исключения в ProblemDetail-подобное тело ApiError.
- * Доменные исключения контекстов добавляются сюда в итерациях 1–9;
- * они не знают об HTTP (раздел 13 требований).
+ * Переводит технические исключения (shared) в ProblemDetail-подобное тело ApiError.
+ * Доменные исключения контекстов переводятся их собственными advice-классами
+ * в adapter.in.web — shared не зависит от контекстов (правило 10.2.8).
  */
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -23,6 +25,21 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiError> notFound(NoResourceFoundException e, HttpServletRequest request) {
         return respond(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND",
             "Ресурс не найден: " + request.getRequestURI(), request);
+    }
+
+    @ExceptionHandler(NotIdentifiedException.class)
+    public ResponseEntity<ApiError> notIdentified(NotIdentifiedException e, HttpServletRequest request) {
+        return respond(HttpStatus.UNAUTHORIZED, "NOT_IDENTIFIED", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> accessDenied(AccessDeniedException e, HttpServletRequest request) {
+        return respond(HttpStatus.FORBIDDEN, "ACCESS_DENIED", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidPaginationException.class)
+    public ResponseEntity<ApiError> invalidPagination(InvalidPaginationException e, HttpServletRequest request) {
+        return respond(HttpStatus.BAD_REQUEST, "INVALID_PAGINATION", e.getMessage(), request);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -48,7 +65,7 @@ public class ApiExceptionHandler {
     }
 
     private ResponseEntity<ApiError> respond(HttpStatus status, String code, String detail,
-                                             HttpServletRequest request) {
+                                              HttpServletRequest request) {
         return ResponseEntity.status(status)
             .body(error(status, code, detail, request));
     }
