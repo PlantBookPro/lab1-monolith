@@ -1,5 +1,6 @@
 package com.plantarena.media.adapter.in.web;
 
+import com.plantarena.media.api.AssetInUseException;
 import com.plantarena.media.application.FileTooLargeException;
 import com.plantarena.media.application.MediaAssetNotFoundException;
 import com.plantarena.media.domain.ImageResolutionTooHighException;
@@ -47,6 +48,12 @@ public class MediaExceptionHandler {
     public ResponseEntity<ApiError> notFound(MediaAssetNotFoundException e,
                                              HttpServletRequest request) {
         return respond(HttpStatus.NOT_FOUND, "MEDIA_ASSET_NOT_FOUND", e.getMessage(), request);
+    }
+
+    /** 409: файл задействован растением — сначала архивируйте растение (ADR-008). */
+    @ExceptionHandler(AssetInUseException.class)
+    public ResponseEntity<ApiError> inUse(AssetInUseException e, HttpServletRequest request) {
+        return respond(HttpStatus.CONFLICT, "ASSET_IN_USE", e.getMessage(), request);
     }
 
     private ResponseEntity<ApiError> respond(HttpStatus status, String code, String detail,
