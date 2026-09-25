@@ -16,7 +16,7 @@ graph TD
     tournaments[tournaments<br/>турниры, окна, голоса, счёт]
     feed[feed<br/>лента, проекция карточек]
 
-    plants -->|ACL: метаданные asset| media
+    plants -->|ACL: метаданные asset, команды задействованности| media
     moderation -->|ACL: PlantSubmitted / recordDecision| plants
     moderation -->|ACL: asset| media
     tournaments -->|ACL: CurrentActor, профиль| identity
@@ -35,7 +35,7 @@ graph TD
 | identity | — | Upstream для всех; Open Host Service (CurrentActor, публичный профиль) |
 | media | — | Upstream для plants, moderation, feed |
 | geo | — | Upstream для tournaments; получает координаты во входной команде, сам identity не читает |
-| plants | media | Customer–Supplier; ACL над `MediaAsset` |
+| plants | media | Customer–Supplier; ACL над `MediaAsset`, команды задействованности `MediaAssetClaims` (ADR-008) |
 | moderation | plants, media | Downstream: подписан на `PlantSubmitted`, отдаёт решение командой в plants.api |
 | tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `ParticipantDirectory`, `ClusteringGateway` |
 | feed | tournaments, plants, media, identity | Downstream, только чтение через read-порты |
@@ -58,12 +58,16 @@ graph TD
   ответа; адаптер `tournaments.adapter.out.plants.InProcessPlantEligibility`
   вызывает `plants.api` и переводит его DTO в модель tournaments (ACL).
   В лабе №2 меняется только этот адаптер.
+- plants сообщает media о задействованности и публичности файла командами
+  `media.api.MediaAssetClaims.claim/release`; media хранит задействованность,
+  но не знает о растениях (ADR-008) — plantId это ключ команды, не ссылка.
 
 ## Таблица взаимодействий
 
 | Инициатор | Получатель | Взаимодействие | Тип | Синхронность | Лаба №2 | Лаба №4 |
 |---|---|---|---|---|---|---|
 | plants | media | метаданные `MediaAsset` по assetId | запрос через `media.api` | синхронно | Feign | Feign |
+| plants | media | `MediaAssetClaims.claim/release` (задействованность, публичность) | команда | синхронно, в транзакции подачи/архивации | Feign + компенсация | Kafka-команды |
 | moderation | plants | подписка на `PlantSubmitted` | событие | in-process | идемпотентная HTTP-команда + retry | Kafka `plant.moderation.v1` |
 | moderation | plants | `PlantModeration.recordDecision` | команда | синхронно | HTTP-команда | Kafka |
 | moderation | media | метаданные asset для инференса | запрос через `media.api` | синхронно | Feign | Feign |
