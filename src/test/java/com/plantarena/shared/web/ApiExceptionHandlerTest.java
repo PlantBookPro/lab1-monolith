@@ -4,9 +4,13 @@ import com.plantarena.shared.security.AccessDeniedException;
 import com.plantarena.shared.security.NotIdentifiedException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import java.util.List;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,5 +61,30 @@ class ApiExceptionHandlerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().code()).isEqualTo("INVALID_PARAMETER");
         assertThat(response.getBody().detail()).contains("page");
+    }
+
+    @Test
+    void отсутствующая_часть_multipart_даёт_400_missing_part() {
+        MissingServletRequestPartException missing =
+            new MissingServletRequestPartException("file");
+
+        ResponseEntity<ApiError> response = handler.missingPart(missing, request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo("MISSING_PART");
+        assertThat(response.getBody().detail()).contains("file");
+    }
+
+    @Test
+    void неподдерживаемый_тип_запроса_даёт_415_unsupported_media_type() {
+        HttpMediaTypeNotSupportedException unsupported =
+            new HttpMediaTypeNotSupportedException(MediaType.APPLICATION_JSON, List.of());
+
+        ResponseEntity<ApiError> response = handler.unsupportedMediaType(unsupported, request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(415);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo("UNSUPPORTED_MEDIA_TYPE");
     }
 }
