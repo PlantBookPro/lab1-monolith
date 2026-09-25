@@ -6,7 +6,7 @@
 | Контекст | Агрегат (корень) | Состав | Ключевые инварианты | Команды | Доменные события | Защищающий тест |
 |---|---|---|---|---|---|---|
 | identity | `User` | роли, профиль, координаты, хэш пароля, статус | USER всегда присутствует; роли меняются только отдельными командами; координаты в допустимых диапазонах | создать USER, изменить профиль, назначить/снять роль, деактивировать | — | `UserTest` (роли/USER всегда), `GeoPointTest` (диапазоны), `UserAdministrationServiceTest`, `IdentityApiIT` (через HTTP) |
-| media | `MediaAsset` | метаданные файла | Неизменяем после создания | загрузить файл | — | (итерация 2) |
+| media | `MediaAsset` | метаданные файла | Неизменяем после создания | загрузить файл | — | `MediaAssetTest` (неизменяемость/фабрики), `ImageFingerprintTest` (алгоритм v1: альфа/каналы/размеры), `MediaAssetServiceTest` (компенсация сиротского файла, права), `MediaApiIT` (через HTTP: форматы/размеры/отпечаток игнорирует метаданные) |
 | plants | `Plant` | ownerId, assetId, fingerprint, статусы модерации и жизни | Переходы модерации и жизни; DEAD необратим; asset не меняется после подачи | подать заявку, применить решение модерации, погибнуть | `PlantSubmitted`, `PlantModerationDecided`, `PlantDied` | (итерация 3) |
 | plants | `ImageRestriction` | ownerId, fingerprint, kind, expiresAt, reason, sourceEntryId | PERMANENT без expiresAt; COOLDOWN активен при `now < expiresAt` | наложить запрет | — | (итерация 3) |
 | plants | `PlantReservation` | ownerId, fingerprint, idempotency key, статус | Не более одного активного резерва на (ownerId, fingerprint) — set-инвариант, частичный UNIQUE-индекс PostgreSQL | зарезервировать, освободить | — | (итерация 3) |

@@ -8,10 +8,12 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -64,6 +66,20 @@ public class ApiExceptionHandler {
                                                      HttpServletRequest request) {
         return respond(HttpStatus.BAD_REQUEST, "INVALID_PARAMETER",
             "Некорректное значение параметра: " + e.getName(), request);
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiError> missingPart(MissingServletRequestPartException e,
+                                                HttpServletRequest request) {
+        return respond(HttpStatus.BAD_REQUEST, "MISSING_PART",
+            "Отсутствует часть запроса: " + e.getRequestPartName(), request);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiError> unsupportedMediaType(HttpMediaTypeNotSupportedException e,
+                                                         HttpServletRequest request) {
+        return respond(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "UNSUPPORTED_MEDIA_TYPE",
+            "Тип содержимого запроса не поддерживается", request);
     }
 
     @ExceptionHandler(Exception.class)
