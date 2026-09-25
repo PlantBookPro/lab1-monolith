@@ -4,6 +4,7 @@ import com.plantarena.shared.event.IntegrationEventPublisher;
 import com.plantarena.shared.security.CurrentActor;
 import com.plantarena.tournaments.api.TournamentData;
 import com.plantarena.tournaments.api.event.TournamentStartedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
 import com.plantarena.tournaments.application.port.in.StartTournamentUseCase;
 import com.plantarena.tournaments.application.port.out.PlantEligibilityGateway;
 import com.plantarena.tournaments.domain.Invitation;
@@ -138,12 +139,17 @@ public class StartTournamentService implements StartTournamentUseCase {
                 invitation.reservationId(), now)));
         }
         // первый раунд (раздел 7): состав зафиксирован, счёт с нуля
-        windows.save(VotingWindow.open(tournament.id(), 1,
+        VotingWindow firstWindow = VotingWindow.open(tournament.id(), 1,
             admitted.stream()
                 .map(entry -> new VotingWindow.ParticipantSeed(entry.id(), entry.userId(),
                     entry.joinedAt()))
                 .toList(),
-            now, now.plus(tournament.roundDuration()), now));
+            now, now.plus(tournament.roundDuration()), now);
+        windows.save(firstWindow);
+        publishOpened(firstWindow, admitted.stream()
+            .map(entry -> new VotingWindowOpenedEvent.Participant(entry.id(), entry.userId(),
+                entry.plantId(), entry.joinedAt()))
+            .toList(), now);
         expireNotReady(tournament.id(), now);
         publishStarted(tournament, now);
         return TournamentAssembler.toData(tournament);
@@ -181,6 +187,19 @@ public class StartTournamentService implements StartTournamentUseCase {
             TournamentStartedEvent.SCHEMA_VERSION, tournament.id(), tournament.version(),
             now, eventId, new TournamentStartedEvent.Payload(tournament.id(),
                 tournament.creatorId())));
+    }
+
+    /** Проекция ленты (раздел 9): состав первого окна. */
+    private void publishOpened(VotingWindow window,
+                               List<VotingWindowOpenedEvent.Participant> participants,
+                               Instant now) {
+        UUID eventId = UUID.randomUUID();
+        eventPublisher.publish(new VotingWindowOpenedEvent(eventId,
+            VotingWindowOpenedEvent.TYPE, VotingWindowOpenedEvent.SCHEMA_VERSION,
+            window.id(), window.version(), now, eventId,
+            new VotingWindowOpenedEvent.Payload(window.id(), window.tournamentId(),
+                window.scope().name(), window.sequence(), window.epochId(), window.clusterId(),
+                window.clusterKey(), window.opensAt(), window.closesAt(), participants)));
     }
 
     private Tournament find(UUID tournamentId) {

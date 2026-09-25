@@ -3,6 +3,7 @@ package com.plantarena.tournaments.application;
 import com.plantarena.shared.security.AppRole;
 import com.plantarena.shared.security.CurrentActor;
 import com.plantarena.tournaments.api.event.TournamentStartedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
 import com.plantarena.tournaments.application.port.in.CreateTournamentUseCase;
 import com.plantarena.tournaments.application.support.FakeEventPublisher;
 import com.plantarena.tournaments.application.support.FakePlantEligibilityGateway;
@@ -173,5 +174,28 @@ class StartTournamentServiceTest {
         assertThat(window.closesAt()).isEqualTo(window.opensAt().plusSeconds(3600));
         assertThat(window.participants()).hasSize(2);
         assertThat(window.participants()).allSatisfy(p -> assertThat(p.score()).isZero());
+    }
+
+    @Test
+    @DisplayName("старт публикует VotingWindowOpened с составом первого окна (проекция feed)")
+    void старт_публикует_открытие_окна() {
+        UUID tournamentId = openTournament(NOW.plusSeconds(1));
+        Invitation ready1 = readyInvitation(tournamentId);
+        Invitation ready2 = readyInvitation(tournamentId);
+
+        service.startDue(NOW.plusSeconds(2), 10);
+
+        VotingWindowOpenedEvent opened = events.published.stream()
+            .filter(VotingWindowOpenedEvent.class::isInstance)
+            .map(VotingWindowOpenedEvent.class::cast)
+            .findFirst().orElseThrow();
+        assertThat(opened.payload().scope()).isEqualTo("PRIVATE");
+        assertThat(opened.payload().sequence()).isEqualTo(1);
+        assertThat(opened.payload().participants()).hasSize(2);
+        assertThat(opened.payload().participants())
+            .extracting(VotingWindowOpenedEvent.Participant::userId)
+            .containsExactlyInAnyOrder(ready1.userId(), ready2.userId());
+        assertThat(opened.payload().participants())
+            .allSatisfy(p -> assertThat(p.plantId()).isNotNull());
     }
 }

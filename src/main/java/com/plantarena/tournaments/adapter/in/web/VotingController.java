@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,21 +37,26 @@ public class VotingController {
 
     @PutMapping("/{windowId}/entries/{entryId}/vote")
     @Operation(operationId = "voting-cast-vote",
-        summary = "Установить голос LIKE/DISLIKE за участника окна (участник турнира, не сам)")
+        summary = "Установить голос LIKE/DISLIKE (участник турнира или гость в глобальном окне)")
     public ResponseEntity<VoteResponse> cast(@PathVariable UUID windowId,
                                              @PathVariable UUID entryId,
+                                             @RequestHeader(value = "X-Guest-Token",
+                                                 required = false) String guestToken,
                                              @Valid @RequestBody VoteRequest request) {
         CurrentActor actor = currentActorProvider.currentActor();
-        long score = voting.cast(actor, windowId, entryId, request.value());
+        long score = voting.cast(actor, guestToken, windowId, entryId, request.value());
         return ResponseEntity.ok(new VoteResponse(score));
     }
 
     @DeleteMapping("/{windowId}/entries/{entryId}/vote")
     @Operation(operationId = "voting-delete-vote",
         summary = "Удалить свой голос до закрытия окна (204, идемпотентно)")
-    public ResponseEntity<Void> remove(@PathVariable UUID windowId, @PathVariable UUID entryId) {
+    public ResponseEntity<Void> remove(@PathVariable UUID windowId,
+                                       @PathVariable UUID entryId,
+                                       @RequestHeader(value = "X-Guest-Token",
+                                           required = false) String guestToken) {
         CurrentActor actor = currentActorProvider.currentActor();
-        voting.remove(actor, windowId, entryId);
+        voting.remove(actor, guestToken, windowId, entryId);
         return ResponseEntity.noContent().build();
     }
 
@@ -58,9 +64,11 @@ public class VotingController {
     @Operation(operationId = "voting-my-vote",
         summary = "Текущий голос субъекта за участника (value или null)")
     public ResponseEntity<MyVoteResponse> myVote(@PathVariable UUID windowId,
-                                                 @PathVariable UUID entryId) {
+                                                 @PathVariable UUID entryId,
+                                                 @RequestHeader(value = "X-Guest-Token",
+                                                     required = false) String guestToken) {
         CurrentActor actor = currentActorProvider.currentActor();
         return ResponseEntity.ok(
-            new MyVoteResponse(voting.myVote(actor, windowId, entryId).orElse(null)));
+            new MyVoteResponse(voting.myVote(actor, guestToken, windowId, entryId).orElse(null)));
     }
 }

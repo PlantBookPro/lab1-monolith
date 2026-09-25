@@ -5,6 +5,7 @@ import com.plantarena.tournaments.domain.TournamentEntry;
 import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -73,9 +74,15 @@ public class JpaTournamentEntryRepository implements TournamentEntryRepository {
     @Override
     @Transactional(readOnly = true)
     public List<TournamentEntry> findByTournamentIdAndStatus(UUID tournamentId,
-                                                             EntryStatus status) {
+                                                              EntryStatus status) {
         return entries.findByTournamentIdAndStatus(tournamentId, status.name())
             .stream().map(JpaTournamentEntryRepository::toDomain).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<UUID> findTournamentIdsByUserId(UUID userId) {
+        return entries.findTournamentIdsByUserId(userId);
     }
 
     private static TournamentEntry toDomain(TournamentEntryJpaEntity entity) {

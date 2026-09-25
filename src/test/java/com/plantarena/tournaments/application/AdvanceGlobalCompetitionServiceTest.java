@@ -1,5 +1,7 @@
 package com.plantarena.tournaments.application;
 
+import com.plantarena.tournaments.api.event.VotingWindowClosedEvent;
+import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
 import com.plantarena.tournaments.application.port.in.AdvanceGlobalCompetitionUseCase;
 import com.plantarena.tournaments.application.port.out.ParticipantLocationsGateway.UserLocation;
 import com.plantarena.tournaments.application.port.out.PlantLifecycleGateway;
@@ -61,6 +63,7 @@ class AdvanceGlobalCompetitionServiceTest {
         UUID clusterId = UUID.randomUUID();
         UUID loser = globalEntry(EntryStatus.QUALIFYING);
         UUID winner = globalEntry(EntryStatus.QUALIFYING);
+        UUID promoted = globalEntry(EntryStatus.QUALIFYING);
         epochs.save(QualificationEpoch.open(epochId, GlobalCompetitionId.VALUE, 1,
             T0.minus(Duration.ofHours(25)), T0.minus(Duration.ofHours(1)), T0));
         VotingWindow qualification = VotingWindow.openQualification(GlobalCompetitionId.VALUE,
@@ -70,7 +73,7 @@ class AdvanceGlobalCompetitionServiceTest {
             T0.minus(Duration.ofHours(2))); // детерминированный top-1
         windows.save(qualification);
         windows.save(VotingWindow.openQualification(GlobalCompetitionId.VALUE, epochId,
-            UUID.randomUUID(), "u8t", 1, List.of(seed(globalEntry(EntryStatus.QUALIFYING))),
+            UUID.randomUUID(), "u8t", 1, List.of(seed(promoted)),
             T0.minus(Duration.ofHours(25)), T0.minus(Duration.ofHours(1)), T0));
         // финал 1: один выживший (n=1 — лидер), дедлайн прошёл
         UUID survivor = globalEntry(EntryStatus.FINALIST);
@@ -115,6 +118,39 @@ class AdvanceGlobalCompetitionServiceTest {
         assertThat(entries.findById(queued).orElseThrow().status())
             .isEqualTo(EntryStatus.QUALIFYING);
         assertThat(epochs.findOpenByTournamentId(GlobalCompetitionId.VALUE)).isPresent();
+
+        // события проекции ленты (раздел 9): закрытия квалификаций/финала, открытия финала/эпохи
+        List<VotingWindowClosedEvent> closedEvents = eventPublisher.published.stream()
+            .filter(VotingWindowClosedEvent.class::isInstance)
+            .map(VotingWindowClosedEvent.class::cast)
+            .toList();
+        assertThat(closedEvents).extracting(event -> event.payload().scope())
+            .containsExactlyInAnyOrder("QUALIFICATION", "QUALIFICATION", "FINAL");
+        assertThat(closedEvents).extracting(event -> event.payload().windowId())
+            .contains(qualification.id());
+
+        VotingWindowOpenedEvent finalOpened = eventPublisher.published.stream()
+            .filter(VotingWindowOpenedEvent.class::isInstance)
+            .map(VotingWindowOpenedEvent.class::cast)
+            .filter(event -> "FINAL".equals(event.payload().scope()))
+            .findFirst().orElseThrow();
+        assertThat(finalOpened.payload().sequence()).isEqualTo(2);
+        assertThat(finalOpened.payload().participants())
+            .extracting(VotingWindowOpenedEvent.Participant::entryId)
+            .containsExactlyInAnyOrder(survivor, winner, promoted);
+
+        VotingWindowOpenedEvent qualificationOpened = eventPublisher.published.stream()
+            .filter(VotingWindowOpenedEvent.class::isInstance)
+            .map(VotingWindowOpenedEvent.class::cast)
+            .filter(event -> "QUALIFICATION".equals(event.payload().scope()))
+            .findFirst().orElseThrow();
+        assertThat(qualificationOpened.payload().clusterId()).isNotNull();
+        assertThat(qualificationOpened.payload().clusterKey()).isEqualTo("fake-55.7558-37.6173");
+        assertThat(qualificationOpened.payload().participants())
+            .extracting(VotingWindowOpenedEvent.Participant::entryId)
+            .containsExactly(queued);
+        assertThat(qualificationOpened.payload().participants())
+            .allSatisfy(p -> assertThat(p.plantId()).isNotNull());
     }
 
     @Test

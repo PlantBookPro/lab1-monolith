@@ -27,9 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class JpaVotingWindowRepository implements VotingWindowRepository {
 
     private final VotingWindowJpaRepository jpaRepository;
+    private final VoteJpaRepository voteJpaRepository;
 
-    public JpaVotingWindowRepository(VotingWindowJpaRepository jpaRepository) {
+    public JpaVotingWindowRepository(VotingWindowJpaRepository jpaRepository,
+                                     VoteJpaRepository voteJpaRepository) {
         this.jpaRepository = jpaRepository;
+        this.voteJpaRepository = voteJpaRepository;
     }
 
     @Override
@@ -131,6 +134,12 @@ public class JpaVotingWindowRepository implements VotingWindowRepository {
     @Transactional(readOnly = true)
     public long countOpenByEpochId(UUID epochId) {
         return jpaRepository.countByEpochIdAndStatus(epochId, WindowStatus.OPEN.name());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<UUID> findVotedEntryIdsInOpenWindows(String subjectKey) {
+        return voteJpaRepository.findVotedEntryIdsInOpenWindows(subjectKey);
     }
 
     private VotingWindowJpaEntity newEntity(VotingWindow window) {

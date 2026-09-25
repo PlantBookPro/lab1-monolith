@@ -2,6 +2,7 @@ package com.plantarena.tournaments.adapter.out.persistence;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,8 @@ public interface TournamentEntryJpaRepository extends JpaRepository<TournamentEn
                                                          @Param("userId") UUID userId);
 
     List<TournamentEntryJpaEntity> findByTournamentIdAndStatus(UUID tournamentId, String status);
+
+    @Query("select distinct e.tournament.id from TournamentEntryJpaEntity e "
+        + "where e.userId = :userId")
+    Set<UUID> findTournamentIdsByUserId(@Param("userId") UUID userId);
 }

@@ -83,6 +83,27 @@ public abstract class TournamentEntryRepositoryContractTest {
     }
 
     @Test
+    @DisplayName("findTournamentIdsByUserId: турниры участника, включая выбывшего (допущение 9)")
+    void турниры_участия_пользователя() {
+        UUID user = UUID.randomUUID();
+        UUID other = UUID.randomUUID();
+        UUID t1 = newTournamentId();
+        UUID t2 = newTournamentId();
+        UUID t3 = newTournamentId();
+        TournamentEntry active = repository().save(TournamentEntry.admit(t1, user,
+            UUID.randomUUID(), UUID.randomUUID(), NOW));
+        TournamentEntry eliminated = repository().save(TournamentEntry.admit(t2, user,
+            UUID.randomUUID(), UUID.randomUUID(), NOW));
+        eliminated.eliminate();
+        repository().save(eliminated);
+        repository().save(TournamentEntry.admit(t3, other, UUID.randomUUID(),
+            UUID.randomUUID(), NOW));
+
+        assertThat(repository().findTournamentIdsByUserId(user))
+            .containsExactlyInAnyOrder(t1, t2);
+    }
+
+    @Test
     @DisplayName("уникальность пары (tournamentId, userId) — как БД")
     void уникальность_пары() {
         UUID tournamentId = newTournamentId();

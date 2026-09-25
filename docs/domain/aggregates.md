@@ -17,7 +17,7 @@
 | tournaments | `Tag` | имя | Уникальность имени; используемый турниром тег не удаляется | создать, переименовать, удалить | — | `TagTest`, `TagsServiceTest`, `TagRepositoryContractTest` + `JpaTagRepositoryContractIT` |
 | tournaments | `VotingWindow` | `WindowParticipant` (счёт, итог), `Vote`, scope, epochId/clusterId | Интервал `[opensAt, closesAt)`; состав зафиксирован (private — минимум 2 участника, глобальные — минимум 1, без дубликатов); score = сумма текущих голосов; один голос субъекта за участника; самоголосование запрещено; повторное закрытие не меняет результатов; итог квалификации — top-1 PROMOTED (ADR-012) | проголосовать, изменить голос, удалить голос, закрыть окно | `EntryEliminated`, `TournamentFinished` (в tx закрытия — ADR-011) | `VotingWindowTest` (интервал/состав/score/самоголосование/закрытие), `VotingWindowGlobalTest` (scope/минимум один/PROMOTED), `VoteValueTest` (дельты переходов), `VotingServiceTest`, `CloseVotingWindowServiceTest`, `VotingApiIT` (через HTTP), `VotingConcurrencyIT` (конкурентные голоса и закрытие) |
 | tournaments | `QualificationEpoch` | sequence, интервал, статус, состав | Интервал `[opensAt, closesAt)`; одна OPEN-эпоха на турнир; закрытие — после закрытия всех окон эпохи; состав зафиксирован | открыть эпоху, закрыть эпоху | — | `QualificationEpochTest` (интервал/одна OPEN/закрытие), `QualificationEpochRepositoryContractTest` + `JpaQualificationEpochRepositoryContractIT` (частичный уникальный индекс) |
-| tournaments | `GuestSession` | хэш токена, срок действия, лимиты | Хранится только хэш токена; срок действия | создать сессию | — | (итерация 8) |
+| tournaments | `GuestSession` | tokenHash (SHA-256), createdAt, expiresAt | Хранится только хэш токена; активна пока `now < expiresAt`; неизменяема после создания | issue (создать сессию) | — | `GuestSessionTest` (фабрика/активность/неизменяемость), `GuestSessionsApiIT` (через HTTP: 201/429/401) |
 | geo | `ClusterSnapshot` | epochId, clusterKey, policyVersion, состав | Состав и версия политики неизменны после фиксации эпохи | зафиксировать состав эпохи | — | `ClusterSnapshotTest` (неизменность после фиксации), `GeohashClusteringPolicyTest`, `GeohashTest` |
 
 ## Доменные сервисы и политики (чистый Java)
@@ -26,4 +26,15 @@
 - `ParticipantRanking` (tie-break: score DESC, joinedAt ASC, entryId ASC) — реализован: `ParticipantRankingTest`
 - `ClusteringPolicy` (geohash) — реализован (итерация 7): `GeohashClusteringPolicyTest`, `GeohashTest`
 - `ImageReusePolicy` — реализован (итерация 3): `ImageReusePolicyTest`
-- `FeedOrdering` (псевдослучайный ключ от server-issued seed) — итерация 8
+- `FeedOrdering` (псевдослучайный ключ от server-issued seed) — реализован (итерация 8): контракт `hashtextextended` — `FeedCardRepositoryContractTest` + `JpaFeedCardRepositoryContractIT`
+
+## Read-модели без агрегата (проекции)
+
+- feed: `FeedCard` (схема `feed`, ADR-002) — строка проекции участника
+  открытого окна с публичными данными растения и владельца. Обновляется
+  событиями `VotingWindowOpened` (создание карточек, синхронно in-process)
+  и `VotingWindowClosed` (удаление карточек окна); неактивные/погибшие
+  растения пропускаются. Защищается `FeedCardRepositoryContractTest` +
+  `JpaFeedCardRepositoryContractIT` (контракт запросов: seed-порядок,
+  keyset, фильтры прав) и `FeedProjectionServiceTest` (обновление по
+  событиям). В лабе №4 меняется только доставка событий (outbox → Kafka).

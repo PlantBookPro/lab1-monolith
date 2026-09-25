@@ -91,12 +91,20 @@ public class InMemoryTournamentEntryRepository implements TournamentEntryReposit
 
     @Override
     public List<TournamentEntry> findByTournamentIdAndStatus(UUID tournamentId,
-                                                             EntryStatus status) {
+                                                              EntryStatus status) {
         return entries.values().stream()
             .filter(entry -> entry.tournamentId().equals(tournamentId)
                 && entry.status() == status)
             .sorted(Comparator.comparing(TournamentEntry::joinedAt)
                 .thenComparing(TournamentEntry::id))
             .toList();
+    }
+
+    @Override
+    public Set<UUID> findTournamentIdsByUserId(UUID userId) {
+        return entries.values().stream()
+            .filter(entry -> entry.userId().equals(userId))
+            .map(TournamentEntry::tournamentId)
+            .collect(java.util.stream.Collectors.toSet());
     }
 }

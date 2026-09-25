@@ -14,6 +14,7 @@ import com.plantarena.tournaments.application.InvitedPlantNotFoundException;
 import com.plantarena.tournaments.application.LocationRequiredException;
 import com.plantarena.tournaments.application.PlantNotApprovedException;
 import com.plantarena.tournaments.application.PlantNotReservableException;
+import com.plantarena.tournaments.application.RateLimitExceededException;
 import com.plantarena.tournaments.application.RegistrationClosedException;
 import com.plantarena.tournaments.application.SelfVoteForbiddenException;
 import com.plantarena.tournaments.application.SubmittedPlantNotFoundException;
@@ -33,6 +34,7 @@ import java.net.URI;
 import java.util.List;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -213,6 +215,17 @@ public class TournamentsExceptionHandler {
     public ResponseEntity<ApiError> unknownGlobalScope(UnknownGlobalScopeException e,
                                                        HttpServletRequest request) {
         return respond(HttpStatus.BAD_REQUEST, "GLOBAL_SCOPE_UNKNOWN", e.getMessage(), request);
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ApiError> rateLimited(RateLimitExceededException e,
+                                                HttpServletRequest request) {
+        String traceId = (String) request.getAttribute(TraceIdFilter.TRACE_ID_ATTRIBUTE);
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+            .header(HttpHeaders.RETRY_AFTER, String.valueOf(e.retryAfterSeconds()))
+            .body(new ApiError(URI.create("about:blank"), HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
+                HttpStatus.TOO_MANY_REQUESTS.value(), e.getMessage(),
+                URI.create(request.getRequestURI()), "RATE_LIMITED", List.of(), traceId));
     }
 
     private ResponseEntity<ApiError> respond(HttpStatus status, String code, String detail,

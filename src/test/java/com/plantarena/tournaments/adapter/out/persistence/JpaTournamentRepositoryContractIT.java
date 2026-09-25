@@ -50,6 +50,7 @@ class JpaTournamentRepositoryContractIT extends TournamentRepositoryContractTest
         jdbcTemplate.update("delete from tournaments.tournament_tag");
         jdbcTemplate.update("delete from tournaments.invitation");
         jdbcTemplate.update("delete from tournaments.tournament_entry");
+        jdbcTemplate.update("delete from tournaments.qualification_epoch");
         jdbcTemplate.update("delete from tournaments.tournament");
         jdbcTemplate.update("delete from tournaments.tag");
     }
