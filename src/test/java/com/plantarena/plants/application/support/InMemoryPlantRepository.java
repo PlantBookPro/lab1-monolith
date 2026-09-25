@@ -33,11 +33,15 @@ public class InMemoryPlantRepository implements PlantRepository {
             .findFirst();
     }
 
+    /** Порядок как в PostgreSQL uuid: побайтовый = сравнение id как строки. */
+    private static final Comparator<Plant> BY_ID_AS_STRING =
+        Comparator.comparing(plant -> plant.id().toString());
+
     @Override
     public List<Plant> findByOwner(UUID ownerId, int offset, int limit) {
         return plants.values().stream()
             .filter(plant -> plant.ownerId().equals(ownerId) && plant.archivedAt() == null)
-            .sorted(Comparator.comparing(Plant::id))
+            .sorted(BY_ID_AS_STRING)
             .skip(offset)
             .limit(limit)
             .toList();
@@ -55,7 +59,7 @@ public class InMemoryPlantRepository implements PlantRepository {
         return plants.values().stream()
             .filter(plant -> plant.ownerId().equals(ownerId) && plant.archivedAt() == null
                 && plant.moderationStatus() == ModerationStatus.APPROVED)
-            .sorted(Comparator.comparing(Plant::id))
+            .sorted(BY_ID_AS_STRING)
             .skip(offset)
             .limit(limit)
             .toList();

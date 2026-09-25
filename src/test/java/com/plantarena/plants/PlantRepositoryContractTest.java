@@ -5,6 +5,8 @@ import com.plantarena.plants.domain.ModerationStatus;
 import com.plantarena.plants.domain.Plant;
 import com.plantarena.plants.domain.PlantRepository;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -111,9 +113,16 @@ public abstract class PlantRepositoryContractTest {
 
         List<Plant> firstPage = repository().findByOwner(ownerId, 0, 2);
         assertThat(firstPage).hasSize(2);
-        assertThat(firstPage.get(0).id().compareTo(firstPage.get(1).id())).isLessThan(0);
         assertThat(repository().findByOwner(ownerId, 2, 2)).hasSize(1);
         assertThat(repository().countByOwner(ownerId)).isEqualTo(3);
+
+        // порядок сравнения UUID как строки совпадает с побайтовым порядком
+        // PostgreSQL uuid — оба наследника контракта упорядочены одинаково
+        List<UUID> ids = new ArrayList<>();
+        repository().findByOwner(ownerId, 0, 2).forEach(plant -> ids.add(plant.id()));
+        repository().findByOwner(ownerId, 2, 2).forEach(plant -> ids.add(plant.id()));
+        assertThat(ids).doesNotHaveDuplicates();
+        assertThat(ids).isSortedAccordingTo(Comparator.comparing(UUID::toString));
 
         Plant archived = firstPage.get(0);
         archived.archive(NOW);
