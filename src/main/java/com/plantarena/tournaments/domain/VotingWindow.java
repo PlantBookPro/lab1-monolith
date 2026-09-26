@@ -255,4 +255,21 @@ public final class VotingWindow {
     public record CloseOutcome(List<UUID> eliminatedEntryIds, List<UUID> survivedEntryIds,
                                UUID winnerEntryId) {
     }
+
+    /** Идентичность по id: JPA-адаптер пересобирает агрегат при чтении. */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof VotingWindow other)) {
+            return false;
+        }
+        return id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }
