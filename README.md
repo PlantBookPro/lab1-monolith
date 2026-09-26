@@ -79,6 +79,30 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
 - Решение видно владельцу: `GET /api/v1/plants/{id}/moderation` — статус,
   причина (`PLANT_DETECTED`/`NOT_A_PLANT`) и `retryUploadAllowed`.
 
+## Турниры (tournaments)
+
+Закрытые (PRIVATE) турниры с приглашениями (раздел 7): модератор/админ создаёт
+DRAFT (параметры + теги), приглашает пользователей; приём заявок — до дедлайна
+регистрации. Принятие приглашения резервирует изображение растения (одно
+изображение — один активный резерв, ADR-010): одобренное модерацией растение →
+заявка READY сразу, идущая модерация → ACCEPTED_PENDING_MODERATION (решение
+переводит в READY или возвращает в INVITED). Наступивший дедлайн стартует
+турнир scheduler'ом (fixedDelay 2с) или вручную — один use case: READY ≥
+minParticipants → RUNNING (участия ACTIVE, не-READY → EXPIRED, резервы
+подтверждены); иначе CANCELLED с причиной INSUFFICIENT_PARTICIPANTS и
+освобождением резервов (растения не погибают).
+
+- Создание и теги — `POST /api/v1/tournaments`, `POST /api/v1/tags` (M/A);
+  список доступных — `GET /api/v1/tournaments?status=&tagId=` (X-Total-Count).
+- Приглашения — `POST /api/v1/tournaments/{id}/invitations`,
+  `GET /api/v1/me/invitations`, `POST /api/v1/invitations/{id}/accept|decline`.
+- Старт/отмена — `POST /api/v1/tournaments/{id}/start|cancel`; участники —
+  `GET /api/v1/tournaments/{id}/entries`.
+- Диагностика (dev/test, M/A): `POST /api/v1/internal/demo/jobs/run-due` —
+  тот же use case, что scheduler, без обхода правил.
+- Окна голосования, выбывание, FINISHED — итерация 6; глобальный турнир и
+  geo-кластеры — итерация 7.
+
 ## Проверка (единственная команда)
 
 ```bash

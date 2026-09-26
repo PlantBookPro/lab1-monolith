@@ -19,8 +19,8 @@ graph TD
     plants -->|ACL: метаданные asset, команды задействованности| media
     moderation -->|ACL: PlantSubmitted / recordDecision| plants
     moderation -->|ACL: loadContent (байты)| media
-    tournaments -->|ACL: CurrentActor, профиль| identity
-    tournaments -->|ACL: PlantEligibility, PlantLifecycle| plants
+    tournaments -->|ACL: CurrentActor, UserDirectory| identity
+    tournaments -->|ACL: PlantEligibility, PlantDirectory, PlantLifecycle| plants
     tournaments -->|ACL: ClusteringGateway| geo
     feed -->|read-порты| tournaments
     feed -->|read-порты| plants
@@ -32,12 +32,12 @@ graph TD
 
 | Контекст | Может обращаться к `api` контекстов | Тип отношения |
 |---|---|---|
-| identity | — | Upstream для всех; Open Host Service (CurrentActor, публичный профиль) |
+| identity | — | Upstream для всех; Open Host Service (CurrentActor, публичный профиль, `UserDirectory` — итерация 5) |
 | media | — | Upstream для plants, moderation, feed |
 | geo | — | Upstream для tournaments; получает координаты во входной команде, сам identity не читает |
 | plants | media | Customer–Supplier; ACL над `MediaAsset`, команды задействованности `MediaAssetClaims` (ADR-008) |
 | moderation | plants, media | Downstream: подписан на `PlantSubmitted` (adapter.in.events), решение командой `plants.api.PlantModeration.recordDecision`; байты файла — `media.api.MediaAssets.loadContent` (ACL adapter.out.media) |
-| tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `ParticipantDirectory`, `ClusteringGateway` |
+| tournaments | identity, plants, geo | Downstream; ACL `PlantEligibility`, `PlantDirectory`, `ParticipantDirectory`, `ClusteringGateway` (geo — итерация 7); подписан на `PlantModerationDecided` (adapter.in.events, та же tx — ADR-010) |
 | feed | tournaments, plants, media, identity | Downstream, только чтение через read-порты |
 
 Правило: контекст использует **только пакет `api`** другого контекста и только
@@ -73,6 +73,9 @@ graph TD
 | moderation | media | метаданные asset для инференса | запрос через `media.api` | синхронно | Feign | Feign |
 | tournaments | identity | `CurrentActor`, публичный профиль | запрос | синхронно | Feign | Feign |
 | tournaments | plants | `PlantEligibility.reserveSubmission/confirmEligibility` | команда/запрос | синхронно | Feign + saga | Kafka-команды |
+| tournaments | plants | `PlantDirectory.findById` (read, проверка APPROVED при принятии) | запрос через `plants.api` | синхронно | Feign | Feign |
+| tournaments | identity | `UserDirectory.findById` (известный активный пользователь) | запрос через `identity.api` | синхронно | Feign | Feign |
+| plants | tournaments | публикация `PlantModerationDecided` (перевод заявки) | событие | синхронно, в tx решения (ADR-010) | outbox → идемпотентная команда | Kafka `plant.moderation.v1` |
 | tournaments | plants | `PlantLifecycle.registerDeath` | команда | синхронно, в транзакции закрытия окна | saga-команда | Kafka `plant.lifecycle.v1` |
 | tournaments | geo | `ClusteringGateway` (состав эпохи) | команда/запрос | синхронно | Feign/R2DBC | Feign |
 | feed | tournaments | проекция карточек по событиям | события | in-process | события внутри tournament-service | Kafka → проекция |
