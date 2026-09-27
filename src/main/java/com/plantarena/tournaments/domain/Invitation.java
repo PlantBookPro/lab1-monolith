@@ -92,7 +92,8 @@ public final class Invitation {
 
     /** Отказ адресата до старта (резерв освобождает application). */
     public void decline(Instant now) {
-        requireStatus(InvitationStatus.INVITED, InvitationStatus.ACCEPTED_PENDING_MODERATION);
+        requireStatus(InvitationStatus.INVITED, InvitationStatus.ACCEPTED_PENDING_MODERATION,
+            InvitationStatus.READY);
         status = InvitationStatus.DECLINED;
         reservationId = null;
         submissionKey = null;

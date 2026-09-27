@@ -183,6 +183,24 @@ class InvitationServiceTest {
     }
 
     @Test
+    @DisplayName("decline: из READY — 200, резерв подтверждённой заявки освобождён")
+    void decline_из_ready() {
+        UUID tournamentId = openTournament();
+        participants.knownUsers.add(userId);
+        UUID invitationId = service.invite(organizer, tournamentId, userId).id();
+        UUID plantId = UUID.randomUUID();
+        plantDirectory.plants.put(plantId,
+            new PlantDirectoryGateway.PlantSnapshot(plantId, userId, true));
+        service.accept(user, invitationId, plantId);
+        UUID reservationId = invitations.findById(invitationId).orElseThrow().reservationId();
+
+        var declined = service.decline(user, invitationId);
+
+        assertThat(declined.status()).isEqualTo("DECLINED");
+        assertThat(eligibility.isReleased(reservationId)).isTrue();
+    }
+
+    @Test
     @DisplayName("revoke: только INVITED и до дедлайна; принятое — 409")
     void revoke_правила() {
         UUID tournamentId = openTournament();

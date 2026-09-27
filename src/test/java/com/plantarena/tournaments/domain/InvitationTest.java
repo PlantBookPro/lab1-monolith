@@ -109,6 +109,20 @@ class InvitationTest {
     }
 
     @Test
+    @DisplayName("decline: из READY — отказ до старта, история подачи сохранена (раздел 7)")
+    void decline_из_ready() {
+        Invitation ready = accepted(true);
+        UUID plantId = ready.submittedPlantId();
+
+        ready.decline(NOW.plusSeconds(5));
+
+        assertThat(ready.status()).isEqualTo(InvitationStatus.DECLINED);
+        assertThat(ready.submittedPlantId()).isEqualTo(plantId); // история последней подачи
+        assertThat(ready.reservationId()).isNull();
+        assertThat(ready.submissionKey()).isNull();
+    }
+
+    @Test
     @DisplayName("revoke: только не принятые (INVITED); принятое — конфликт организатора")
     void revoke_только_invited() {
         Invitation invitation = Invitation.invite(TOURNAMENT_ID, USER_ID, ORGANIZER_ID, NOW);
