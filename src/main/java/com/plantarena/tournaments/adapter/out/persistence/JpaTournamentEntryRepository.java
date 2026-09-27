@@ -33,6 +33,7 @@ public class JpaTournamentEntryRepository implements TournamentEntryRepository {
         TournamentEntryJpaEntity entity = entries.findById(entry.id())
             .orElseGet(() -> new TournamentEntryJpaEntity(entry.id(), tournament,
                 entry.userId(), entry.plantId(), entry.reservationId(), entry.joinedAt()));
+        entity.setStatus(entry.status().name());
         return toDomain(entries.saveAndFlush(entity));
     }
 
