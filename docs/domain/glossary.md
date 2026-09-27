@@ -28,6 +28,7 @@
 | Участник окна | `WindowParticipant` | tournaments | Участие entry в конкретном окне: счёт и итог |
 | Голос | `Vote` | tournaments | LIKE/DISLIKE субъекта за участника окна |
 | Субъект голосования | `VotingSubject` | tournaments | USER(userId) или GUEST(токен гостевой сессии) |
+| Дельта голоса | `VoteValue.transitionDelta` | tournaments | Изменение счёта при переходе голоса: +1/−1 новый, ±2 смена знака, 0 повтор, удаление — компенсация |
 | Эпоха отбора | `QualificationEpoch` | tournaments | Период глобального отбора с фиксированным составом |
 | Тег | `Tag` | tournaments | Тематика турнира (справочник); tagIds — параметры турнира (меняются только в DRAFT), удаление используемого тега запрещено |
 | Кластер, ячейка | `Cluster` / `ClusterSnapshot` | geo | Географическая группа участников эпохи |

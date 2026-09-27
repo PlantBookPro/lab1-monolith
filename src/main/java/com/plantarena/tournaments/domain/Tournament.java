@@ -113,6 +113,12 @@ public final class Tournament {
         cancelReason = CancelReason.INSUFFICIENT_PARTICIPANTS;
     }
 
+    /** Завершение: победитель определён закрытием окна (раздел 7). */
+    public void finish(Instant now) {
+        requireStatus(TournamentStatus.RUNNING);
+        status = TournamentStatus.FINISHED;
+    }
+
     /** Изменение параметров: только в DRAFT (раздел 13). */
     public void updateParameters(String name, Instant registrationDeadline,
                                  Duration roundDuration, double eliminationFraction,

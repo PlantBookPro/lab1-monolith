@@ -16,7 +16,7 @@ public final class TournamentEntry {
     private final UUID userId;
     private final UUID plantId;
     private final UUID reservationId;
-    private final EntryStatus status;
+    private EntryStatus status;
     private final Instant joinedAt;
 
     private TournamentEntry(UUID id, UUID tournamentId, UUID userId, UUID plantId,
@@ -43,6 +43,24 @@ public final class TournamentEntry {
                                           EntryStatus status, Instant joinedAt) {
         return new TournamentEntry(id, tournamentId, userId, plantId, reservationId,
             status, joinedAt);
+    }
+
+    /** Выбывание (закрытие окна, раздел 7): ACTIVE → ELIMINATED. */
+    public void eliminate() {
+        requireActive();
+        status = EntryStatus.ELIMINATED;
+    }
+
+    /** Победа (закрытие окна, раздел 7): ACTIVE → WINNER. */
+    public void declareWinner() {
+        requireActive();
+        status = EntryStatus.WINNER;
+    }
+
+    private void requireActive() {
+        if (status != EntryStatus.ACTIVE) {
+            throw new IllegalStateException("Итог участия уже зафиксирован: " + status);
+        }
     }
 
     public UUID id() {

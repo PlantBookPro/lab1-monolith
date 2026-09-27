@@ -10,9 +10,12 @@ import com.plantarena.tournaments.application.support.InMemoryInvitationReposito
 import com.plantarena.tournaments.application.support.InMemoryTagRepository;
 import com.plantarena.tournaments.application.support.InMemoryTournamentEntryRepository;
 import com.plantarena.tournaments.application.support.InMemoryTournamentRepository;
+import com.plantarena.tournaments.application.support.InMemoryVotingWindowRepository;
 import com.plantarena.tournaments.domain.Invitation;
 import com.plantarena.tournaments.domain.InvitationStatus;
 import com.plantarena.tournaments.domain.TournamentStatus;
+import com.plantarena.tournaments.domain.VotingWindow;
+import com.plantarena.tournaments.domain.WindowStatus;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -36,6 +39,7 @@ class StartTournamentServiceTest {
         new InMemoryInvitationRepository(tournaments);
     private final InMemoryTournamentEntryRepository entries =
         new InMemoryTournamentEntryRepository(tournaments);
+    private final InMemoryVotingWindowRepository windows = new InMemoryVotingWindowRepository();
     private final FakePlantEligibilityGateway eligibility = new FakePlantEligibilityGateway();
     private final FakeEventPublisher events = new FakeEventPublisher();
     private final Clock clock = Clock.fixed(NOW, ZoneOffset.UTC);
@@ -44,7 +48,8 @@ class StartTournamentServiceTest {
         new TournamentAdministrationService(tournaments, new InMemoryTagRepository(),
             invitations, eligibility, accessPolicy, clock);
     private final StartTournamentService service = new StartTournamentService(tournaments,
-        invitations, entries, eligibility, accessPolicy, events, clock, transactionTemplate());
+        invitations, entries, windows, eligibility, accessPolicy, events, clock,
+        transactionTemplate());
 
     private final UUID organizerId = UUID.randomUUID();
     private final CurrentActor organizer =
@@ -127,7 +132,7 @@ class StartTournamentServiceTest {
             .isInstanceOf(TournamentStateConflictException.class); // до дедлайна
 
         StartTournamentService afterDeadline = new StartTournamentService(tournaments,
-            invitations, entries, eligibility, accessPolicy, events,
+            invitations, entries, windows, eligibility, accessPolicy, events,
             Clock.fixed(NOW.plusSeconds(7200), ZoneOffset.UTC), transactionTemplate());
         assertThat(afterDeadline.start(organizer, tournamentId).status()).isEqualTo("RUNNING");
 
@@ -150,5 +155,23 @@ class StartTournamentServiceTest {
             .isEqualTo(TournamentStatus.REGISTRATION_OPEN);
 
         assertThat(service.startDue(NOW.plusSeconds(3), 10)).isZero(); // уже обработан
+    }
+
+    @Test
+    @DisplayName("старт создаёт первый VotingWindow: sequence 1, OPEN, состав = допущенные, счёт 0")
+    void старт_создаёт_первое_окно() {
+        UUID tournamentId = openTournament(NOW.plusSeconds(1));
+        readyInvitation(tournamentId);
+        readyInvitation(tournamentId);
+
+        service.startDue(NOW.plusSeconds(2), 10);
+
+        VotingWindow window = windows.findLatestByTournamentId(tournamentId).orElseThrow();
+        assertThat(window.sequence()).isEqualTo(1);
+        assertThat(window.status()).isEqualTo(WindowStatus.OPEN);
+        assertThat(window.opensAt()).isEqualTo(NOW.plusSeconds(2)); // now старта
+        assertThat(window.closesAt()).isEqualTo(window.opensAt().plusSeconds(3600));
+        assertThat(window.participants()).hasSize(2);
+        assertThat(window.participants()).allSatisfy(p -> assertThat(p.score()).isZero());
     }
 }
