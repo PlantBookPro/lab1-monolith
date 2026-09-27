@@ -112,6 +112,10 @@ public class InvitationService implements InviteUserUseCase, RevokeInvitationUse
         Invitation invitation = findInvitation(invitationId);
         accessPolicy.requireAddressee(actor, invitation);
         Tournament tournament = findTournament(invitation.tournamentId());
+        if (!tournament.isAcceptingNow(clock.instant())) {
+            throw new RegistrationClosedException(
+                "Принимать приглашения можно только в REGISTRATION_OPEN до дедлайна");
+        }
         if (invitation.status() == InvitationStatus.ACCEPTED_PENDING_MODERATION
                 || invitation.status() == InvitationStatus.READY) {
             if (plantId != null && plantId.equals(invitation.submittedPlantId())) {
@@ -123,10 +127,6 @@ public class InvitationService implements InviteUserUseCase, RevokeInvitationUse
         if (invitation.status() != InvitationStatus.INVITED) {
             throw new TournamentStateConflictException(
                 "Приглашение уже закрыто: " + invitation.status());
-        }
-        if (!tournament.isAcceptingNow(clock.instant())) {
-            throw new RegistrationClosedException(
-                "Принимать приглашения можно только в REGISTRATION_OPEN до дедлайна");
         }
         PlantDirectoryGateway.PlantSnapshot plant = plantDirectory.findById(plantId)
             .orElseThrow(() -> new InvitedPlantNotFoundException("Растение не найдено: " + plantId));
