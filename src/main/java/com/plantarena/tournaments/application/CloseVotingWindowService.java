@@ -14,7 +14,6 @@ import com.plantarena.tournaments.domain.TournamentRepository;
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
 import com.plantarena.tournaments.domain.WindowStatus;
-import java.time.Clock;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -45,7 +44,6 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
     private final PlantEligibilityGateway eligibility;
     private final PlantLifecycleGateway plantLifecycle;
     private final IntegrationEventPublisher eventPublisher;
-    private final Clock clock;
     private final TransactionTemplate transactionTemplate;
 
     public CloseVotingWindowService(VotingWindowRepository windows,
@@ -53,7 +51,7 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
                                     TournamentEntryRepository entries,
                                     PlantEligibilityGateway eligibility,
                                     PlantLifecycleGateway plantLifecycle,
-                                    IntegrationEventPublisher eventPublisher, Clock clock,
+                                    IntegrationEventPublisher eventPublisher,
                                     TransactionTemplate transactionTemplate) {
         this.windows = windows;
         this.tournaments = tournaments;
@@ -61,7 +59,6 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
         this.eligibility = eligibility;
         this.plantLifecycle = plantLifecycle;
         this.eventPublisher = eventPublisher;
-        this.clock = clock;
         this.transactionTemplate = transactionTemplate;
     }
 
@@ -71,7 +68,7 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
         for (UUID windowId : windows.findDueForClose(now, limit)) {
             try {
                 transactionTemplate.executeWithoutResult(
-                    status -> closeOne(windowId, clock.instant()));
+                    status -> closeOne(windowId, now));
                 processed++;
             } catch (RuntimeException e) {
                 // одно окно не блокирует остальные; повтор — следующий poll

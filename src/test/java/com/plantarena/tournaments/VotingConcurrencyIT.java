@@ -171,27 +171,25 @@ class VotingConcurrencyIT extends AbstractIntegrationTest {
     @DisplayName("повторное закрытие: одна гибель, один запрет, один следующий раунд")
     void повторное_закрытие() throws Exception {
         Setup setup = setup(1); // окно на 1 с
-        // fix синхронизации по плану (шаг 2): closeDue с «будущим» now лишь
-        // находит окно, но closeOne сверяется с настоящим Clock — поэтому
-        // условие по статусу окна в БД, а не по возвращённому значению
-        Awaitility.await().atMost(Duration.ofSeconds(10))
-            .until(() -> {
-                closeVotingWindow.closeDue(clockPlus(2), 10);
-                return "CLOSED".equals(statusOf(setup.windowId));
-            });
-
+        // оба вызова с «будущим» now закрывают OPEN-окно (единый источник
+        // времени в closeDue) — реальная арбитраж FOR UPDATE; scheduler не
+        // мешает: окно ещё не due по настоящему времени
         CountDownLatch start = new CountDownLatch(1);
         ExecutorService pool = Executors.newFixedThreadPool(2);
+        List<Future<?>> jobs = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            pool.submit(() -> {
+            jobs.add(pool.submit(() -> {
                 start.await();
                 closeVotingWindow.closeDue(clockPlus(2), 10);
                 return null;
-            });
+            }));
         }
         start.countDown();
         pool.shutdown();
         assertThat(pool.awaitTermination(30, TimeUnit.SECONDS)).isTrue();
+        for (Future<?> job : jobs) {
+            job.get(); // ошибка внутри задачи валит тест
+        }
 
         // инварианты: окно закрыто, выбывших столько, сколько должен алгоритм,
         // следующий раунд ровно один, растение погибло с одним запретом
