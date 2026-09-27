@@ -15,6 +15,7 @@ class TournamentTest {
 
     private static final Instant NOW = Instant.parse("2026-09-27T10:00:00Z");
     private static final Instant DEADLINE = NOW.plusSeconds(3600);
+    private static final Instant NOW_AFTER_DEADLINE = DEADLINE.plusSeconds(1);
 
     private Tournament draft() {
         return Tournament.createDraft(UUID.randomUUID(), "Осенний чемпионат", "Описание",
@@ -168,6 +169,23 @@ class TournamentTest {
         tournament.start(DEADLINE, 2);
         assertThat(tournament.canInvite(DEADLINE.plusSeconds(1))).isFalse();
         assertThat(tournament.isAcceptingNow(DEADLINE.plusSeconds(1))).isFalse();
+    }
+
+    @Test
+    @DisplayName("finish: RUNNING → FINISHED (победитель определён, раздел 7)")
+    void finish_из_running() {
+        Tournament tournament = started(); // createDraft → openRegistration → start
+        tournament.finish(NOW_AFTER_DEADLINE);
+        assertThat(tournament.status()).isEqualTo(TournamentStatus.FINISHED);
+    }
+
+    @Test
+    @DisplayName("finish из не-RUNNING — ошибка состояния")
+    void finish_не_из_running() {
+        Tournament draft = Tournament.createDraft(UUID.randomUUID(), "Черновик", null,
+            DEADLINE.plusSeconds(600), Duration.ofSeconds(3600), 0.5, 2, Set.of(), NOW);
+        assertThatThrownBy(() -> draft.finish(NOW))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     private Tournament started() {

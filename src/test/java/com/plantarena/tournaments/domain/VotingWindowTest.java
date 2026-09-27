@@ -17,9 +17,10 @@ class VotingWindowTest {
     private static final UUID USER_1 = UUID.randomUUID();
     private static final UUID USER_2 = UUID.randomUUID();
     private static final UUID USER_3 = UUID.randomUUID();
-    private static final UUID ENTRY_1 = UUID.randomUUID();
-    private static final UUID ENTRY_2 = UUID.randomUUID();
-    private static final UUID ENTRY_3 = UUID.randomUUID();
+    // фиксированные возрастающие id: тай-брейк entryId ASC детерминирован (ENTRY_3 — больший)
+    private static final UUID ENTRY_1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID ENTRY_2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    private static final UUID ENTRY_3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
     private static final Instant OPENS = Instant.parse("2026-09-27T10:00:00Z");
     private static final Instant CLOSES = OPENS.plusSeconds(60);
 
@@ -122,6 +123,67 @@ class VotingWindowTest {
         assertThat(window.myVote(subject, ENTRY_2)).isNull();
         window.castVote(VotingSubject.user(USER_1), ENTRY_2, VoteValue.LIKE, OPENS);
         assertThat(window.myVote(subject, ENTRY_2)).isEqualTo(VoteValue.LIKE);
+    }
+
+    @Test
+    @DisplayName("закрытие до closesAt невозможно")
+    void закрытие_до_дедлайна() {
+        VotingWindow window = window3();
+        assertThatThrownBy(() -> window.close(CLOSES.minusSeconds(1),
+            new RoundElimination(), 0.5))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("открыто");
+    }
+
+    @Test
+    @DisplayName("закрытие: 3 участника, f=0.5 → 1 худший ELIMINATED, 2 SURVIVED")
+    void закрытие_с_выбыванием() {
+        VotingWindow window = window3();
+        window.castVote(VotingSubject.user(USER_1), ENTRY_2, VoteValue.LIKE, OPENS);
+        window.castVote(VotingSubject.user(USER_2), ENTRY_1, VoteValue.DISLIKE, OPENS);
+        // счёт: entry2 +1, entry3 0, entry1 −1 → выбывает entry1
+
+        VotingWindow.CloseOutcome outcome = window.close(CLOSES, new RoundElimination(), 0.5);
+
+        assertThat(outcome.eliminatedEntryIds()).containsExactly(ENTRY_1);
+        assertThat(outcome.survivedEntryIds()).containsExactly(ENTRY_2, ENTRY_3);
+        assertThat(outcome.winnerEntryId()).isNull();
+        assertThat(window.status()).isEqualTo(WindowStatus.CLOSED);
+        assertThat(window.scoreOf(ENTRY_1)).isEqualTo(-1L); // итоги не переписываются
+    }
+
+    @Test
+    @DisplayName("закрытие при одном выжившем: WINNER, окно с одним участником не создаётся")
+    void закрытие_с_победителем() {
+        VotingWindow window = VotingWindow.open(TOURNAMENT, 2, List.of(
+            seed(ENTRY_2, USER_2), seed(ENTRY_3, USER_3)), OPENS, CLOSES, OPENS);
+        window.castVote(VotingSubject.user(USER_2), ENTRY_3, VoteValue.LIKE, OPENS);
+        // счёт: entry3 +1, entry2 0 → выбывает entry2 (f=0.5 → 1)
+
+        VotingWindow.CloseOutcome outcome = window.close(CLOSES, new RoundElimination(), 0.5);
+
+        assertThat(outcome.eliminatedEntryIds()).containsExactly(ENTRY_2);
+        assertThat(outcome.survivedEntryIds()).isEmpty();
+        assertThat(outcome.winnerEntryId()).isEqualTo(ENTRY_3);
+    }
+
+    @Test
+    @DisplayName("повторное закрытие не меняет результатов (ошибка состояния; идемпотентность — use case)")
+    void повторное_закрытие() {
+        VotingWindow window = window3();
+        window.close(CLOSES, new RoundElimination(), 0.5);
+        assertThatThrownBy(() -> window.close(CLOSES.plusSeconds(1), new RoundElimination(), 0.5))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("уже закрыто");
+    }
+
+    @Test
+    @DisplayName("ничья решается детерминированно: score DESC, joinedAt ASC, entryId ASC")
+    void ничья_при_закрытии() {
+        // все score 0, joinedAt равны → выбывает больший entryId
+        VotingWindow window = window3();
+        VotingWindow.CloseOutcome outcome = window.close(CLOSES, new RoundElimination(), 0.5);
+        assertThat(outcome.eliminatedEntryIds()).containsExactly(ENTRY_3);
     }
 
     private VotingWindow window3() {

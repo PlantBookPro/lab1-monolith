@@ -120,6 +120,45 @@ public final class VotingWindow {
         return participant.score();
     }
 
+    /**
+     * Закрытие окна (разделы 7, 12.3): фиксирует итоговый рейтинг и результаты
+     * участников. Повторный вызов для CLOSED — ошибка состояния; идемпотентность
+     * повтора (windowId, sequence) — на уровне use case по статусу. Если после
+     * выбывания остаётся один — он WINNER (турнир FINISHED решает use case).
+     */
+    public CloseOutcome close(Instant now, EliminationAlgorithm algorithm,
+                              double eliminationFraction) {
+        if (status != WindowStatus.OPEN) {
+            throw new IllegalStateException("Окно уже закрыто: " + id);
+        }
+        if (now.isBefore(closesAt)) {
+            throw new IllegalStateException("Окно открыто до " + closesAt);
+        }
+        status = WindowStatus.CLOSED;
+        List<WindowParticipant> ranked = ParticipantRanking.rank(participantsByEntry.values());
+        int eliminatedCount = algorithm.eliminatedCount(ranked.size(), eliminationFraction);
+        List<UUID> eliminated = new ArrayList<>(eliminatedCount);
+        for (int i = 0; i < eliminatedCount; i++) {
+            WindowParticipant worst = ranked.get(ranked.size() - 1 - i);
+            worst.eliminate();
+            eliminated.add(worst.entryId());
+        }
+        int survivorCount = ranked.size() - eliminatedCount;
+        List<UUID> survived = new ArrayList<>(survivorCount);
+        UUID winnerEntryId = null;
+        for (int i = 0; i < survivorCount; i++) {
+            WindowParticipant survivor = ranked.get(i);
+            if (survivorCount == 1) {
+                survivor.declareWinner();
+                winnerEntryId = survivor.entryId();
+            } else {
+                survivor.survive();
+                survived.add(survivor.entryId());
+            }
+        }
+        return new CloseOutcome(List.copyOf(eliminated), List.copyOf(survived), winnerEntryId);
+    }
+
     /** Текущий голос субъекта за участника (null — голоса нет). */
     public VoteValue myVote(String subjectKey, UUID entryId) {
         Vote vote = votesByKey.get(voteKey(subjectKey, entryId));
@@ -210,5 +249,10 @@ public final class VotingWindow {
 
     /** Состав нового окна: entry + владелец + joinedAt (из TournamentEntry). */
     public record ParticipantSeed(UUID entryId, UUID userId, Instant joinedAt) {
+    }
+
+    /** Итог закрытия: выбывшие; выжившие (≥ 2 → следующий раунд) или победитель. */
+    public record CloseOutcome(List<UUID> eliminatedEntryIds, List<UUID> survivedEntryIds,
+                               UUID winnerEntryId) {
     }
 }
