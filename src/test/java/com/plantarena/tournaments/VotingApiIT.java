@@ -239,11 +239,17 @@ class VotingApiIT extends AbstractIntegrationTest {
             .andExpect(header().exists("X-Total-Count"))
             .andReturn().getResponse().getContentAsString();
         UUID winnerEntry = UUID.fromString(JsonPath.read(results, "$.winnerEntryId"));
-        UUID winnerUser = UUID.fromString(JsonPath.read(results,
-            "$.items[?(@.entryId=='%s')].userId".formatted(winnerEntry)));
+        // фильтр JsonPath возвращает массив — по образцу entryOf (план содержал
+        // неверный каст JSONArray к String/Integer)
+        List<?> winnerItem = JsonPath.read(results,
+            "$.items[?(@.entryId=='%s')]".formatted(winnerEntry));
+        UUID winnerUser = UUID.fromString(
+            (String) ((java.util.Map<String, Object>) winnerItem.get(0)).get("userId"));
         assertThat(winnerUser).isIn(u2, u3);
-        assertThat((Integer) JsonPath.read(results,
-            "$.items[?(@.entryId=='%s')].eliminatedInRound".formatted(entry1))).isEqualTo(1);
+        List<?> eliminatedItem = JsonPath.read(results,
+            "$.items[?(@.entryId=='%s')]".formatted(entry1));
+        assertThat(((java.util.Map<String, Object>) eliminatedItem.get(0))
+            .get("eliminatedInRound")).isEqualTo(1);
 
         // победитель ALIVE, резерв освобождён — растение можно архивировать (204)
         UUID winnerPlant = winnerUser.equals(u2) ? plant2 : plant3;
@@ -284,12 +290,16 @@ class VotingApiIT extends AbstractIntegrationTest {
     }
 
     private void awaitRoundsPresent(UUID viewer, UUID tournamentId) {
+        // ≥ 1 раунда: при повторном вызове после закрытия первого раунда их уже 2
+        // (следующий раунд создаётся в той же tx закрытия) — точный счёт проверяет
+        // сам тест ("2" ниже по сценарию).
         Awaitility.await().atMost(Duration.ofSeconds(20)).pollInterval(Duration.ofMillis(500))
             .untilAsserted(() -> mockMvc.perform(
                     get("/api/v1/tournaments/" + tournamentId + "/rounds")
                         .header(DEMO_HEADER, viewer.toString()))
                 .andExpect(status().isOk())
-                .andExpect(header().string("X-Total-Count", "1")));
+                .andExpect(result -> assertThat(Integer.parseInt(
+                    result.getResponse().getHeader("X-Total-Count"))).isPositive()));
     }
 
     private void awaitRoundClosed(UUID viewer, UUID tournamentId, int sequence) {
