@@ -63,6 +63,22 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
 Одобрение модерации делает файл растения публично видимым чужим
 (`GET /api/v1/files/{id}`); архивация возвращает приватность (ADR-008).
 
+## Модерация (moderation)
+
+Поданная заявка проходит автоматическое распознавание (ADR-009): MobileNetV2
+(ONNX Runtime) внутри монолита. Зелёное на фото — не гарантия: решает
+классификатор; ошибка распознавателя — не решение, заявка остаётся PENDING и
+будет повторена (backoff 1с → 2с → … → кап 1ч, без лимита попыток).
+
+- Модель (~13 МБ) скачивается автоматически при сборке в
+  `target/models/mobilenetv2-1.0.onnx` (offline-сборка не ломается: задания
+  честно уходят в RETRY, в логе видно `ClassifierUnavailableException`).
+- Ручной запуск: `MODERATION_MODEL_PATH=... ./mvnw spring-boot:run`.
+- Настоящий инференс на эталонных фото (ромашка/собака):
+  `./mvnw verify -P inference` (в обычный `verify` не входит).
+- Решение видно владельцу: `GET /api/v1/plants/{id}/moderation` — статус,
+  причина (`PLANT_DETECTED`/`NOT_A_PLANT`) и `retryUploadAllowed`.
+
 ## Проверка (единственная команда)
 
 ```bash
@@ -71,7 +87,8 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
 
 Запускает: unit- и application-тесты (Surefire), ArchUnit-правила границ,
 интеграционные/приёмочные тесты на Testcontainers PostgreSQL (Failsafe),
-отчёт и gate JaCoCo (LINE ≥ 70%).
+отчёт и gate JaCoCo (LINE ≥ 70%). Настоящий ONNX-инференс — отдельно:
+`./mvnw verify -P inference`.
 
 ## Git workflow
 
