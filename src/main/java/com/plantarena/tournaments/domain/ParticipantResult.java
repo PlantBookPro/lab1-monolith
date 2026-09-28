@@ -6,5 +6,5 @@ package com.plantarena.tournaments.domain;
  * PROMOTED (глобальная квалификация) — итерация 7.
  */
 public enum ParticipantResult {
-    ACTIVE, SURVIVED, ELIMINATED, WINNER
+    ACTIVE, SURVIVED, ELIMINATED, WINNER, PROMOTED
 }

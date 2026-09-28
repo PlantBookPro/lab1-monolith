@@ -5,6 +5,7 @@ import com.plantarena.tournaments.domain.VoteValue;
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
 import com.plantarena.tournaments.domain.WindowParticipant;
+import com.plantarena.tournaments.domain.WindowScope;
 import com.plantarena.tournaments.domain.WindowStatus;
 import java.time.Instant;
 import java.util.HashSet;
@@ -159,7 +160,8 @@ public class JpaVotingWindowRepository implements VotingWindowRepository {
                 .map(vote -> toDomainVote(participant.getEntryId(), vote)))
             .toList();
         return VotingWindow.restore(entity.getId(), entity.getTournamentId(),
-            entity.getSequence(), WindowStatus.valueOf(entity.getStatus()),
+            entity.getSequence(), WindowScope.PRIVATE, null, null, null,
+            WindowStatus.valueOf(entity.getStatus()),
             entity.getOpensAt(), entity.getClosesAt(), entity.getCreatedAt(),
             entity.getVersion(), participants, votes);
     }
