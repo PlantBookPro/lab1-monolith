@@ -1,11 +1,13 @@
 package com.plantarena.tournaments.application.support;
 
+import com.plantarena.tournaments.domain.EntryStatus;
 import com.plantarena.tournaments.domain.TournamentEntry;
 import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -67,5 +69,28 @@ public class InMemoryTournamentEntryRepository implements TournamentEntryReposit
     @Override
     public Optional<TournamentEntry> findById(UUID id) {
         return Optional.ofNullable(entries.get(id));
+    }
+
+    private static final Set<EntryStatus> ACTIVE_GLOBAL = Set.of(EntryStatus.QUEUED,
+        EntryStatus.QUALIFYING, EntryStatus.FINAL_PENDING, EntryStatus.FINALIST);
+
+    @Override
+    public Optional<TournamentEntry> findActiveGlobalByUserId(UUID tournamentId, UUID userId) {
+        return entries.values().stream()
+            .filter(entry -> entry.tournamentId().equals(tournamentId)
+                && entry.userId().equals(userId)
+                && ACTIVE_GLOBAL.contains(entry.status()))
+            .findAny();
+    }
+
+    @Override
+    public List<TournamentEntry> findByTournamentIdAndStatus(UUID tournamentId,
+                                                             EntryStatus status) {
+        return entries.values().stream()
+            .filter(entry -> entry.tournamentId().equals(tournamentId)
+                && entry.status() == status)
+            .sorted(Comparator.comparing(TournamentEntry::joinedAt)
+                .thenComparing(TournamentEntry::id))
+            .toList();
     }
 }

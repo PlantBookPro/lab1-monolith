@@ -88,6 +88,51 @@ public class JpaVotingWindowRepository implements VotingWindowRepository {
             .stream().map(this::toDomain).toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<UUID> findDueForCloseByScope(WindowScope scope, Instant now, int limit) {
+        return jpaRepository.findDueForCloseByScope(scope.name(), now, PageRequest.of(0, limit));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<VotingWindow> findOpenByScope(UUID tournamentId, WindowScope scope) {
+        return jpaRepository
+            .findFirstByTournamentIdAndScopeAndStatusOrderBySequenceDesc(
+                tournamentId, scope.name(), WindowStatus.OPEN.name())
+            .map(this::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<VotingWindow> findLatestByTournamentIdAndScope(UUID tournamentId,
+                                                                   WindowScope scope) {
+        return jpaRepository.findFirstByTournamentIdAndScopeOrderBySequenceDesc(
+                tournamentId, scope.name())
+            .map(this::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<VotingWindow> findOpenByEpochId(UUID epochId) {
+        return jpaRepository.findByEpochIdAndStatusOrderByClusterKeyAsc(
+                epochId, WindowStatus.OPEN.name())
+            .stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<VotingWindow> findOpenByClusterId(UUID clusterId) {
+        return jpaRepository.findByClusterIdAndStatus(clusterId, WindowStatus.OPEN.name())
+            .map(this::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countOpenByEpochId(UUID epochId) {
+        return jpaRepository.countByEpochIdAndStatus(epochId, WindowStatus.OPEN.name());
+    }
+
     private VotingWindowJpaEntity newEntity(VotingWindow window) {
         VotingWindowJpaEntity entity = new VotingWindowJpaEntity();
         entity.setId(window.id());
@@ -97,6 +142,10 @@ public class JpaVotingWindowRepository implements VotingWindowRepository {
     private void mapState(VotingWindowJpaEntity entity, VotingWindow window) {
         entity.setTournamentId(window.tournamentId());
         entity.setSequence(window.sequence());
+        entity.setScope(window.scope().name());
+        entity.setEpochId(window.epochId());
+        entity.setClusterId(window.clusterId());
+        entity.setClusterKey(window.clusterKey());
         entity.setStatus(window.status().name());
         entity.setOpensAt(window.opensAt());
         entity.setClosesAt(window.closesAt());
@@ -160,7 +209,8 @@ public class JpaVotingWindowRepository implements VotingWindowRepository {
                 .map(vote -> toDomainVote(participant.getEntryId(), vote)))
             .toList();
         return VotingWindow.restore(entity.getId(), entity.getTournamentId(),
-            entity.getSequence(), WindowScope.PRIVATE, null, null, null,
+            entity.getSequence(), WindowScope.valueOf(entity.getScope()),
+            entity.getEpochId(), entity.getClusterId(), entity.getClusterKey(),
             WindowStatus.valueOf(entity.getStatus()),
             entity.getOpensAt(), entity.getClosesAt(), entity.getCreatedAt(),
             entity.getVersion(), participants, votes);

@@ -31,4 +31,22 @@ public interface VotingWindowRepository {
 
     /** Все окна турнира (итоги: раунд выбывания каждого entry; турнир конечен). */
     List<VotingWindow> findAllByTournamentId(UUID tournamentId);
+
+    /** Просроченные OPEN-окна конкретного scope (глобальные границы, раздел 8). */
+    List<UUID> findDueForCloseByScope(WindowScope scope, Instant now, int limit);
+
+    /** Открытое окно турнира в scope (финал: не более одного — индекс). */
+    Optional<VotingWindow> findOpenByScope(UUID tournamentId, WindowScope scope);
+
+    /** Последнее окно турнира в scope (нумерация финальных окон). */
+    Optional<VotingWindow> findLatestByTournamentIdAndScope(UUID tournamentId, WindowScope scope);
+
+    /** Открытые окна эпохи (кластеры текущего отбора). */
+    List<VotingWindow> findOpenByEpochId(UUID epochId);
+
+    /** Открытое окно кластера (лидерборд кластера, алгоритм 9). */
+    Optional<VotingWindow> findOpenByClusterId(UUID clusterId);
+
+    /** Сколько открытых окон осталось у эпохи (закрытие эпохи). */
+    long countOpenByEpochId(UUID epochId);
 }

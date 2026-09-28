@@ -13,6 +13,7 @@ import com.plantarena.tournaments.domain.Tournament;
 import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import com.plantarena.tournaments.domain.TournamentRepository;
 import com.plantarena.tournaments.domain.TournamentStatus;
+import com.plantarena.tournaments.domain.TournamentType;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -78,6 +79,9 @@ public class TournamentQueryService implements ListTournamentsUseCase, GetTourna
     @Override
     public TournamentData get(CurrentActor actor, UUID tournamentId) {
         Tournament tournament = find(tournamentId);
+        if (tournament.type() == TournamentType.GLOBAL) {
+            throw new TournamentNotFoundException("Турнир не найден: " + tournamentId);
+        }
         accessPolicy.requireTournamentViewer(actor, tournament,
             visibleBeyondOrganizer(actor, tournamentId));
         return TournamentAssembler.toData(tournament);
