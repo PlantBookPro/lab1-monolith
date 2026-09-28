@@ -47,6 +47,9 @@ public class SubmitGlobalEntryService implements SubmitGlobalEntryUseCase {
     @Override
     public GlobalEntryView submit(CurrentActor actor, UUID plantId) {
         accessPolicy.requireIdentified(actor);
+        locations.findLocation(actor.userId())
+            .orElseThrow(() -> new LocationRequiredException(
+                "Для глобального участия нужны координаты в профиле (PUT /me/location)"));
         PlantDirectoryGateway.PlantSnapshot plant = plants.findById(plantId)
             .filter(snapshot -> snapshot.ownerId().equals(actor.userId()))
             .orElseThrow(() -> new SubmittedPlantNotFoundException(
@@ -55,9 +58,6 @@ public class SubmitGlobalEntryService implements SubmitGlobalEntryUseCase {
             throw new PlantNotApprovedException(
                 "Глобальный турнир принимает только одобренные модерацией растения (раздел 6)");
         }
-        locations.findLocation(actor.userId())
-            .orElseThrow(() -> new LocationRequiredException(
-                "Для глобального участия нужны координаты в профиле (PUT /me/location)"));
         if (entries.findActiveGlobalByUserId(GlobalCompetitionId.VALUE, actor.userId())
             .isPresent()) {
             throw new ActiveGlobalEntryExistsException(
