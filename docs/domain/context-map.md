@@ -75,9 +75,11 @@ graph TD
 | tournaments | plants | `PlantEligibility.reserveSubmission/confirmEligibility` | команда/запрос | синхронно | Feign + saga | Kafka-команды |
 | tournaments | plants | `PlantDirectory.findById` (read, проверка APPROVED при принятии) | запрос через `plants.api` | синхронно | Feign | Feign |
 | tournaments | identity | `UserDirectory.findById` (известный активный пользователь) | запрос через `identity.api` | синхронно | Feign | Feign |
+| tournaments | identity | `UserDirectory.findLocation` (координаты для кластеризации, ACL `ParticipantLocationsGateway`) | запрос через `identity.api` | синхронно | Feign | Feign |
 | plants | tournaments | публикация `PlantModerationDecided` (перевод заявки) | событие | синхронно, в tx решения (ADR-010) | outbox → идемпотентная команда | Kafka `plant.moderation.v1` |
 | tournaments | plants | `PlantLifecycle.registerDeath` (закрытие окна: гибель выбывшего + PERMANENT-запрет, устойчивый порядок по plantId) | команда | синхронно, в транзакции закрытия окна (ADR-011) | надёжная команда с повтором (идемпотентность — DEAD-статус plants) | Kafka `plant.lifecycle.v1` |
-| tournaments | geo | `ClusteringGateway` (состав эпохи) | команда/запрос | синхронно | Feign/R2DBC | Feign |
+| tournaments | geo | `ClusteringGateway.assignClusters` (кластеризация состава эпохи + неизменные снимки, ADR-012) | команда | синхронно, в транзакции открытия эпохи | Feign + идемпотентный повтор по epochId | Kafka-команды |
+| scheduler (tournaments) | `AdvanceGlobalCompetitionUseCase` | границы глобального режима (закрытие квалификации/финала, открытие финала/эпохи — фиксированный порядок, ADR-012) | вызов use case (fixedDelay 2с, идемпотентен) | in-process | scheduler сервиса | scheduler сервиса |
 | feed | tournaments | проекция карточек по событиям | события | in-process | события внутри tournament-service | Kafka → проекция |
 | feed | plants | публичные данные растения | запрос через `plants.api` | синхронно | Feign | Feign |
 | feed | media | URL изображения по assetId | запрос через `media.api` | синхронно | Feign | Feign |
