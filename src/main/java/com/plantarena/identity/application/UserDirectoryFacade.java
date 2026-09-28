@@ -27,4 +27,12 @@ public class UserDirectoryFacade implements UserDirectory {
             .map(user -> new UserData(user.id(), user.displayName(),
                 user.status() == UserStatus.ACTIVE));
     }
+
+    @Override
+    public Optional<UserLocation> findLocation(UUID userId) {
+        return users.findById(userId)
+            .flatMap(user -> Optional.ofNullable(user.location())
+                .map(location -> new UserLocation(location.latitude(), location.longitude(),
+                    user.version())));
+    }
 }

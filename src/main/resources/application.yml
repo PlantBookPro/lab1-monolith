@@ -37,3 +37,6 @@ plantarena:
     model-path: ${MODERATION_MODEL_PATH:target/models/mobilenetv2-1.0.onnx} # MobileNetV2 ONNX, ADR-009
   geo:
     geohash-precision: 4 # точность geohash-сетки, фиксируется в версии политики (раздел 8)
+  global:
+    epoch-duration: 24h # длительность эпохи отбора (раздел 8)
+    final-window-duration: 6h # длительность финального окна (раздел 8)

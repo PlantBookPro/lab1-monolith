@@ -12,8 +12,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.dao.DataIntegrityViolationException;
 
-/** In-memory фейк TournamentEntryRepository: честен к UNIQUE(tournamentId, userId). */
+/** In-memory фейк TournamentEntryRepository: честен к частичному UNIQUE(tournamentId, userId)
+ * WHERE status IN ('ACTIVE', 'ELIMINATED', 'WINNER') — миграция V4 (история глобальных
+ * участий одного пользователя не конфликтует). */
 public class InMemoryTournamentEntryRepository implements TournamentEntryRepository {
+
+    private static final Set<EntryStatus> PAIR_UNIQUE_STATUSES = Set.of(EntryStatus.ACTIVE,
+        EntryStatus.ELIMINATED, EntryStatus.WINNER);
 
     public final Map<UUID, TournamentEntry> entries = new ConcurrentHashMap<>();
     private final InMemoryTournamentRepository tournaments;
@@ -31,7 +36,8 @@ public class InMemoryTournamentEntryRepository implements TournamentEntryReposit
         entries.values().stream()
             .filter(existing -> existing.tournamentId().equals(entry.tournamentId())
                 && existing.userId().equals(entry.userId())
-                && !existing.id().equals(entry.id()))
+                && !existing.id().equals(entry.id())
+                && PAIR_UNIQUE_STATUSES.contains(existing.status()))
             .findAny()
             .ifPresent(existing -> {
                 throw new DataIntegrityViolationException(

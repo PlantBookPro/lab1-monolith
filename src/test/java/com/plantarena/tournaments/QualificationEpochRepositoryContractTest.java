@@ -29,19 +29,23 @@ public abstract class QualificationEpochRepositoryContractTest {
         UUID tournamentId = newTournamentId();
         QualificationEpoch first = epoch(tournamentId, 1);
         repository.save(first);
-        QualificationEpoch second = epoch(tournamentId, 2);
-        repository.save(second);
 
         assertThat(repository.findOpenByTournamentId(tournamentId))
             .map(QualificationEpoch::id).contains(first.id());
-        assertThat(repository.findLastByTournamentId(tournamentId))
-            .map(QualificationEpoch::sequence).contains(2);
         assertThat(repository.findById(first.id())).isPresent();
 
+        // одна открытая эпоха на турнир (частичный уникальный индекс V4):
+        // вторая открывается только после закрытия первой
         first.close(first.closesAt());
         repository.save(first);
+        assertThat(repository.findOpenByTournamentId(tournamentId)).isEmpty();
+
+        QualificationEpoch second = epoch(tournamentId, 2);
+        repository.save(second);
         assertThat(repository.findOpenByTournamentId(tournamentId))
             .map(QualificationEpoch::id).contains(second.id());
+        assertThat(repository.findLastByTournamentId(tournamentId))
+            .map(QualificationEpoch::sequence).contains(2);
     }
 
     private QualificationEpoch epoch(UUID tournamentId, int sequence) {
