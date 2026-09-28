@@ -2,6 +2,7 @@ package com.plantarena.tournaments.application.support;
 
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
+import com.plantarena.tournaments.domain.WindowScope;
 import com.plantarena.tournaments.domain.WindowStatus;
 import java.time.Instant;
 import java.util.Comparator;
@@ -67,5 +68,60 @@ public class InMemoryVotingWindowRepository implements VotingWindowRepository {
     @Override
     public List<VotingWindow> findAllByTournamentId(UUID tournamentId) {
         return findByTournamentId(tournamentId, 0, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public List<UUID> findDueForCloseByScope(WindowScope scope, Instant now, int limit) {
+        return windows.values().stream()
+            .filter(window -> window.scope() == scope
+                && window.status() == WindowStatus.OPEN
+                && !now.isBefore(window.closesAt()))
+            .sorted(Comparator.comparing(VotingWindow::closesAt))
+            .limit(limit)
+            .map(VotingWindow::id)
+            .toList();
+    }
+
+    @Override
+    public Optional<VotingWindow> findOpenByScope(UUID tournamentId, WindowScope scope) {
+        return windows.values().stream()
+            .filter(window -> window.tournamentId().equals(tournamentId)
+                && window.scope() == scope && window.status() == WindowStatus.OPEN)
+            .max(Comparator.comparingInt(VotingWindow::sequence));
+    }
+
+    @Override
+    public Optional<VotingWindow> findLatestByTournamentIdAndScope(UUID tournamentId,
+                                                                   WindowScope scope) {
+        return windows.values().stream()
+            .filter(window -> window.tournamentId().equals(tournamentId)
+                && window.scope() == scope)
+            .max(Comparator.comparingInt(VotingWindow::sequence));
+    }
+
+    @Override
+    public List<VotingWindow> findOpenByEpochId(UUID epochId) {
+        return windows.values().stream()
+            .filter(window -> epochId.equals(window.epochId())
+                && window.status() == WindowStatus.OPEN)
+            .sorted(Comparator.comparing(window -> window.clusterKey() == null
+                ? "" : window.clusterKey()))
+            .toList();
+    }
+
+    @Override
+    public Optional<VotingWindow> findOpenByClusterId(UUID clusterId) {
+        return windows.values().stream()
+            .filter(window -> clusterId.equals(window.clusterId())
+                && window.status() == WindowStatus.OPEN)
+            .findAny();
+    }
+
+    @Override
+    public long countOpenByEpochId(UUID epochId) {
+        return windows.values().stream()
+            .filter(window -> epochId.equals(window.epochId())
+                && window.status() == WindowStatus.OPEN)
+            .count();
     }
 }

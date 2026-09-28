@@ -16,6 +16,7 @@ import com.plantarena.tournaments.domain.VoteValue;
 import com.plantarena.tournaments.domain.VotingSubject;
 import com.plantarena.tournaments.domain.VotingWindow;
 import com.plantarena.tournaments.domain.WindowParticipant;
+import com.plantarena.tournaments.domain.WindowScope;
 import com.plantarena.tournaments.domain.WindowStatus;
 import java.time.Duration;
 import java.time.Instant;
@@ -80,6 +81,7 @@ class VotingQueryServiceTest {
         // второе окно с одним участником: состояние «финальное окно» эмулируется
         // напрямую (restore), т.к. open требует минимум двух участников
         VotingWindow second = VotingWindow.restore(UUID.randomUUID(), tournamentId, 2,
+            WindowScope.PRIVATE, null, null, null,
             WindowStatus.OPEN, NOW.minusSeconds(60), NOW.plusSeconds(60), NOW.minusSeconds(60),
             0L,
             List.of(WindowParticipant.restore(UUID.randomUUID(), entry2, user2, 0L,

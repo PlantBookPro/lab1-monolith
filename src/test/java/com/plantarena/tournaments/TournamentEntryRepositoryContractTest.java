@@ -95,4 +95,28 @@ public abstract class TournamentEntryRepositoryContractTest {
                 UUID.randomUUID(), NOW)))
             .isInstanceOf(DataIntegrityViolationException.class);
     }
+
+    @Test
+    @DisplayName("глобальные участия: активное по пользователю, по статусу")
+    void глобальные_участия() {
+        TournamentEntryRepository repository = repository();
+        UUID tournamentId = newTournamentId();
+        UUID userId = UUID.randomUUID();
+        TournamentEntry queued = TournamentEntry.queueForGlobal(tournamentId, userId,
+            UUID.randomUUID(), UUID.randomUUID(), NOW);
+        TournamentEntry withdrawn = TournamentEntry.queueForGlobal(tournamentId,
+            UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), NOW);
+        withdrawn.withdraw();
+        repository.save(queued);
+        repository.save(withdrawn);
+
+        assertThat(repository.findActiveGlobalByUserId(tournamentId, userId))
+            .map(TournamentEntry::id).contains(queued.id());
+        assertThat(repository.findActiveGlobalByUserId(tournamentId, UUID.randomUUID()))
+            .isEmpty();
+        assertThat(repository.findByTournamentIdAndStatus(tournamentId, EntryStatus.QUEUED))
+            .extracting(TournamentEntry::id).containsExactly(queued.id());
+        assertThat(repository.findByTournamentIdAndStatus(tournamentId, EntryStatus.WITHDRAWN))
+            .extracting(TournamentEntry::id).containsExactly(withdrawn.id());
+    }
 }

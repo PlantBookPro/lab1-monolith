@@ -166,6 +166,25 @@ class CloseVotingWindowServiceTest {
             .isEqualTo(WindowStatus.OPEN);
     }
 
+    @Test
+    @DisplayName("глобальное окно не закрывается приватным use case'ом (раздел 8)")
+    void глобальное_окно_не_закрывается() {
+        UUID user1 = UUID.randomUUID();
+        VotingWindow finalWindow = VotingWindow.openFinal(tournamentId, 1,
+            List.of(new VotingWindow.ParticipantSeed(entry1, user1, NOW),
+                new VotingWindow.ParticipantSeed(entry2, UUID.randomUUID(), NOW)),
+            NOW.minusSeconds(120), NOW.minusSeconds(60), NOW.minusSeconds(120));
+        windows.save(finalWindow);
+
+        int processed = service.closeDue(NOW, 10);
+
+        assertThat(processed).isEqualTo(1); // окно взято в работу, но пропущено по scope
+        assertThat(windows.findById(finalWindow.id()).orElseThrow().status())
+            .isEqualTo(WindowStatus.OPEN);
+        assertThat(statusOf(entry1)).isEqualTo(EntryStatus.ACTIVE);
+        assertThat(plantLifecycle.calls).isEmpty();
+    }
+
     private VotingWindow openDueWindow() {
         VotingWindow window = VotingWindow.open(tournamentId, 1, seeds(),
             NOW.minusSeconds(120), NOW.minusSeconds(60), NOW.minusSeconds(120));

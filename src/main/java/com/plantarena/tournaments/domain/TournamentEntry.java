@@ -57,6 +57,52 @@ public final class TournamentEntry {
         status = EntryStatus.WINNER;
     }
 
+    /** Глобальная заявка: одобренное растение в очередь следующей эпохи (раздел 8). */
+    public static TournamentEntry queueForGlobal(UUID tournamentId, UUID userId, UUID plantId,
+                                                 UUID reservationId, Instant now) {
+        return new TournamentEntry(UUID.randomUUID(), tournamentId, userId, plantId,
+            reservationId, EntryStatus.QUEUED, now);
+    }
+
+    /** Снятие заявки из очереди (раздел 13): только QUEUED. */
+    public void withdraw() {
+        requireStatus(EntryStatus.QUEUED);
+        status = EntryStatus.WITHDRAWN;
+    }
+
+    /** Включение в эпоху отбора (раздел 8, алгоритм 2): QUEUED → QUALIFYING. */
+    public void startQualifying() {
+        requireStatus(EntryStatus.QUEUED);
+        status = EntryStatus.QUALIFYING;
+    }
+
+    /** Победа в квалификации (алгоритм 5): QUALIFYING → FINAL_PENDING. */
+    public void promoteToFinalPending() {
+        requireStatus(EntryStatus.QUALIFYING);
+        status = EntryStatus.FINAL_PENDING;
+    }
+
+    /** Включение в финальное окно (алгоритм 6): FINAL_PENDING → FINALIST. */
+    public void becomeFinalist() {
+        requireStatus(EntryStatus.FINAL_PENDING);
+        status = EntryStatus.FINALIST;
+    }
+
+    /** Глобальное поражение (алгоритмы 3, 8): QUALIFYING/FINALIST → ELIMINATED. */
+    public void eliminateFromGlobal() {
+        if (status != EntryStatus.QUALIFYING && status != EntryStatus.FINALIST) {
+            throw new IllegalStateException("Итог участия уже зафиксирован: " + status);
+        }
+        status = EntryStatus.ELIMINATED;
+    }
+
+    private void requireStatus(EntryStatus expected) {
+        if (status != expected) {
+            throw new IllegalStateException(
+                "Ожидается статус " + expected + ", текущий: " + status);
+        }
+    }
+
     private void requireActive() {
         if (status != EntryStatus.ACTIVE) {
             throw new IllegalStateException("Итог участия уже зафиксирован: " + status);

@@ -13,7 +13,8 @@ public interface TournamentJpaRepository extends JpaRepository<TournamentJpaEnti
 
     @Query("""
         select t from TournamentJpaEntity t
-        where (:admin = true or t.creatorId = :userId
+        where t.type = 'PRIVATE'
+        and (:admin = true or t.creatorId = :userId
             or exists (select 1 from InvitationJpaEntity i
                 where i.tournament = t and i.userId = :userId
                     and i.status in ('INVITED', 'ACCEPTED_PENDING_MODERATION', 'READY'))
@@ -31,7 +32,8 @@ public interface TournamentJpaRepository extends JpaRepository<TournamentJpaEnti
 
     @Query("""
         select count(t) from TournamentJpaEntity t
-        where (:admin = true or t.creatorId = :userId
+        where t.type = 'PRIVATE'
+        and (:admin = true or t.creatorId = :userId
             or exists (select 1 from InvitationJpaEntity i
                 where i.tournament = t and i.userId = :userId
                     and i.status in ('INVITED', 'ACCEPTED_PENDING_MODERATION', 'READY'))
