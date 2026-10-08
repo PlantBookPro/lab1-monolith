@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-/** Тело POST /tournaments (раздел 13): параметры PRIVATE DRAFT. */
+
 public record CreateTournamentRequest(
         @NotBlank @Size(min = 1, max = 100) String name,
         @Size(max = 2000) String description,

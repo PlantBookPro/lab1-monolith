@@ -9,12 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/**
- * Spring Data репозиторий проекции. Псевдослучайный sort key вычисляется в
- * SQL: hashtextextended(id::text, :seed) — детерминированная функция
- * PostgreSQL (раздел 9, ADR-002); сортировка по (sort_key DESC, id DESC).
- * Коллекции-параметры всегда непустые (адаптер подставляет sentinel).
- */
+
 interface FeedCardJpaRepository extends JpaRepository<FeedCardJpaEntity, UUID> {
 
     @Query(value = """

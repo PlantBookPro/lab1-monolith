@@ -7,11 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/**
- * Опрос просроченных окон: fixedDelay 2с, пачка ≤ 10. Тот же use case, что
- * demo-ручка (разделы 7, 12.3); per-window tx и устойчивость к сбоям решает
- * closeDue. Планировщик уже включён (ModerationWiringConfig).
- */
+
 @Component
 public class VotingWindowClosePoller {
 

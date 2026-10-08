@@ -14,11 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * JPA-модель tournament (раздел 11); маппинг на домен — явный
- * (JpaTournamentRepository). M2M tournament ↔ tag — join table с PK по двум
- * FK (раздел 11). Мутирует — optimistic locking через @Version.
- */
+
 @Entity
 @Table(name = "tournament", schema = "tournaments")
 public class TournamentJpaEntity {
@@ -91,7 +87,7 @@ public class TournamentJpaEntity {
         this.status = "DRAFT";
     }
 
-    /** Мутации домена; id/creator/type/algorithm/created_at неизменяемы. */
+    
     void update(String name, String description, String status,
                 Instant registrationDeadline, long roundDurationSeconds,
                 double eliminationFraction, int minParticipants, String cancelReason,

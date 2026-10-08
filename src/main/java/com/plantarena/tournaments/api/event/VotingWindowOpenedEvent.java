@@ -5,13 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Опубликованное событие: открыто окно голосования с зафиксированным
- * составом (раздел 9). Подписчик — проекция ленты feed (итерация 8);
- * в лабе №4 доставляется через outbox → Kafka. Несёт состав участников
- * (entry, владелец, растение) — feed обогащает карточки сам через
- * read-контракты plants/identity.
- */
+
 public record VotingWindowOpenedEvent(
         UUID eventId,
         String eventType,

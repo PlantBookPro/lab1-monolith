@@ -3,10 +3,7 @@ package com.plantarena.tournaments.application;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * Гостевые сессии (раздел 9): срок действия и минимальные лимиты защиты
- * от накрутки (in-memory, сбрасываются рестартом — ADR-013).
- */
+
 @ConfigurationProperties(prefix = "plantarena.guests")
 public record GuestSessionsSettings(Duration sessionTtl, int sessionCreationLimitPerMinute,
                                     int voteLimitPerMinute) {

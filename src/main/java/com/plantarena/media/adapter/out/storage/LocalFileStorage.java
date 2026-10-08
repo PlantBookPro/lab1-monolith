@@ -11,12 +11,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * Локальное файловое хранилище за портом FileStorage (раздел 6): Docker volume
- * в лабе №1; в лабе №4 заменяется на file-service с S3-совместимым хранилищем —
- * меняется только этот адаптер. Ключи генерирует хранилище (UUID + расширение),
- * перезапись невозможна (CREATE_NEW). Ключи системные — наружу не публикуются.
- */
+
 @Component
 public class LocalFileStorage implements FileStorage {
 

@@ -10,10 +10,7 @@ import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Единая OpenAPI-спецификация монолита (раздел 13 требований).
- * Демо-идентификация документируется в Swagger (ADR-005).
- */
+
 @Configuration
 public class OpenApiConfig {
 
@@ -27,10 +24,7 @@ public class OpenApiConfig {
                     + "закрытые и глобальный турниры, голосование, лента"));
     }
 
-    /**
-     * Добавляет описание демо-заголовка ко всем операциям: отсутствие заголовка
-     * означает гостя (ADR-005). Это механизм демонстрации, не аутентификация.
-     */
+    
     @Bean
     public OperationCustomizer demoUserIdHeaderCustomizer() {
         return (Operation operation, org.springframework.web.method.HandlerMethod handlerMethod) -> {
@@ -46,10 +40,7 @@ public class OpenApiConfig {
         };
     }
 
-    /**
-     * Заголовок гостевого токена (раздел 9): X-Guest-Token от POST
-     * /guest-sessions; для идентифицированного пользователя игнорируется.
-     */
+    
     @Bean
     public OperationCustomizer guestTokenHeaderCustomizer() {
         return (Operation operation, org.springframework.web.method.HandlerMethod handlerMethod) -> {

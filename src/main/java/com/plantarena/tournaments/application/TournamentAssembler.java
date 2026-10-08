@@ -9,7 +9,7 @@ import com.plantarena.tournaments.domain.Tag;
 import com.plantarena.tournaments.domain.Tournament;
 import com.plantarena.tournaments.domain.TournamentEntry;
 
-/** Домен → api-DTO (api не зависит от domain, LayerRules). */
+
 final class TournamentAssembler {
 
     private TournamentAssembler() {

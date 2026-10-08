@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 
-/** JPA-модель участника кластера: PK (snapshot_id, entry_id), раздел 11. */
+
 @Entity
 @Table(name = "cluster_member", schema = "geo")
 @IdClass(ClusterMemberJpaId.class)

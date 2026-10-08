@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** JPA-модель tag (раздел 11); единственная мутация — rename (без version). */
+
 @Entity
 @Table(name = "tag", schema = "tournaments")
 public class TagJpaEntity {

@@ -1,8 +1,6 @@
 package com.plantarena.shared.web;
 
-/**
- * Параметры пагинации списков (раздел 13): page от 0, size 1–50, по умолчанию 20.
- */
+
 public record PaginationParams(int page, int size) {
 
     public static final int DEFAULT_SIZE = 20;

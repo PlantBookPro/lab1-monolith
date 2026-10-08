@@ -10,11 +10,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Тело PATCH /tournaments/{id}: null = не менять (пустое имя недопустимо);
- * параметры применимы только в DRAFT, безопасное описание — и после
- * открытия (раздел 13).
- */
+
 public record UpdateTournamentRequest(
         @Size(min = 1, max = 100) String name,
         @Size(max = 2000) String description,

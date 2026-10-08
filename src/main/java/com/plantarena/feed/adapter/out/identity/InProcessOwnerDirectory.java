@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/** ACL: публичный профиль identity → порт feed (in-process, без email/координат). */
+
 @Component
 public class InProcessOwnerDirectory implements OwnerDirectory {
 

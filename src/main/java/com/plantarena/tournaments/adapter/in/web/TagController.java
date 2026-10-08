@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Справочник тегов (раздел 13): создание — M/A, изменение/удаление — A
- * (используемый тег не удаляется — 409), чтение — все идентифицированные.
- */
+
 @RestController
 @RequestMapping("/api/v1/tags")
 @Tag(name = "tournaments")

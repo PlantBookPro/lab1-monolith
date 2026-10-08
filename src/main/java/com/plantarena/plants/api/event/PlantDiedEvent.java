@@ -4,10 +4,7 @@ import com.plantarena.shared.event.IntegrationEvent;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Опубликованное событие: растение погибло необратимо (раздел 4.3).
- * Потребители лабы №4: notification, tournament lifecycle.
- */
+
 public record PlantDiedEvent(
         UUID eventId,
         String eventType,

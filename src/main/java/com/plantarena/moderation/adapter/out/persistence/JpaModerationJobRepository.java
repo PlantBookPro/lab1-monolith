@@ -13,11 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта ModerationJobRepository на JPA + PostgreSQL (раздел 14.2).
- * find-or-create + saveAndFlush (паттерн JpaPlantRepository): конкурентный
- * захват due-заданий ловит @Version в БД. Сортировка due: nextAttemptAt, id.
- */
+
 @Repository
 @Transactional
 public class JpaModerationJobRepository implements ModerationJobRepository {

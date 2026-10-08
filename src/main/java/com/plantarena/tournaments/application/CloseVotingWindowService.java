@@ -26,16 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/**
- * Один use case закрытия окон для scheduler'а и demo-ручки (раздел 12.3,
- * дизайн итерации 6): каждое окно — в отдельной короткой tx; один сбой не
- * блокирует остальные. Внутри tx (ADR-011): блокировка окна → повтор для
- * CLOSED — no-op → закрытие доменом (рейтинг + выбывание) → entry
- * ELIMINATED/WINNER → команды plants (гибель PERMANENT, освобождение
- * резервов; растения в устойчивом порядке по plantId) → следующий раунд или
- * FINISHED + TournamentFinished. События EntryEliminated/TournamentFinished
- * публикуются в той же tx.
- */
+
 @Service
 public class CloseVotingWindowService implements CloseVotingWindowUseCase {
 
@@ -74,7 +65,7 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
                     status -> closeOne(windowId, now));
                 processed++;
             } catch (RuntimeException e) {
-                // одно окно не блокирует остальные; повтор — следующий poll
+                
                 log.warn("Закрытие окна {} не удалось, будет повторено: {}", windowId,
                     e.getMessage());
             }
@@ -86,10 +77,10 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
         VotingWindow window = windows.findByIdForUpdate(windowId)
             .orElseThrow(() -> new WindowNotFoundException("Окно не найдено: " + windowId));
         if (window.scope() != WindowScope.PRIVATE) {
-            return; // глобальные окна закрывает AdvanceGlobalCompetitionService (раздел 8)
+            return; 
         }
         if (window.status() != WindowStatus.OPEN || now.isBefore(window.closesAt())) {
-            return; // уже закрыто (идемпотентность повтора) или ещё не due
+            return; 
         }
         Tournament tournament = findTournament(window.tournamentId());
         VotingWindow.CloseOutcome outcome = window.close(now,
@@ -100,7 +91,7 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
 
         List<TournamentEntry> eliminated = outcome.eliminatedEntryIds().stream()
             .map(this::findEntry)
-            .sorted(Comparator.comparing(TournamentEntry::plantId)) // устойчивый порядок (12.3)
+            .sorted(Comparator.comparing(TournamentEntry::plantId)) 
             .toList();
         for (TournamentEntry entry : eliminated) {
             entry.eliminate();
@@ -156,7 +147,7 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
                 winner.userId(), winner.plantId())));
     }
 
-    /** Проекция ленты (раздел 9): состав окна следующего раунда. */
+    
     private void publishOpened(VotingWindow window,
                                List<VotingWindowOpenedEvent.Participant> participants,
                                Instant now) {
@@ -169,7 +160,7 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
                 window.clusterKey(), window.opensAt(), window.closesAt(), participants)));
     }
 
-    /** Проекция ленты (раздел 9): карточки закрытого окна удаляются. */
+    
     private void publishClosed(VotingWindow window, Instant now) {
         UUID eventId = UUID.randomUUID();
         eventPublisher.publish(new VotingWindowClosedEvent(eventId,

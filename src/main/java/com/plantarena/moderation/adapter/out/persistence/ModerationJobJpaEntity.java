@@ -8,10 +8,7 @@ import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель moderation_job (раздел 11); маппинг на домен — явный (в
- * JpaModerationJobRepository). Конкурентный захват due-заданий ловит @Version.
- */
+
 @Entity
 @Table(name = "moderation_job", schema = "moderation")
 public class ModerationJobJpaEntity {
@@ -69,7 +66,7 @@ public class ModerationJobJpaEntity {
         this.createdAt = createdAt;
     }
 
-    /** Мутации домена; id/plantId/assetId/createdAt неизменяемы. */
+    
     void update(String status, int attempts, Instant nextAttemptAt, String modelVersion,
                 Float confidence, String reasonCode, Instant startedAt, Instant completedAt) {
         this.status = status;

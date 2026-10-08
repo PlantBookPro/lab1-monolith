@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/** ACL: read-контракт гостевых сессий tournaments → порт feed (in-process). */
+
 @Component
 public class InProcessGuestSessions implements GuestSessions {
 

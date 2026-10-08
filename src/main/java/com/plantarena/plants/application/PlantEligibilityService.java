@@ -21,12 +21,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация опубликованного контракта PlantEligibility (раздел 6): проверки
- * и изменение резерва атомарны. Гонку двух одновременных резервов одной пары
- * (ownerId, fingerprint) закрывает частичный уникальный индекс PostgreSQL —
- * нарушение переводится в ReservationConflictException (допущение 4).
- */
+
 @Service
 public class PlantEligibilityService implements PlantEligibility {
 
@@ -50,7 +45,7 @@ public class PlantEligibilityService implements PlantEligibility {
     public UUID reserveSubmission(UUID ownerId, UUID plantId, UUID idempotencyKey) {
         PlantReservation existing = reservations.findByIdempotencyKey(idempotencyKey).orElse(null);
         if (existing != null) {
-            return existing.id(); // идемпотентный повтор команды (раздел 6)
+            return existing.id(); 
         }
         Plant plant = plants.findById(plantId)
             .orElseThrow(() -> new PlantNotFoundException("Растение не найдено: " + plantId));
@@ -78,7 +73,7 @@ public class PlantEligibilityService implements PlantEligibility {
                 ownerId, plant.id(), plant.fingerprint(), idempotencyKey, clock.instant()));
             return saved.id();
         } catch (DataIntegrityViolationException e) {
-            // гонка: частичный уникальный индекс (owner_id, fingerprint) WHERE ACTIVE
+            
             throw new ReservationConflictException(
                 "Изображение уже зарезервировано другой заявкой (гонка)");
         }

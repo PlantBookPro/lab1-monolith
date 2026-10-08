@@ -4,12 +4,7 @@ import java.time.Clock;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Минимальная in-memory защита от накрутки (раздел 9): фиксированное окно
- * 1 минута на ключ (IP выдачи сессий / сессия голосования). Состояние
- * сбрасывается рестартом — осознанная минимальность (ADR-013);
- * полноценный anti-doping-service — будущая работа.
- */
+
 public class FixedWindowRateLimiter {
 
     private final Clock clock;
@@ -22,7 +17,7 @@ public class FixedWindowRateLimiter {
         this.clock = clock;
     }
 
-    /** Превышение лимита в текущем окне — RateLimitExceededException. */
+    
     public void check(String key, int limit) {
         long minute = clock.instant().toEpochMilli() / 60_000;
         Window window = windows.compute(key, (k, old) ->

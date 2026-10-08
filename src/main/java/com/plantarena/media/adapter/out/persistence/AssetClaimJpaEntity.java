@@ -7,11 +7,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель asset_claim (ADR-008). PK — asset_id: один файл — одно
- * задействованное растение; запись перезаписывается upsert-ом фасада,
- * поэтому без version (optimistic locking не нужен).
- */
+
 @Entity
 @Table(name = "asset_claim", schema = "media")
 public class AssetClaimJpaEntity {

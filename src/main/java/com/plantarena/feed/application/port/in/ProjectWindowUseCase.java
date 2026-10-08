@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/** Проекция ленты (ADR-002): применение событий окна (перевод события в команду feed). */
+
 public interface ProjectWindowUseCase {
 
     void onWindowOpened(WindowCardsCommand command);

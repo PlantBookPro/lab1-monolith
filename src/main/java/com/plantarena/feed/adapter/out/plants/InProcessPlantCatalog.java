@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/** ACL: публичные данные растения plants → порт feed (in-process). */
+
 @Component
 public class InProcessPlantCatalog implements PlantCatalog {
 

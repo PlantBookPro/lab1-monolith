@@ -6,12 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * ACL-адаптер media → moderation (раздел 4.3, Customer–Supplier): байты файла
- * через опубликованный контракт media.api; storageKey не пересекает границу.
- * Права не проверяются: вызов внутреннего контракта монолита по assetId из
- * задания модерации. В лабе №2 меняется на HTTP-клиент file-service.
- */
+
 @Component
 public class InProcessMediaContentGateway implements MediaContentGateway {
 

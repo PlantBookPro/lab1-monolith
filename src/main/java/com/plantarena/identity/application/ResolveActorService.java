@@ -13,10 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Идентификация субъекта по userId (ADR-005): роли всегда из БД,
- * неизвестный/деактивированный ID — ошибка идентификации.
- */
+
 @Service
 @Transactional(readOnly = true)
 public class ResolveActorService implements ResolveActorUseCase {

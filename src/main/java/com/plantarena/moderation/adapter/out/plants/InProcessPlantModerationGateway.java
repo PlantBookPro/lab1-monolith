@@ -7,12 +7,7 @@ import com.plantarena.plants.api.PlantModeration;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * ACL-адаптер plants → moderation (раздел 4.3): решение передаётся командой
- * plants.api.PlantModeration.recordDecision. Конфликт решения по уже
- * решённой заявке переводится в термины moderation (DecisionConflictException
- * → задание завершается DONE/STALE). В лабе №2 меняется на HTTP-клиент.
- */
+
 @Component
 public class InProcessPlantModerationGateway implements PlantModerationGateway {
 

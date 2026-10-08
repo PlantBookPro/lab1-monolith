@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/** Запросы к голосам (раздел 9): оцененные субъектом entry в открытых окнах. */
+
 public interface VoteJpaRepository extends JpaRepository<VoteJpaEntity, UUID> {
 
     @Query(value = """

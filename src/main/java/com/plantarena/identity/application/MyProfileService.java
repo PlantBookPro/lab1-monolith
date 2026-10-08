@@ -8,9 +8,7 @@ import com.plantarena.shared.security.CurrentActor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Собственный профиль пользователя (/me).
- */
+
 @Service
 @Transactional
 public class MyProfileService implements MyProfileUseCase {

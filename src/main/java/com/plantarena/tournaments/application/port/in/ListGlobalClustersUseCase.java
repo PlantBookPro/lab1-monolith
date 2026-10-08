@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/** Кластеры текущей эпохи (раздел 13): публично, без приватных данных. */
+
 public interface ListGlobalClustersUseCase {
 
     ClusterListResult list(PaginationParams page);

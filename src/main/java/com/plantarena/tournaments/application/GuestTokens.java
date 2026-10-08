@@ -6,11 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-/**
- * Токены гостевых сессий (раздел 9): 32 байта SecureRandom → Base64URL
- * (непрогнозируемый) и SHA-256 hex для хранения. Токен существует только
- * в ответе выдачи и в заголовке X-Guest-Token.
- */
+
 public final class GuestTokens {
 
     private static final SecureRandom RANDOM = new SecureRandom();

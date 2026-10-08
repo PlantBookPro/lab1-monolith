@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/** Spring Data для tournament: доступность (раздел 13) и due-дедлайны (раздел 7). */
+
 public interface TournamentJpaRepository extends JpaRepository<TournamentJpaEntity, UUID> {
 
     @Query("""

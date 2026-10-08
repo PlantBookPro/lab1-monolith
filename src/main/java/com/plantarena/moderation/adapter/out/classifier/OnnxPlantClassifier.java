@@ -16,17 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.imageio.ImageIO;
 
-/**
- * Классификатор MobileNetV2 (ImageNet-1K) через ONNX Runtime внутри монолита
- * (ADR-009). Препроцессинг: decode → resize 224×224 RGB → нормализация
- * ImageNet → NCHW float. Решение: top-1 ∈ растительные классы ImageNet-1K и
- * confidence ≥ 0.35. Отдельных классов «дерево» в ImageNet-1K нет — деревья
- * представлены плодами/семенами (жёлудь, конский каштан, инжир; ADR-009).
- * Сессия создаётся на каждый вызов: для лабы №1 нагрузка мизерная, состояние
- * не держим; пул сессий — лаба №2 при выносе inference-сервиса.
- * Отсутствие файла модели — ClassifierUnavailableException (job RETRY,
- * растение PENDING: честная незавершённость, раздел 6).
- */
+
 public class OnnxPlantClassifier implements PlantClassifier {
 
     public static final String MODEL_VERSION = "mobilenetv2-1.0-onnx-imagenet/plant-classes-v1";
@@ -35,13 +25,13 @@ public class OnnxPlantClassifier implements PlantClassifier {
     private static final float[] MEAN = {0.485f, 0.456f, 0.406f};
     private static final float[] STD = {0.229f, 0.224f, 0.225f};
 
-    /** Растительные классы ImageNet-1K (индексы стандартного маппинга, ADR-009). */
+    
     static final Set<Integer> PLANT_CLASS_INDICES = Set.of(
-        936, 937, 938, 941, 944,       // капуста, брокколи, цветная капуста, сквош, артишок
-        950, 951, 952, 953, 954, 956,  // апельсин, лимон, инжир, ананас, банан, аннона
-        958,                           // сено
-        984, 985, 986, 987,            // рапс, ромашка, венерин башмачок, кукуруза
-        988, 989, 990, 998);           // жёлудь, плод шиповника, конский каштан, початок
+        936, 937, 938, 941, 944,       
+        950, 951, 952, 953, 954, 956,  
+        958,                           
+        984, 985, 986, 987,            
+        988, 989, 990, 998);           
 
     private final Path modelPath;
 
@@ -64,7 +54,7 @@ public class OnnxPlantClassifier implements PlantClassifier {
         return new Classification(plant, confidence, MODEL_VERSION);
     }
 
-    /** decode → resize 224×224 RGB → нормализация ImageNet → NCHW. */
+    
     private float[] preprocess(byte[] imageBytes) {
         BufferedImage source;
         try {

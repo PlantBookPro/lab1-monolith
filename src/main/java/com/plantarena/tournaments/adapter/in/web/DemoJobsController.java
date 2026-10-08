@@ -15,12 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Диагностика (раздел 13): обработка наступивших дедлайнов через тот же use
- * case, что scheduler и ручка старта — без обхода правил. Только профили
- * dev/test (в обычной конфигурации бин отсутствует); доступ — M/A. Время —
- * только Clock (публичной ручки времени нет); отдельный Swagger tag.
- */
+
 @RestController
 @RequestMapping("/api/v1/internal/demo/jobs")
 @Profile({"dev", "test"})

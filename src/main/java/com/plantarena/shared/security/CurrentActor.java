@@ -3,10 +3,7 @@ package com.plantarena.shared.security;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Технический тип текущего субъекта (раздел 2): userId, роли, признак гостя.
- * Живёт в shared.security; провайдера реализует контекст identity.
- */
+
 public record CurrentActor(UUID userId, Set<AppRole> roles, boolean isGuest) {
 
     public CurrentActor {

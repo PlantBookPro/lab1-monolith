@@ -24,14 +24,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Голосование (разделы 9, 12.1): одна tx — один агрегат VotingWindow.
- * Блокировка окна (findByIdForUpdate) сериализует голоса и закрытие; время
- * проверяется после блокировки. Права: участник, допущенный к старту
- * (включая выбывшего — допущение 9); посторонний — 404 (турнир скрыт),
- * организатор-не-участник — 403, гость — GUEST по X-Guest-Token только в
- * глобальных окнах (закрытые — 404), самоголосование — 403 (допущение 6).
- */
+
 @Service
 public class VotingService implements VotingUseCase {
 
@@ -108,11 +101,7 @@ public class VotingService implements VotingUseCase {
         return Optional.ofNullable(value).map(Enum::name);
     }
 
-    /**
-     * Субъект голосования (раздел 9): идентифицированный — USER всегда
-     * (гостевой токен игнорируется); гость — GUEST по активной сессии
-     * (X-Guest-Token), с лимитом голосов на сессию (429).
-     */
+    
     private VotingSubject subjectOf(CurrentActor actor, String guestToken) {
         if (actor != null && !actor.isGuest()) {
             return VotingSubject.user(actor.userId());
@@ -151,7 +140,7 @@ public class VotingService implements VotingUseCase {
     private void requireVoter(CurrentActor actor, Tournament tournament, VotingWindow window) {
         if (window.scope() == WindowScope.PRIVATE) {
             if (actor == null || actor.isGuest()) {
-                // закрытый турнир скрыт от гостя (раздел 13: 404, не 401/403)
+                
                 throw new TournamentNotFoundException(
                     "Турнир не найден: " + tournament.id());
             }
@@ -163,8 +152,8 @@ public class VotingService implements VotingUseCase {
             }
             return;
         }
-        // глобальные окна (раздел 2): любой идентифицированный или гость
-        // с активной сессией — субъект уже проверен subjectOf
+        
+        
     }
 
     private void checkVote(VotingWindow window, UUID entryId, CurrentActor actor) {

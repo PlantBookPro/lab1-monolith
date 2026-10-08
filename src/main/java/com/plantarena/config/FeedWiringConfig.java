@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Связывание контекста feed: настройки, подпись курсора, seed порядка. */
+
 @Configuration
 @EnableConfigurationProperties(FeedSettings.class)
 public class FeedWiringConfig {

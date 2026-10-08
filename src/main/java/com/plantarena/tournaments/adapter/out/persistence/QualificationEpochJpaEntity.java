@@ -8,7 +8,7 @@ import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
 
-/** JPA-модель эпохи отбора (раздел 11); маппинг в домен — явный. */
+
 @Entity
 @Table(name = "qualification_epoch", schema = "tournaments")
 public class QualificationEpochJpaEntity {

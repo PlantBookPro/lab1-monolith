@@ -16,14 +16,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация опубликованного контракта PlantLifecycle (раздел 4.3): гибель
- * приходит командой от tournaments. Межагрегатная транзакция «Plant +
- * ImageRestriction» — отступление от «одна транзакция — один агрегат»,
- * описанное в ADR-008 (процесс закрытия окна, раздел 12.3); в лабе №2/4 —
- * надёжная команда/событие с повтором. Идемпотентна: DEAD-растение — no-op
- * (рестарт без повторной гибели и без дубля запрета).
- */
+
 @Service
 public class PlantLifecycleService implements PlantLifecycle {
 
@@ -54,7 +47,7 @@ public class PlantLifecycleService implements PlantLifecycle {
         Plant plant = plants.findById(plantId)
             .orElseThrow(() -> new PlantNotFoundException("Растение не найдено: " + plantId));
         if (plant.lifeStatus() == LifeStatus.DEAD) {
-            return; // идемпотентность повтора доставки
+            return; 
         }
         plant.die(clock.instant());
         plants.save(plant);
@@ -65,7 +58,7 @@ public class PlantLifecycleService implements PlantLifecycle {
             case COOLDOWN -> ImageRestriction.cooldown(plant.ownerId(), plant.fingerprint(),
                 reason, sourceEntryId, cooldownExpiresAt, clock.instant());
         };
-        restrictions.save(restriction); // append-only история (раздел 6)
+        restrictions.save(restriction); 
 
         UUID eventId = UUID.randomUUID();
         eventPublisher.publish(new PlantDiedEvent(eventId, PlantDiedEvent.TYPE,

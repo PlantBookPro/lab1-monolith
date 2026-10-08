@@ -20,10 +20,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Запросы турниров (раздел 13): доступные списки с фильтрами, просмотр
- * (организатор/админ/активное приглашение/участие), участники.
- */
+
 @Service
 @Transactional(readOnly = true)
 public class TournamentQueryService implements ListTournamentsUseCase, GetTournamentUseCase,
@@ -62,7 +59,7 @@ public class TournamentQueryService implements ListTournamentsUseCase, GetTourna
         return new TournamentListResult(items, tournaments.count(filter));
     }
 
-    /** Фильтр статуса: строка опубликованного языка → домен; неизвестное — 400. */
+    
     private TournamentStatus parseStatus(String status) {
         if (status == null) {
             return null;

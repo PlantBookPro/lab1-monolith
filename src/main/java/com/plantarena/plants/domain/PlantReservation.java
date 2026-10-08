@@ -4,13 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат plants: резерв пары (ownerId, fingerprint) за одной заявкой
- * (раздел 6, допущение 4). Set-инвариант «не более одного активного резерва
- * на пару» домен лишь формулирует — обеспечивает частичный уникальный индекс
- * PostgreSQL (раздел 5). Идемпотентность повтора — по idempotency key
- * (ID команды): повтор с тем же ключом возвращает тот же reservationId.
- */
+
 public final class PlantReservation {
 
     private final UUID id;
@@ -44,7 +38,7 @@ public final class PlantReservation {
             idempotencyKey, ReservationStatus.ACTIVE, now, null);
     }
 
-    /** Восстановление из хранилища (JPA-адаптер). */
+    
     public static PlantReservation restore(UUID id, UUID ownerId, UUID plantId,
                                            ImageFingerprint fingerprint, UUID idempotencyKey,
                                            ReservationStatus status, Instant createdAt,
@@ -53,7 +47,7 @@ public final class PlantReservation {
             status, createdAt, releasedAt);
     }
 
-    /** Освобождение (отказ/отмена/завершение); идемпотентно. */
+    
     public boolean release(Instant now) {
         if (status == ReservationStatus.RELEASED) {
             return false;

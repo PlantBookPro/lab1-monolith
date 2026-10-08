@@ -29,14 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/**
- * Продвижение границ глобального турнира (раздел 8, алгоритм 6) — один use
- * case для scheduler'а и demo-ручки. Фиксированный порядок: (1) закрыть
- * due-квалификацию, (2) закрыть due-финал, (3) открыть следующий финал,
- * (4) открыть следующую эпоху. Каждое окно/шаг — короткая tx (ADR-012);
- * идемпотентность по статусам: CLOSED-окно и существующие OPEN-эпоха/финал —
- * no-op, рестарт не убивает растения повторно (раздел 12.3).
- */
 @Service
 public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetitionUseCase {
 
@@ -87,7 +79,6 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
         return new AdvanceReport(qualificationClosed, finalClosed, finalsOpened, epochsOpened);
     }
 
-    /** (1) Закрытие due-квалификационных окон (алгоритмы 3–5). */
     private int closeDueQualification(Instant now) {
         int closed = 0;
         for (UUID windowId
@@ -108,7 +99,7 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
         VotingWindow window = windows.findByIdForUpdate(windowId)
             .orElseThrow(() -> new IllegalStateException("Окно не найдено: " + windowId));
         if (window.status() != WindowStatus.OPEN || now.isBefore(window.closesAt())) {
-            return; // уже закрыто (идемпотентность) или ещё не due
+            return;
         }
         VotingWindow.QualificationCloseOutcome outcome = window.closeQualification(now);
         windows.save(window);
@@ -134,7 +125,6 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
         }
     }
 
-    /** (2) Закрытие due-финального окна (алгоритмы 7–8). */
     private int closeDueFinal(Instant now) {
         int closed = 0;
         for (UUID windowId : windows.findDueForCloseByScope(WindowScope.FINAL, now, BATCH_SIZE)) {
@@ -164,10 +154,8 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
             registerGlobalDeath(entry, "Поражение в финальном окне " + window.sequence(), now);
             publishEliminated(window, entry, now);
         }
-        // выжившие остаются FINALIST — переход в следующее окно (3)
     }
 
-    /** (3) Следующее финальное окно: выжившие + все FINAL_PENDING (алгоритм 6). */
     private int openNextFinal(Instant now) {
         Boolean opened = transactionTemplate.execute(status -> {
             if (windows.findOpenByScope(GlobalCompetitionId.VALUE, WindowScope.FINAL)
@@ -183,7 +171,7 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
             List<TournamentEntry> finalists = entries.findByTournamentIdAndStatus(
                 GlobalCompetitionId.VALUE, EntryStatus.FINALIST);
             if (finalists.isEmpty()) {
-                return false; // n = 0: финал ждёт заявок (алгоритм 7)
+                return false;
             }
             int nextSequence = windows
                 .findLatestByTournamentIdAndScope(GlobalCompetitionId.VALUE, WindowScope.FINAL)
@@ -201,7 +189,6 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
         return Boolean.TRUE.equals(opened) ? 1 : 0;
     }
 
-    /** (4) Следующая эпоха: QUEUED → кластеризация → QUALIFYING + окна (алгоритм 2). */
     private int openNextEpoch(Instant now) {
         Boolean opened = transactionTemplate.execute(status -> {
             if (epochs.findOpenByTournamentId(GlobalCompetitionId.VALUE).isPresent()) {
@@ -210,7 +197,7 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
             List<TournamentEntry> queued = entries.findByTournamentIdAndStatus(
                 GlobalCompetitionId.VALUE, EntryStatus.QUEUED);
             if (queued.isEmpty()) {
-                return false; // пустые эпохи не создаются (дизайн, решение 4)
+                return false;
             }
             List<ClusteringGateway.MemberLocation> members = new ArrayList<>();
             for (TournamentEntry entry : queued) {
@@ -251,7 +238,6 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
         return Boolean.TRUE.equals(opened) ? 1 : 0;
     }
 
-    /** Гибель + суточный запрет совпавшей картинки + освобождение резерва. */
     private void registerGlobalDeath(TournamentEntry entry, String reason, Instant now) {
         plantLifecycle.registerDeath(entry.plantId(),
             PlantLifecycleGateway.RestrictionKind.COOLDOWN, now.plus(GLOBAL_COOLDOWN),
@@ -267,7 +253,6 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
                 entry.plantId(), window.sequence())));
     }
 
-    /** Проекция ленты (раздел 9): состав открытого окна. */
     private void publishOpened(VotingWindow window,
                                List<VotingWindowOpenedEvent.Participant> participants,
                                Instant now) {
@@ -280,7 +265,6 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
                 window.clusterKey(), window.opensAt(), window.closesAt(), participants)));
     }
 
-    /** Проекция ленты (раздел 9): карточки закрытого окна удаляются. */
     private void publishClosed(VotingWindow window, Instant now) {
         UUID eventId = UUID.randomUUID();
         eventPublisher.publish(new VotingWindowClosedEvent(eventId,
@@ -292,7 +276,7 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
 
     private List<TournamentEntry> eliminatedSorted(List<UUID> entryIds) {
         return entryIds.stream().map(this::findEntry)
-            .sorted(Comparator.comparing(TournamentEntry::plantId)) // устойчивый порядок (12.3)
+            .sorted(Comparator.comparing(TournamentEntry::plantId))
             .toList();
     }
 

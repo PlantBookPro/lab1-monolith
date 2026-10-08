@@ -5,14 +5,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат moderation (раздел 6): задание автоматического распознавания по
- * заявке. Инварианты: DONE терминален; переходы только NEW/RETRY →
- * IN_PROGRESS → DONE | RETRY; результат (modelVersion/confidence/reasonCode)
- * заполняется только при DONE; ошибка распознавателя — НЕ решение (RETRY,
- * растение остаётся PENDING). Retry без лимита: attempts — наблюдаемость;
- * backoff экспоненциальный с капом 1ч (ADR-009). Время приходит аргументом.
- */
+
 public final class ModerationJob {
 
     private static final Duration BACKOFF_CAP = Duration.ofHours(1);
@@ -53,13 +46,13 @@ public final class ModerationJob {
         this.version = version;
     }
 
-    /** Новое задание по заявке: NEW, готово к захвату немедленно. */
+    
     public static ModerationJob create(UUID plantId, UUID assetId, Instant now) {
         return new ModerationJob(UUID.randomUUID(), plantId, assetId, ModerationJobStatus.NEW,
             0, now, null, null, null, null, null, now, 0);
     }
 
-    /** Восстановление из хранилища с сохранением id и version (JPA-адаптер). */
+    
     public static ModerationJob restore(UUID id, UUID plantId, UUID assetId,
                                         ModerationJobStatus status, int attempts,
                                         Instant nextAttemptAt, String modelVersion,
@@ -70,7 +63,7 @@ public final class ModerationJob {
             modelVersion, confidence, reasonCode, startedAt, completedAt, createdAt, version);
     }
 
-    /** Захват due-задания воркером: attempts++, startedAt фиксируется первой попыткой. */
+    
     public void claim(Instant now) {
         requireStatus(ModerationJobStatus.NEW, ModerationJobStatus.RETRY);
         status = ModerationJobStatus.IN_PROGRESS;
@@ -80,7 +73,7 @@ public final class ModerationJob {
         }
     }
 
-    /** Успешная попытка: результат обязателен, STALE здесь запрещён (отдельная команда). */
+    
     public void succeed(String modelVersion, float confidence, ModerationReasonCode reasonCode,
                         Instant now) {
         requireStatus(ModerationJobStatus.IN_PROGRESS);
@@ -100,14 +93,14 @@ public final class ModerationJob {
         completedAt = now;
     }
 
-    /** Техническая ошибка — НЕ решение: RETRY с экспоненциальным backoff (без лимита попыток). */
+    
     public void retry(Instant now) {
         requireStatus(ModerationJobStatus.IN_PROGRESS);
         status = ModerationJobStatus.RETRY;
         nextAttemptAt = now.plus(backoff(attempts));
     }
 
-    /** Устаревший результат: решение по заявке уже есть, повтор не применяется. */
+    
     public void completeStale(Instant now) {
         requireStatus(ModerationJobStatus.IN_PROGRESS);
         status = ModerationJobStatus.DONE;
@@ -115,7 +108,7 @@ public final class ModerationJob {
         completedAt = now;
     }
 
-    /** Backoff попытки N: 1с, 2с, 4с, … кап 1ч (раздел 6, ADR-009). */
+    
     static Duration backoff(int attempts) {
         if (attempts >= 13) {
             return BACKOFF_CAP;

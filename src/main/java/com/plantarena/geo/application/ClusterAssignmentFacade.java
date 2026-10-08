@@ -12,11 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * Реализация опубликованного контракта geo.api.ClusterAssignment:
- * группировка политикой → фиксация снимков (состав и версия неизменны) →
- * ответ с составами участий. Время — из внедрённого Clock.
- */
+
 @Component
 public class ClusterAssignmentFacade implements ClusterAssignment {
 

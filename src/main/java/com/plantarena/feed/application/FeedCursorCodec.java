@@ -10,12 +10,7 @@ import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-/**
- * Подпись курсора ленты (раздел 9): base64url(payload).base64url(HMAC-SHA256).
- * Canonical: seed|cutoffEpochMilli|lastSortKey|lastId|subjectKey. Проверка —
- * пересчёт + MessageDigest.isEqual (постоянное время). TTL — от
- * snapshotCutoff: истёкший → 410 с предложением начать новую ленту.
- */
+
 public class FeedCursorCodec {
 
     private static final Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();

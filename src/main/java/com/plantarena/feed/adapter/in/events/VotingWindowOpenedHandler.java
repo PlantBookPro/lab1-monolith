@@ -5,11 +5,7 @@ import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-/**
- * Подписка на открытие окна (раздел 9): перевод опубликованного события в
- * команду проекции. Синхронно в tx издателя — карточки появляются вместе
- * с окном (обязательное последствие, раздел 10.3).
- */
+
 @Component
 public class VotingWindowOpenedHandler {
 

@@ -4,10 +4,7 @@ import com.plantarena.shared.event.IntegrationEvent;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Опубликованное событие: турнир стартовал (раздел 16). Подписчики —
- * итерации 6–8 (окна/лента) и notification-service лабы №4.
- */
+
 public record TournamentStartedEvent(
         UUID eventId,
         String eventType,

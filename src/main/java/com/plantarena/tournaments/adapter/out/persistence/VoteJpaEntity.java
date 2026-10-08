@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** JPA-модель голоса (раздел 11); UNIQUE(window_participant_id, subject_key). */
+
 @Entity
 @Table(name = "vote", schema = "tournaments")
 public class VoteJpaEntity {

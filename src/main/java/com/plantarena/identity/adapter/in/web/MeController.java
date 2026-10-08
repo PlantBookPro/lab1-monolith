@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Собственный профиль (/me): только идентифицированный пользователь.
- */
+
 @RestController
 @RequestMapping("/api/v1/me")
 @Tag(name = "identity")

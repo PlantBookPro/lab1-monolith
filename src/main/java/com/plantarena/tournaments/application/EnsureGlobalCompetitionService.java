@@ -7,11 +7,7 @@ import java.time.Clock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Идемпотентное создание единственной записи глобального турнира (раздел 8,
- * ADR-012): фиксированный id, статус RUNNING навсегда, creator — системный
- * UUID. Вызывается bootstrap-раннером при старте; повтор — no-op.
- */
+
 @Service
 public class EnsureGlobalCompetitionService implements EnsureGlobalCompetitionUseCase {
 

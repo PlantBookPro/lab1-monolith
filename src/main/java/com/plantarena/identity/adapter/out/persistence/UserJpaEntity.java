@@ -17,9 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * JPA-модель app_user (схема identity, раздел 11). Маппинг на домен явный (UserMapper).
- */
+
 @Entity
 @Table(name = "app_user", schema = "identity")
 public class UserJpaEntity {

@@ -5,13 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-/**
- * Доменный сервис отпечатков (ADR-007, алгоритм v1): SHA-256 по нормализованным
- * пикселям — префикс версии, ширина/высота int64 big-endian, затем R,G,B каждого
- * пикселя построчно (row-major). Альфа-канал и метаданные игнорируются;
- * EXIF-ориентация не применяется (зафиксировано в ADR-007). Любое изменение
- * раскладки требует новой версии алгоритма.
- */
+
 public final class ImageFingerprinter {
 
     public static final int ALGORITHM_VERSION = 1;
@@ -24,14 +18,14 @@ public final class ImageFingerprinter {
         digest.update(longBytes(image.width()));
         digest.update(longBytes(image.height()));
         for (int pixel : image.argb()) {
-            digest.update((byte) (pixel >> 16)); // R
-            digest.update((byte) (pixel >> 8));  // G
-            digest.update((byte) pixel);         // B (альфа игнорируется)
+            digest.update((byte) (pixel >> 16)); 
+            digest.update((byte) (pixel >> 8));  
+            digest.update((byte) pixel);         
         }
         return new ImageFingerprint(HexFormat.of().formatHex(digest.digest()), ALGORITHM_VERSION);
     }
 
-    /** rawSha256 (раздел 6): хэш исходных байтов — выявляет одинаковые файлы. */
+    
     public String rawSha256(byte[] content) {
         return HexFormat.of().formatHex(sha256().digest(content));
     }

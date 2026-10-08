@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/** ACL: read-контракт tournaments → порт feed (раздел 4.3, in-process). */
+
 @Component
 public class InProcessVotingDirectory implements VotingDirectory {
 

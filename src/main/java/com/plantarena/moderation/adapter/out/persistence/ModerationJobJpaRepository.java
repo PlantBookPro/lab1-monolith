@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/** Spring Data для moderation_job; due = NEW/RETRY с прошедшим nextAttemptAt. */
+
 public interface ModerationJobJpaRepository extends JpaRepository<ModerationJobJpaEntity, UUID> {
 
     List<ModerationJobJpaEntity> findByStatusInAndNextAttemptAtLessThanEqual(

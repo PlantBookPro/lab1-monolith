@@ -10,9 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/**
- * JPA-модель справочника role (схема identity): строки засеиваются миграцией V2.
- */
+
 @Entity
 @Table(name = "role", schema = "identity")
 public class RoleJpaEntity {

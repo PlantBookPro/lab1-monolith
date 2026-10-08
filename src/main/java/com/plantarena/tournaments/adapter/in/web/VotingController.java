@@ -17,11 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Голосование (раздел 13): PUT устанавливает значение (200 + новый score),
- * DELETE удаляет (204, идемпотентно), my-vote возвращает текущее значение.
- * Права и состояние окна решает use case (401/403/404/409).
- */
+
 @RestController
 @RequestMapping("/api/v1/windows")
 @Tag(name = "voting")

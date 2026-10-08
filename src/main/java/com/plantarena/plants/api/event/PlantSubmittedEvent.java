@@ -4,10 +4,7 @@ import com.plantarena.shared.event.IntegrationEvent;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Опубликованное событие: создана заявка «это моё растение» (раздел 4.3).
- * moderation подписан на него и создаёт задание распознавания (итерация 4).
- */
+
 public record PlantSubmittedEvent(
         UUID eventId,
         String eventType,

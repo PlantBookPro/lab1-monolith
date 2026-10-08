@@ -7,13 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/**
- * Опрос наступивших дедлайнов регистрации: fixedDelay 2с, пачка ≤ 10.
- * Тот же use case, что ручка POST /tournaments/{id}/start и demo-ручка
- * (раздел 7, дизайн итерации 5, решение 1); per-tournament tx и
- * устойчивость к сбоям решает startDue. Планировщик уже включён
- * (ModerationWiringConfig, @EnableScheduling) — нового config не нужно.
- */
+
 @Component
 public class TournamentDeadlinePoller {
 

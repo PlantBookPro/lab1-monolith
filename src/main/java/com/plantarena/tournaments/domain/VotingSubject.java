@@ -3,16 +3,11 @@ package com.plantarena.tournaments.domain;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Субъект голосования (раздел 9): USER(userId) или GUEST(гостевая сессия).
- * subjectKey — стабильный ключ уникальности (окно, entry, субъект) с
- * префиксом типа: «USER:<uuid>» / «GUEST:<sessionId>». Гость не владеет
- * участиями — самоголосование (допущение 6) к нему неприменимо.
- */
+
 public final class VotingSubject {
 
-    private final UUID userId;     // USER
-    private final UUID sessionId;  // GUEST
+    private final UUID userId;     
+    private final UUID sessionId;  
 
     private VotingSubject(UUID userId, UUID sessionId) {
         if (userId == null && sessionId == null) {
@@ -30,12 +25,12 @@ public final class VotingSubject {
         return new VotingSubject(null, Objects.requireNonNull(sessionId, "sessionId"));
     }
 
-    /** Ключ уникальности голоса (хранится в БД как VARCHAR). */
+    
     public String subjectKey() {
         return userId != null ? "USER:" + userId : "GUEST:" + sessionId;
     }
 
-    /** Самоголосование (допущение 6): субъект — владелец участия? Гость — нет. */
+    
     public boolean isUser(UUID candidate) {
         return userId != null && userId.equals(candidate);
     }

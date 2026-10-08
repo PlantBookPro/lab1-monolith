@@ -12,12 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-/**
- * Обработка due-заданий (раздел 12): короткая tx захвата (claim + save),
- * инференс ВНЕ транзакции, короткая tx применения (ApplyModerationResultService).
- * Техническая ошибка → RETRY (растение остаётся PENDING, ничего не теряется);
- * конфликт решения → DONE/STALE; конкурентный захват ловит @Version.
- */
+
 @Service
 public class ProcessModerationJobsService implements ProcessDueModerationJobsUseCase {
 
@@ -56,7 +51,7 @@ public class ProcessModerationJobsService implements ProcessDueModerationJobsUse
         return processed;
     }
 
-    /** Короткая tx захвата: claim + save; проигрыш конкуренции — пропускаем. */
+    
     private ModerationJob claim(ModerationJob candidate) {
         try {
             candidate.claim(clock.instant());
@@ -71,7 +66,7 @@ public class ProcessModerationJobsService implements ProcessDueModerationJobsUse
         }
     }
 
-    /** Инференс вне tx; применение — короткая tx (ApplyModerationResultService). */
+    
     private void process(ModerationJob job) {
         try {
             MediaContentGateway.MediaContent content = mediaContent.loadContent(job.assetId())

@@ -25,12 +25,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Приглашения (раздел 7): пригласить/отозвать (организатор, до дедлайна),
- * принять с растением (адресат, до дедлайна; резерв в той же tx — ADR-010),
- * отказаться. Принятие: APPROVED-растение → READY сразу, идущая модерация →
- * ACCEPTED_PENDING_MODERATION (не допуск к голосованию).
- */
+
 @Service
 public class InvitationService implements InviteUserUseCase, RevokeInvitationUseCase,
         AcceptInvitationUseCase, DeclineInvitationUseCase, ListInvitationsUseCase {
@@ -119,7 +114,7 @@ public class InvitationService implements InviteUserUseCase, RevokeInvitationUse
         if (invitation.status() == InvitationStatus.ACCEPTED_PENDING_MODERATION
                 || invitation.status() == InvitationStatus.READY) {
             if (plantId != null && plantId.equals(invitation.submittedPlantId())) {
-                return TournamentAssembler.toData(invitation); // идемпотентный повтор
+                return TournamentAssembler.toData(invitation); 
             }
             throw new TournamentStateConflictException(
                 "Приглашение уже принято; сначала откажитесь, затем подайте другое растение");
@@ -130,7 +125,7 @@ public class InvitationService implements InviteUserUseCase, RevokeInvitationUse
         }
         PlantDirectoryGateway.PlantSnapshot plant = plantDirectory.findById(plantId)
             .orElseThrow(() -> new InvitedPlantNotFoundException("Растение не найдено: " + plantId));
-        UUID submissionKey = UUID.randomUUID(); // свежий ключ на попытку (дизайн, решение 3)
+        UUID submissionKey = UUID.randomUUID(); 
         UUID reservationId = eligibility.reserve(actor.userId(), plantId, submissionKey);
         invitation.accept(plantId, reservationId, submissionKey, plant.approved(),
             clock.instant());
@@ -149,7 +144,7 @@ public class InvitationService implements InviteUserUseCase, RevokeInvitationUse
             throw new TournamentStateConflictException("Отказ возможен только до старта");
         }
         if (invitation.status() == InvitationStatus.DECLINED) {
-            return TournamentAssembler.toData(invitation); // идемпотентно
+            return TournamentAssembler.toData(invitation); 
         }
         if (invitation.status() == InvitationStatus.REVOKED
                 || invitation.status() == InvitationStatus.EXPIRED) {

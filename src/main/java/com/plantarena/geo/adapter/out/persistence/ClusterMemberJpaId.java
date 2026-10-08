@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-/** Составной ключ cluster_member (snapshot_id, entry_id). */
+
 public class ClusterMemberJpaId implements Serializable {
 
     private UUID snapshotId;

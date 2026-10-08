@@ -3,7 +3,7 @@ package com.plantarena.tournaments.application;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** Тайминги глобального турнира (раздел 8): эпоха и финальное окно. */
+
 @ConfigurationProperties(prefix = "plantarena.global")
 public record GlobalCompetitionSettings(Duration epochDuration, Duration finalWindowDuration) {
 

@@ -7,10 +7,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель image_restriction (раздел 11). Append-only: только создаётся
- * и читается — version (optimistic locking) не нужен.
- */
+
 @Entity
 @Table(name = "image_restriction", schema = "plants")
 public class ImageRestrictionJpaEntity {

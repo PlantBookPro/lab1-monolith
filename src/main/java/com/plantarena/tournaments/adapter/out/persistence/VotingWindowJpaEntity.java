@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/** JPA-модель окна голосования (раздел 11); маппинг в домен — явный. */
+
 @Entity
 @Table(name = "voting_window", schema = "tournaments")
 public class VotingWindowJpaEntity {

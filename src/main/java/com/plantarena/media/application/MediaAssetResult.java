@@ -4,10 +4,7 @@ import com.plantarena.media.domain.MediaAsset;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Публичный результат загрузки (раздел 6): без storageKey и хэшей —
- * внутренние пути хранилища наружу не публикуются.
- */
+
 public record MediaAssetResult(UUID id, UUID ownerId, String mimeType, long byteSize,
                                int width, int height, Instant createdAt) {
 

@@ -7,14 +7,11 @@ import com.plantarena.shared.security.NotIdentifiedException;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * AccessPolicy контекста identity: правила единого языка контекста
- * (раздел 2 требований). Владелец ресурса проверяется отдельно от роли.
- */
+
 @Component
 public class IdentityAccessPolicy {
 
-    /** Создание и список пользователей — модератор или админ. */
+    
     public void requireUserManagement(CurrentActor actor) {
         requireIdentified(actor);
         if (!actor.hasRole(AppRole.MODERATOR) && !actor.hasRole(AppRole.ADMIN)) {
@@ -23,7 +20,7 @@ public class IdentityAccessPolicy {
         }
     }
 
-    /** Просмотр профиля — сам пользователь, модератор или админ. */
+    
     public void requireViewUser(CurrentActor actor, UUID targetUserId) {
         requireIdentified(actor);
         if (isSelf(actor, targetUserId) || actor.hasRole(AppRole.MODERATOR) || actor.hasRole(AppRole.ADMIN)) {
@@ -33,7 +30,7 @@ public class IdentityAccessPolicy {
             "Просмотр профиля доступен самому пользователю, модератору или администратору");
     }
 
-    /** Изменение профиля — владелец или админ; роли и статус меняются отдельными командами. */
+    
     public void requireEditProfile(CurrentActor actor, UUID targetUserId) {
         requireIdentified(actor);
         if (isSelf(actor, targetUserId) || actor.hasRole(AppRole.ADMIN)) {
@@ -42,7 +39,7 @@ public class IdentityAccessPolicy {
         throw new AccessDeniedException("Изменение профиля доступно владельцу или администратору");
     }
 
-    /** Управление ролями и деактивация — только админ. */
+    
     public void requireAdmin(CurrentActor actor) {
         requireIdentified(actor);
         if (!actor.hasRole(AppRole.ADMIN)) {

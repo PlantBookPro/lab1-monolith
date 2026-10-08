@@ -40,17 +40,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Перевод исключений tournaments в ProblemDetail-подобное тело (раздел 13:
- * скрытое — 404, конфликты состояний/дедлайна/дублей — 409, неизвестный
- * фильтр — 400). PLANT_NOT_RESERVABLE несёт retryAt — срок временного
- * запрета изображения (COOLDOWN), у остальных — null.
- *
- * <p>HIGHEST_PRECEDENCE: advice без @Order сортируются по порядку сканирования,
- * и catch-all Exception из shared ApiExceptionHandler успевает перехватить
- * исключения tournaments раньше (пакет shared идёт после plants/identity/media,
- * но перед tournaments) — явный приоритет ставит контекстный перевод первым.
- */
+
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class TournamentsExceptionHandler {
@@ -121,7 +111,7 @@ public class TournamentsExceptionHandler {
         return respond(HttpStatus.CONFLICT, "IMAGE_ALREADY_RESERVED", e.getMessage(), request);
     }
 
-    /** 409 + retryAt: срок истечения временного запрета изображения (null — бессрочный/нет). */
+    
     @ExceptionHandler(PlantNotReservableException.class)
     public ResponseEntity<ApiError> plantNotReservable(PlantNotReservableException e,
                                                        HttpServletRequest request) {

@@ -12,12 +12,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/**
- * Подача заявки в глобальный турнир (раздел 8, алгоритм 1): только APPROVED
- * (раздел 6), координаты обязательны (раздел 8), одно активное участие
- * (допущение 5). Резерв изображения — с idempotency key = entryId, в одной
- * tx с созданием участия (по образцу ADR-010).
- */
+
 @Service
 public class SubmitGlobalEntryService implements SubmitGlobalEntryUseCase {
 

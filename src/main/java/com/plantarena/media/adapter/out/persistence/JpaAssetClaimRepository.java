@@ -7,11 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта AssetClaimRepository на JPA + PostgreSQL (раздел 14.2).
- * save с существующим asset_id — merge (upsert публичности по решению
- * модерации); с новым — insert.
- */
+
 @Repository
 @Transactional
 public class JpaAssetClaimRepository implements AssetClaimRepository {

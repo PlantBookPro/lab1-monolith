@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/** JPA-модель снимка кластера (раздел 11); маппинг в домен — явный. */
+
 @Entity
 @Table(name = "cluster_snapshot", schema = "geo")
 public class ClusterSnapshotJpaEntity {

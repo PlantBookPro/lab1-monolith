@@ -30,12 +30,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Use cases растений (разделы 6 и 13). Подача — межконтекстный процесс
- * «Plant (plants) + claim (media)» в одной транзакции монолита (раздел 12,
- * ADR-008); в лабе №2 — команда в file-service с retry/компенсацией.
- * Публикует PlantSubmitted (moderation подписан, итерация 4).
- */
+
 @Service
 public class PlantService implements SubmitPlantUseCase, ListPlantsUseCase, GetPlantUseCase,
         RenamePlantUseCase, ArchivePlantUseCase, GetPlantModerationUseCase {
@@ -71,7 +66,7 @@ public class PlantService implements SubmitPlantUseCase, ListPlantsUseCase, GetP
         MediaAssetsGateway.AssetMetadata asset = mediaAssets.findById(command.assetId())
             .orElseThrow(() -> new AssetNotFoundException("Файл не найден: " + command.assetId()));
         if (!asset.ownerId().equals(actor.userId())) {
-            throw new AssetNotFoundException("Файл не найден"); // чужой скрыт (раздел 13)
+            throw new AssetNotFoundException("Файл не найден"); 
         }
         plants.findActiveByAssetId(asset.id()).ifPresent(existing -> {
             throw new AssetAlreadyClaimedException(
@@ -84,12 +79,12 @@ public class PlantService implements SubmitPlantUseCase, ListPlantsUseCase, GetP
         Plant plant = Plant.submit(actor.userId(), asset.id(), fingerprint,
             command.title(), clock.instant());
         plants.save(plant);
-        mediaClaims.claim(asset.id(), plant.id(), false); // занят, но не публичен (ADR-008)
+        mediaClaims.claim(asset.id(), plant.id(), false); 
 
         UUID eventId = UUID.randomUUID();
         eventPublisher.publish(new PlantSubmittedEvent(eventId, PlantSubmittedEvent.TYPE,
             PlantSubmittedEvent.SCHEMA_VERSION, plant.id(), plant.version(), clock.instant(),
-            eventId, // correlationId: сквозная корреляция появится с Kafka (лаба №4)
+            eventId, 
             new PlantSubmittedEvent.Payload(plant.id(), plant.ownerId(), plant.assetId(),
                 plant.fingerprint().value(), plant.fingerprint().algorithmVersion())));
         return toData(plant);
@@ -140,7 +135,7 @@ public class PlantService implements SubmitPlantUseCase, ListPlantsUseCase, GetP
         }
         plant.archive(clock.instant());
         plants.save(plant);
-        mediaClaims.release(plant.assetId(), plant.id()); // файл освобождён (ADR-008)
+        mediaClaims.release(plant.assetId(), plant.id()); 
     }
 
     @Override
@@ -163,7 +158,7 @@ public class PlantService implements SubmitPlantUseCase, ListPlantsUseCase, GetP
             });
     }
 
-    /** Архивированное растение скрыто для всех, включая владельца (раздел 13). */
+    
     private Plant loadVisible(UUID plantId) {
         Plant plant = plants.findById(plantId)
             .orElseThrow(() -> new PlantNotFoundException("Растение не найдено: " + plantId));

@@ -12,10 +12,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Справочник тегов (раздел 13): создание — M/A, изменение/удаление — A,
- * используемый тег не удаляется (409).
- */
+
 @Service
 public class TagsService implements TagsUseCase {
 

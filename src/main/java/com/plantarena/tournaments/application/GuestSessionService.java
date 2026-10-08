@@ -9,11 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Выдача гостевых сессий (раздел 9): публично, токен возвращается один раз;
- * в БД — только SHA-256 хэш. Лимит выдачи — на IP (фиксированное окно),
- * превышение — 429 + сигнал в AbuseSignals.
- */
+
 @Service
 public class GuestSessionService implements CreateGuestSessionUseCase {
 

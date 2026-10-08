@@ -5,7 +5,7 @@ import com.plantarena.tournaments.api.event.VotingWindowClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-/** Подписка на закрытие окна (раздел 9): карточки окна удаляются. */
+
 @Component
 public class VotingWindowClosedHandler {
 

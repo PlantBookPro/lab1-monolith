@@ -10,11 +10,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель tournament_entry (раздел 11): создаётся при старте; статус
- * мутирует с итерации 6 (eliminate/winner при закрытии окон) — без version
- * (писатель один: закрытие окна под FOR UPDATE).
- */
+
 @Entity
 @Table(name = "tournament_entry", schema = "tournaments")
 public class TournamentEntryJpaEntity {

@@ -5,10 +5,7 @@ import com.plantarena.tournaments.api.TagData;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Справочник тегов (раздел 13): создание — M/A, изменение — A, удаление — A
- * (используемый тег не удаляется), чтение — все идентифицированные.
- */
+
 public interface TagsUseCase {
 
     TagData create(CurrentActor actor, String name);

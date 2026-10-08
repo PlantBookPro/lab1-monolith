@@ -1,9 +1,6 @@
 package com.plantarena.media.domain;
 
-/**
- * Форматы первого этапа (раздел 6): JPEG и PNG. MIME и расширение — часть
- * единого языка media; маппинг MIME ↔ формат используется JPA-адаптером.
- */
+
 public enum ImageFormat {
     JPEG("image/jpeg", "jpg"),
     PNG("image/png", "png");

@@ -12,11 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Перевод исключений identity в ProblemDetail-подобное тело (раздел 13).
- * Живёт в adapter.in.web: shared не зависит от контекстов (правило 10.2.8);
- * Spring выбирает самый специфичный обработчик среди всех advice.
- */
+
 @RestControllerAdvice
 public class IdentityExceptionHandler {
 

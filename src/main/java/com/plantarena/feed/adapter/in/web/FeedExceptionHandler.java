@@ -14,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Перевод исключений feed (раздел 13): невалидный курсор — 400, истёкший —
- * 410 (начать новую ленту). HIGHEST_PRECEDENCE — раньше catch-all shared.
- */
+
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class FeedExceptionHandler {

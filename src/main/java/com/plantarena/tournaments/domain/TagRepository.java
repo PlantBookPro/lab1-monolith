@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Порт репозитория справочника тегов; isUsedByTournament — для удаления (409). */
+
 public interface TagRepository {
 
     Tag save(Tag tag);
@@ -19,6 +19,6 @@ public interface TagRepository {
 
     void delete(UUID id);
 
-    /** Используется ли тег хотя бы одним турниром (M2M tournament_tag). */
+    
     boolean isUsedByTournament(UUID tagId);
 }

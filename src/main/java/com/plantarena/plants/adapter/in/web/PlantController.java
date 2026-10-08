@@ -27,10 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Ручки растений (раздел 13). Контроллер обращается только к входным портам
- * application (правило 10.2.7); видимость и права решает use case/AccessPolicy.
- */
+
 @RestController
 @RequestMapping("/api/v1/plants")
 @Tag(name = "plants")

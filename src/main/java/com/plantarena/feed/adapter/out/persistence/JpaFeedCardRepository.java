@@ -11,15 +11,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * JPA-реализация порта FeedCardRepository. Пустые множества фильтров
- * заменяются невозможным sentinel-UUID: семантика «ничего не совпало» без
- * пустого IN (...) в PostgreSQL. excludedOwner для гостя — тоже sentinel.
- */
+
 @Repository
 public class JpaFeedCardRepository implements FeedCardRepository {
 
-    /** Не существует и не может существовать (RFC 9562 reserved). */
+    
     private static final UUID SENTINEL = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     private final FeedCardJpaRepository jpaRepository;

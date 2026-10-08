@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/** Spring Data для tag; isUsedByTournament — join с tournament_tag (раздел 11). */
+
 public interface TagJpaRepository extends JpaRepository<TagJpaEntity, UUID> {
 
     Optional<TagJpaEntity> findByName(String name);

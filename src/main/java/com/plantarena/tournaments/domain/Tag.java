@@ -4,10 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат tournaments: тег справочника тематик (раздел 13). Простой
- * справочник — без version (единственная мутация rename, админ).
- */
+
 public final class Tag {
 
     private final UUID id;

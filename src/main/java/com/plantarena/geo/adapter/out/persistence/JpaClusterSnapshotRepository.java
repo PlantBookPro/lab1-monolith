@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/** JPA-реализация порта ClusterSnapshotRepository: явный маппинг. */
+
 @Repository
 public class JpaClusterSnapshotRepository implements ClusterSnapshotRepository {
 

@@ -7,11 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/**
- * Опрос границ глобального турнира (раздел 8): fixedDelay 2с. Тот же use
- * case, что demo-ручка; идемпотентность по статусам — рестарт приложения не
- * теряет окна и не убивает растения повторно (раздел 12.3).
- */
+
 @Component
 public class GlobalBoundaryPoller {
 

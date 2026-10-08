@@ -25,12 +25,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Администрация турнира (раздел 7): черновик, параметры (только DRAFT),
- * безопасное описание, удаление пустого черновика, открытие регистрации,
- * отмена до RUNNING. Отмена освобождает резервы принятых заявок командой
- * plants в той же tx (ADR-010).
- */
+
 @Service
 public class TournamentAdministrationService implements CreateTournamentUseCase,
         UpdateTournamentUseCase, DeleteTournamentUseCase, OpenRegistrationUseCase,
@@ -157,7 +152,7 @@ public class TournamentAdministrationService implements CreateTournamentUseCase,
         return TournamentAssembler.toData(tournament);
     }
 
-    /** Освободить резервы принятых заявок (отмена — ADR-010, та же tx). */
+    
     private void releaseAcceptedReservations(UUID tournamentId) {
         for (InvitationStatus status : List.of(InvitationStatus.ACCEPTED_PENDING_MODERATION,
             InvitationStatus.READY)) {

@@ -7,11 +7,7 @@ import java.time.Clock;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
-/**
- * PlantSubmitted → задание NEW. Вызывается синхронным @EventListener внутри
- * транзакции подачи заявки (in-process, раздел 12): задание появляется
- * атомарно с растением. Идемпотентно по plantId (повтор доставки — no-op).
- */
+
 @Service
 public class CreateModerationJobService implements CreateModerationJobUseCase {
 

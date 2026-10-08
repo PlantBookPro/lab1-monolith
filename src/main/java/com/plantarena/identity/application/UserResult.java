@@ -6,9 +6,7 @@ import com.plantarena.identity.domain.UserStatus;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Результат use case без passwordHash: пароль никогда не покидает домен (ADR-005).
- */
+
 public record UserResult(UUID id, String email, String displayName, Set<UserRole> roles,
                          UserStatus status, Double latitude, Double longitude) {
 

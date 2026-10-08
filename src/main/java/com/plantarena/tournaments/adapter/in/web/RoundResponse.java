@@ -4,7 +4,7 @@ import com.plantarena.tournaments.application.port.in.ListRoundsUseCase;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Раунд турнира (раздел 13). */
+
 public record RoundResponse(UUID id, int sequence, String status, Instant opensAt,
                             Instant closesAt) {
 

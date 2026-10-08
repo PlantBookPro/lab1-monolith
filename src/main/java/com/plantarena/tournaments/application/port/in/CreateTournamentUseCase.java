@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-/** Создать PRIVATE DRAFT (раздел 7/13; модератор/админ). */
+
 public interface CreateTournamentUseCase {
 
     TournamentData create(CurrentActor actor, CreateTournamentCommand command);

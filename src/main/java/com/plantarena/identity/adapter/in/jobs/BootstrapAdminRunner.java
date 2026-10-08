@@ -8,10 +8,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-/**
- * Bootstrap-админ из ENV (раздел 2): первый ADMIN создаётся при старте,
- * повторный запуск не создаёт дубликат (идемпотентность — в use case).
- */
+
 @Component
 public class BootstrapAdminRunner implements ApplicationRunner {
 

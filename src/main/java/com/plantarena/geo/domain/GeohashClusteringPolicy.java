@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-/** Реализация политики: geohash-сетка выбранной точности (раздел 8). */
+
 public final class GeohashClusteringPolicy implements ClusteringPolicy {
 
     private final int precision;

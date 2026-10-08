@@ -4,12 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат plants: запрет изображения для пары (ownerId, fingerprint)
- * (раздел 6, допущения 2–3). Append-only: история гибели не удаляется;
- * активность вычисляет ImageReusePolicy, а не статус. PERMANENT без expiresAt;
- * COOLDOWN блокирует, пока now &lt; expiresAt.
- */
+
 public final class ImageRestriction {
 
     private final UUID id;
@@ -39,14 +34,14 @@ public final class ImageRestriction {
         }
     }
 
-    /** Запрет навсегда (поражение в закрытом турнире, допущение 2). */
+    
     public static ImageRestriction permanent(UUID ownerId, ImageFingerprint fingerprint,
                                              String reason, UUID sourceEntryId, Instant now) {
         return new ImageRestriction(UUID.randomUUID(), ownerId, fingerprint,
             RestrictionKind.PERMANENT, null, reason, sourceEntryId, now);
     }
 
-    /** Временный запрет (поражение в глобальном турнире — 24 ч, допущение 2). */
+    
     public static ImageRestriction cooldown(UUID ownerId, ImageFingerprint fingerprint,
                                             String reason, UUID sourceEntryId,
                                             Instant expiresAt, Instant now) {
@@ -55,7 +50,7 @@ public final class ImageRestriction {
             reason, sourceEntryId, now);
     }
 
-    /** Восстановление из хранилища (JPA-адаптер). */
+    
     public static ImageRestriction restore(UUID id, UUID ownerId, ImageFingerprint fingerprint,
                                            RestrictionKind kind, Instant expiresAt, String reason,
                                            UUID sourceEntryId, Instant createdAt) {
@@ -79,7 +74,7 @@ public final class ImageRestriction {
         return kind;
     }
 
-    /** null для PERMANENT; для COOLDOWN — момент окончания. */
+    
     public Instant expiresAt() {
         return expiresAt;
     }

@@ -18,17 +18,11 @@ import java.time.Clock;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
-/**
- * Use cases media (раздел 6). Транзакции по разделу 12: файл сохраняется
- * в хранилище ДО короткой транзакции регистрации метаданных (в адаптере);
- * сбой регистрации компенсируется удалением сиротского файла.
- * Задействованность (ADR-008): удаление занятого файла — 409 ASSET_IN_USE;
- * скачивание чужих — только публичная задействованность (APPROVED-растение).
- */
+
 @Service
 public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCase, DeleteMediaUseCase {
 
-    static final long MAX_BYTES = 10 * 1024 * 1024; // 10 MiB (раздел 6)
+    static final long MAX_BYTES = 10 * 1024 * 1024; 
 
     private final MediaAssetRepository repository;
     private final ImageAnalyzer imageAnalyzer;
@@ -55,7 +49,7 @@ public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCa
         if (content.length > MAX_BYTES) {
             throw new FileTooLargeException("Файл превышает 10 MiB: " + content.length + " байт");
         }
-        AnalyzedImage image = imageAnalyzer.analyze(content); // 415 / 413 (пиксели)
+        AnalyzedImage image = imageAnalyzer.analyze(content); 
         ImageFingerprint fingerprint = fingerprinter.fingerprint(image);
         String rawSha256 = fingerprinter.rawSha256(content);
         String storageKey = fileStorage.save(content, image.format());
@@ -63,10 +57,10 @@ public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCa
             MediaAsset asset = MediaAsset.uploaded(actor.userId(), storageKey, image.format(),
                 content.length, image.width(), image.height(), rawSha256, fingerprint,
                 clock.instant());
-            repository.save(asset); // короткая транзакция (раздел 12)
+            repository.save(asset); 
             return MediaAssetResult.from(asset);
         } catch (RuntimeException e) {
-            fileStorage.delete(storageKey); // компенсация сиротского файла
+            fileStorage.delete(storageKey); 
             throw e;
         }
     }
@@ -87,11 +81,11 @@ public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCa
         MediaAsset asset = find(assetId);
         accessPolicy.requireDeleter(actor, asset.ownerId());
         claims.findByAssetId(asset.id()).ifPresent(claim -> {
-            throw new AssetInUseException( // 409: сначала архивируйте растение (ADR-008)
+            throw new AssetInUseException( 
                 "Файл задействован растением: " + claim.plantId());
         });
-        repository.delete(asset.id());           // короткая транзакция
-        fileStorage.delete(asset.storageKey());  // метаданные уже удалены — «висячих» ссылок нет
+        repository.delete(asset.id());           
+        fileStorage.delete(asset.storageKey());  
     }
 
     private MediaAsset find(UUID assetId) {

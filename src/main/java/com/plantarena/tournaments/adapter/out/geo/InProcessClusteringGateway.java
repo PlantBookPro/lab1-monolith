@@ -6,11 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * ACL-адаптер geo → tournaments (раздел 4.3): команда кластеризации через
- * контракт geo.api.ClusterAssignment; geo получает координаты во входной
- * команде. В лабе №2 меняется на HTTP-клиент.
- */
+
 @Component
 public class InProcessClusteringGateway implements ClusteringGateway {
 

@@ -28,15 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/**
- * Один use case старта для ручки и scheduler'а (раздел 7, дизайн итерации 5):
- * start — ручка организатора (после дедлайна, конфликт состояний — 409);
- * startDue — due-турниры из БД, каждый в отдельной короткой tx
- * (TransactionTemplate): один сбой не блокирует остальные. READY ≥
- * minParticipants → RUNNING + TournamentEntry + EXPIRED не-READY +
- * TournamentStarted; иначе CANCELLED (INSUFFICIENT_PARTICIPANTS) с
- * освобождением резервов. Растения не погибают (раздел 7).
- */
+
 @Service
 public class StartTournamentService implements StartTournamentUseCase {
 
@@ -100,7 +92,7 @@ public class StartTournamentService implements StartTournamentUseCase {
                     status -> startDueOne(tournamentId, now));
                 processed++;
             } catch (RuntimeException e) {
-                // один битый турнир не блокирует остальные; повтор — следующий poll
+                
                 log.warn("Старт турнира {} не удался, будет повторён: {}", tournamentId,
                     e.getMessage());
             }
@@ -111,7 +103,7 @@ public class StartTournamentService implements StartTournamentUseCase {
     private void startDueOne(UUID tournamentId, Instant now) {
         Tournament tournament = find(tournamentId);
         if (tournament.status() != TournamentStatus.REGISTRATION_OPEN) {
-            return; // уже обработан (идемпотентность повторного poll'а)
+            return; 
         }
         doStart(tournament, now);
     }
@@ -126,7 +118,7 @@ public class StartTournamentService implements StartTournamentUseCase {
             return TournamentAssembler.toData(tournament);
         }
         for (Invitation invitation : ready) {
-            // допуск к старту: только APPROVED и действующий резерв (раздел 6)
+            
             eligibility.confirm(invitation.userId(), invitation.submittedPlantId(),
                 invitation.reservationId());
         }
@@ -138,7 +130,7 @@ public class StartTournamentService implements StartTournamentUseCase {
                 invitation.userId(), invitation.submittedPlantId(),
                 invitation.reservationId(), now)));
         }
-        // первый раунд (раздел 7): состав зафиксирован, счёт с нуля
+        
         VotingWindow firstWindow = VotingWindow.open(tournament.id(), 1,
             admitted.stream()
                 .map(entry -> new VotingWindow.ParticipantSeed(entry.id(), entry.userId(),
@@ -189,7 +181,7 @@ public class StartTournamentService implements StartTournamentUseCase {
                 tournament.creatorId())));
     }
 
-    /** Проекция ленты (раздел 9): состав первого окна. */
+    
     private void publishOpened(VotingWindow window,
                                List<VotingWindowOpenedEvent.Participant> participants,
                                Instant now) {

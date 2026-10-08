@@ -4,7 +4,7 @@ import com.plantarena.shared.security.CurrentActor;
 import java.util.List;
 import java.util.UUID;
 
-/** Итоги турнира: победитель и выбывшие (раздел 13). */
+
 public interface ListResultsUseCase {
 
     ResultListResult listResults(CurrentActor actor, UUID tournamentId, int page, int size);

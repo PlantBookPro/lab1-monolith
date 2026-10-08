@@ -26,11 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Ручки глобального турнира (раздел 13). Конфигурация/кластеры/лидерборды —
- * публичны (без идентификации); подача/снятие/своё участие — U. Контроллер
- * обращается только к входным портам application.
- */
+
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "global")

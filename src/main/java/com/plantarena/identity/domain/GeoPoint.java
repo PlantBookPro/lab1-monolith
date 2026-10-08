@@ -1,8 +1,6 @@
 package com.plantarena.identity.domain;
 
-/**
- * VO «Координаты»: широта [-90, 90], долгота [-180, 180], границы включаются.
- */
+
 public record GeoPoint(double latitude, double longitude) {
 
     public GeoPoint {

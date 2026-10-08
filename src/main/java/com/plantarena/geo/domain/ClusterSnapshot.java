@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат geo (раздел 8, алгоритм 2): зафиксированный кластер эпохи. Состав и
- * версия политики неизменны после фиксации; изменяется только созданием.
- */
+
 public final class ClusterSnapshot {
 
     private final UUID id;
@@ -28,7 +25,7 @@ public final class ClusterSnapshot {
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
     }
 
-    /** Фиксация кластера при открытии эпохи (минимум один участник). */
+    
     public static ClusterSnapshot fix(UUID epochId, String clusterKey, String policyVersion,
                                       List<ClusterMember> members, Instant now) {
         Objects.requireNonNull(members, "members");
@@ -43,7 +40,7 @@ public final class ClusterSnapshot {
             snapshotMembers, now);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static ClusterSnapshot restore(UUID id, UUID epochId, String clusterKey,
                                           String policyVersion,
                                           List<SnapshotMember> members, Instant createdAt) {
@@ -74,7 +71,7 @@ public final class ClusterSnapshot {
         return createdAt;
     }
 
-    /** Состав кластера: пользователь, участие, версия координат (раздел 11). */
+    
     public record SnapshotMember(UUID userId, UUID entryId, long locationVersion) {
     }
 }

@@ -7,10 +7,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Изменить турнир (организатор/админ): параметры — только в DRAFT, описание —
- * безопасное изменение и после открытия (раздел 13). null = не менять.
- */
+
 public interface UpdateTournamentUseCase {
 
     TournamentData update(CurrentActor actor, UUID tournamentId, UpdateTournamentCommand command);

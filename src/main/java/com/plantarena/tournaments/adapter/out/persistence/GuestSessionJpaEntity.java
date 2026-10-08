@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** JPA-модель гостевой сессии (раздел 11); маппинг в домен — явный. */
+
 @Entity
 @Table(name = "guest_session", schema = "tournaments")
 public class GuestSessionJpaEntity {

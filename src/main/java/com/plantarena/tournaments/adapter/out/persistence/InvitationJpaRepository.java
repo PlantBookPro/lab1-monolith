@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/** Spring Data для invitation; статусы — строки (маппинг явный). */
+
 public interface InvitationJpaRepository extends JpaRepository<InvitationJpaEntity, UUID> {
 
     Optional<InvitationJpaEntity> findByTournamentIdAndUserId(UUID tournamentId, UUID userId);

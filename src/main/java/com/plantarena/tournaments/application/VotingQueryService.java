@@ -27,11 +27,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Запросы итерации 6 (раздел 13): раунды, лидерборд окна (score DESC,
- * позиции), итоги (WINNER первым, раунд выбывания). Доступ — как к турниру
- * (организатор/админ/активное приглашение/участие), скрытое — 404.
- */
+
 @Service
 @Transactional(readOnly = true)
 public class VotingQueryService implements ListRoundsUseCase, GetLeaderboardUseCase,

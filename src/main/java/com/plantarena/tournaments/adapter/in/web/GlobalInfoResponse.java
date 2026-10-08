@@ -3,7 +3,7 @@ package com.plantarena.tournaments.adapter.in.web;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Публичная конфигурация глобального турнира (раздел 13). */
+
 public record GlobalInfoResponse(long epochDurationSeconds, long finalWindowDurationSeconds,
                                  EpochInfo currentEpoch, WindowInfo currentFinalWindow) {
 

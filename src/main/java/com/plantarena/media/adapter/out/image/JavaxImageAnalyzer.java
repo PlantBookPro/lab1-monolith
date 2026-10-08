@@ -14,19 +14,14 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.springframework.stereotype.Component;
 
-/**
- * Анализ фактического содержимого на javax.imageio (JDK): формат определяется
- * зарегистрированным reader'ом — не расширением и не MIME клиента (раздел 6).
- * Размеры читаются по заголовку ДО декодирования растра — большие буферы
- * под превышающие лимит изображения не выделяются.
- */
+
 @Component
 public class JavaxImageAnalyzer implements ImageAnalyzer {
 
-    static final long MAX_PIXELS = 20_000_000; // 20 миллионов пикселей (раздел 6)
+    static final long MAX_PIXELS = 20_000_000; 
 
     static {
-        ImageIO.setUseCache(false); // не писать временные файлы при декодировании
+        ImageIO.setUseCache(false); 
     }
 
     @Override
@@ -46,7 +41,7 @@ public class JavaxImageAnalyzer implements ImageAnalyzer {
             try {
                 ImageFormat format = formatOf(reader);
                 reader.setInput(input);
-                int width = reader.getWidth(0);   // по заголовку, без декодирования
+                int width = reader.getWidth(0);   
                 int height = reader.getHeight(0);
                 if ((long) width * height > MAX_PIXELS) {
                     throw new ImageResolutionTooHighException(

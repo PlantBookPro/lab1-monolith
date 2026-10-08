@@ -18,12 +18,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация опубликованного контракта PlantModeration (раздел 4.3):
- * решение moderation приходит командой. Одобрение делает файл растения
- * публичным в media (ADR-008). Публикует PlantModerationDecided
- * (tournaments подписан, итерация 5).
- */
+
 @Service
 public class PlantModerationService implements PlantModeration {
 
@@ -53,11 +48,11 @@ public class PlantModerationService implements PlantModeration {
             throw new ModerationAlreadyDecidedException(e.getMessage());
         }
         if (!changed) {
-            return toData(plant); // идемпотентный повтор доставки того же решения
+            return toData(plant); 
         }
         plants.save(plant);
         if (decision == Decision.APPROVED) {
-            mediaClaims.claim(plant.assetId(), plant.id(), true); // публично (ADR-008)
+            mediaClaims.claim(plant.assetId(), plant.id(), true); 
         }
         UUID eventId = UUID.randomUUID();
         eventPublisher.publish(new PlantModerationDecidedEvent(eventId,

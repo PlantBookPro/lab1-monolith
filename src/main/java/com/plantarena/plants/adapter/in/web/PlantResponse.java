@@ -6,7 +6,7 @@ import com.plantarena.plants.api.PlantModerationStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Ответ растений: без fingerprint — отпечаток внутренний инструмент запретов. */
+
 public record PlantResponse(UUID id, UUID ownerId, UUID assetId, String title,
                             PlantModerationStatus moderationStatus, PlantLifeStatus lifeStatus,
                             Instant createdAt, Instant diedAt, Instant archivedAt) {

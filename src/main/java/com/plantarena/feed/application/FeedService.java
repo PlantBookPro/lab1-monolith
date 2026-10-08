@@ -18,12 +18,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Лента (раздел 9): права и фильтры применяются повторно на каждой странице
- * (cursor не даёт прав), запрос limit+1 определяет hasNext, total не
- * возвращается. Псевдослучайный порядок — seed + стабильный id (SQL,
- * ADR-002); snapshotCutoff прячет новых участников до обновления ленты.
- */
+
 @Service
 public class FeedService implements GetFeedUseCase {
 

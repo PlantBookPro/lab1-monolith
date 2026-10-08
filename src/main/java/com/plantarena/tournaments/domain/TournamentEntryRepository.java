@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-/** Порт репозитория агрегата TournamentEntry (уникальность пары — БД). */
+
 public interface TournamentEntryRepository {
 
     TournamentEntry save(TournamentEntry entry);
@@ -14,18 +14,18 @@ public interface TournamentEntryRepository {
 
     long countByTournamentId(UUID tournamentId);
 
-    /** Участие пользователя в турнире (право просмотра, раздел 13). */
+    
     boolean existsByTournamentIdAndUserId(UUID tournamentId, UUID userId);
 
-    /** Участие по id (закрытие окна, раздел 12.3). */
+    
     Optional<TournamentEntry> findById(UUID id);
 
-    /** Активное глобальное участие пользователя (допущение 5, раздел 11). */
+    
     Optional<TournamentEntry> findActiveGlobalByUserId(UUID tournamentId, UUID userId);
 
-    /** Участия турнира в статусе (глобальная оркестрация, раздел 8). */
+    
     List<TournamentEntry> findByTournamentIdAndStatus(UUID tournamentId, EntryStatus status);
 
-    /** Турниры, где пользователь был допущен к старту (лента, раздел 9). */
+    
     Set<UUID> findTournamentIdsByUserId(UUID userId);
 }

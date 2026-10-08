@@ -17,12 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта TournamentRepository на JPA + PostgreSQL (раздел 14.2).
- * find-or-create + update + saveAndFlush (паттерн JpaPlantRepository):
- * конкурентные старт/отмена ловит @Version в БД. Теги синхронизируются через
- * @ManyToMany (раздел 11).
- */
+
 @Repository
 @Transactional
 public class JpaTournamentRepository implements TournamentRepository {

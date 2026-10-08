@@ -11,10 +11,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Служебное управление пользователями. Транзакционные границы — в application
- * (раздел 12), одна транзакция изменяет один агрегат User.
- */
+
 @Service
 @Transactional
 public class UserAdministrationService implements UserAdministrationUseCase {

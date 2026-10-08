@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/** История раундов турнира (раздел 13). */
+
 public interface ListRoundsUseCase {
 
     RoundListResult listRounds(CurrentActor actor, UUID tournamentId, int page, int size);

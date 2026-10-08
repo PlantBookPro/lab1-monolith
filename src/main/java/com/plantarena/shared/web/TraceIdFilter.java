@@ -11,9 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Назначает traceId каждому HTTP-запросу и возвращает его в заголовке X-Trace-Id.
- */
+
 public final class TraceIdFilter implements Filter {
 
     public static final String TRACE_ID_ATTRIBUTE = "plantarena.traceId";

@@ -7,10 +7,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель media_asset (раздел 11); маппинг на домен — явный (MediaAssetMapper).
- * Агрегат неизменяем — entity только создаётся и читается.
- */
+
 @Entity
 @Table(name = "media_asset", schema = "media")
 public class MediaAssetJpaEntity {

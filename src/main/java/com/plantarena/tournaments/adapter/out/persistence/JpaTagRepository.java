@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Реализация порта TagRepository. */
+
 @Repository
 @Transactional
 public class JpaTagRepository implements TagRepository {

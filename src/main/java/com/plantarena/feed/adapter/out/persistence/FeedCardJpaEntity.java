@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/** JPA-модель карточки ленты (ADR-002); проекция — без version. */
+
 @Entity
 @Table(name = "feed_card", schema = "feed")
 public class FeedCardJpaEntity {

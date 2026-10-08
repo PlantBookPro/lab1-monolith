@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/** Счёт выбранного окна (раздел 13); без windowId — текущее/последнее окно. */
+
 public interface GetLeaderboardUseCase {
 
     LeaderboardResult get(CurrentActor actor, UUID tournamentId, UUID windowId,

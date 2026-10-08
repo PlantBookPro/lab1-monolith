@@ -4,11 +4,7 @@ import com.plantarena.shared.event.IntegrationEvent;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Опубликованное событие: окно голосования закрыто (раздел 9). Подписчик —
- * проекция ленты feed (итерация 8): карточки окна удаляются; выжившие
- * возвращаются событием VotingWindowOpened следующего окна.
- */
+
 public record VotingWindowClosedEvent(
         UUID eventId,
         String eventType,

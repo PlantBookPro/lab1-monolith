@@ -4,7 +4,7 @@ import com.plantarena.plants.api.PlantModerationStatus;
 import com.plantarena.shared.security.CurrentActor;
 import java.util.UUID;
 
-/** Статус модерации для владельца (раздел 13: GET /plants/{id}/moderation). */
+
 public interface GetPlantModerationUseCase {
 
     ModerationStatusResult moderation(CurrentActor actor, UUID plantId);

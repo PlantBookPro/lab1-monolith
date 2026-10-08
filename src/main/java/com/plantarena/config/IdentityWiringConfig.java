@@ -7,12 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-/**
- * Связывание адаптера идентификации (ADR-005). config — единственное место,
- * знающее несколько контекстов (раздел 10.2, правило 9). Обычный профиль без
- * адаптера идентификации завершается явной ошибкой конфигурации при старте;
- * Spring Security + JWT появится в лабе №3 (замена только этого бина).
- */
+
 @Configuration
 public class IdentityWiringConfig {
 

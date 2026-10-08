@@ -7,9 +7,7 @@ import com.plantarena.identity.domain.UserRole;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 
-/**
- * Явный маппинг JPA-модели на домен (раздел 5 требований).
- */
+
 final class UserMapper {
 
     private UserMapper() {

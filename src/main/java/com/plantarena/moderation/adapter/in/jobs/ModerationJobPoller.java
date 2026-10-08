@@ -6,11 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/**
- * Опрос due-заданий модерации: fixedDelay 2с, пачка ≤ 10 (спека итерации 4).
- * Транзакционную структуру (захват → инференс вне tx → применение) решает
- * use case; poller только вызывает его и не даёт планировщику умереть.
- */
+
 @Component
 public class ModerationJobPoller {
 

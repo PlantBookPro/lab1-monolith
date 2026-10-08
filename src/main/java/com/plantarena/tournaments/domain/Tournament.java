@@ -8,15 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Агрегат tournaments (раздел 7): закрытый турнир. Инварианты: параметры
- * валидны (дедлайн в будущем, 0 &lt; доля &lt; 1, minParticipants ≥ 2,
- * длительность положительна); параметры и теги меняются только в DRAFT;
- * описание — безопасное изменение в DRAFT/REGISTRATION_OPEN/RUNNING; старт —
- * только из REGISTRATION_OPEN после дедлайна при READY ≥ minParticipants;
- * отмена — только до RUNNING; отмена активного турнира запрещена. Время
- * приходит аргументом.
- */
 public final class Tournament {
 
     private final UUID id;
@@ -54,7 +45,6 @@ public final class Tournament {
         this.tagIds.addAll(tagIds == null ? Set.of() : tagIds);
     }
 
-    /** Новый черновик закрытого турнира (создаёт модератор/админ, раздел 13). */
     public static Tournament createDraft(UUID creatorId, String name, String description,
                                          Instant registrationDeadline, Duration roundDuration,
                                          double eliminationFraction, int minParticipants,
@@ -65,11 +55,6 @@ public final class Tournament {
             eliminationFraction, minParticipants, null, tagIds, now, 0);
     }
 
-    /**
-     * Единственный глобальный турнир (раздел 8): фиксированный id, статус
-     * RUNNING навсегда; параметры private-режима — заглушки, тайминги — в
-     * конфигурации (дизайн итерации 7, решение 1). creator — системный UUID.
-     */
     public static Tournament global(UUID id, UUID systemCreatorId, Instant now) {
         return new Tournament(id, systemCreatorId, "Глобальный турнир", null,
             TournamentType.GLOBAL, TournamentStatus.RUNNING,
@@ -77,7 +62,6 @@ public final class Tournament {
             Duration.ofHours(1), 0.5, 2, null, Set.of(), now, 0);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
     public static Tournament restore(UUID id, UUID creatorId, String name, String description,
                                      TournamentType type, TournamentStatus status,
                                      EliminationAlgorithmKind algorithm,
@@ -90,7 +74,6 @@ public final class Tournament {
             cancelReason, tagIds, createdAt, version);
     }
 
-    /** Открыть приём заявок: только из DRAFT и до дедлайна. */
     public void openRegistration(Instant now) {
         requireStatus(TournamentStatus.DRAFT);
         if (!now.isBefore(registrationDeadline)) {
@@ -99,7 +82,6 @@ public final class Tournament {
         status = TournamentStatus.REGISTRATION_OPEN;
     }
 
-    /** Старт: после дедлайна при достаточном числе READY-заявок (раздел 7). */
     public void start(Instant now, int readyCount) {
         requireStatus(TournamentStatus.REGISTRATION_OPEN);
         if (now.isBefore(registrationDeadline)) {
@@ -112,20 +94,17 @@ public final class Tournament {
         status = TournamentStatus.RUNNING;
     }
 
-    /** Явная отмена организатором: только до RUNNING (раздел 7). */
     public void cancel(Instant now) {
         requireStatus(TournamentStatus.DRAFT, TournamentStatus.REGISTRATION_OPEN);
         status = TournamentStatus.CANCELLED;
     }
 
-    /** Автоматическая отмена по дедлайну при нехватке участников. */
     public void cancelForInsufficientParticipants(Instant now) {
         requireStatus(TournamentStatus.REGISTRATION_OPEN);
         status = TournamentStatus.CANCELLED;
         cancelReason = CancelReason.INSUFFICIENT_PARTICIPANTS;
     }
 
-    /** Завершение: победитель определён закрытием окна (раздел 7). */
     public void finish(Instant now) {
         if (type == TournamentType.GLOBAL) {
             throw new IllegalStateException("Глобальный турнир никогда не завершается (раздел 8)");
@@ -134,7 +113,6 @@ public final class Tournament {
         status = TournamentStatus.FINISHED;
     }
 
-    /** Изменение параметров: только в DRAFT (раздел 13). */
     public void updateParameters(String name, Instant registrationDeadline,
                                  Duration roundDuration, double eliminationFraction,
                                  int minParticipants, Instant now) {
@@ -143,7 +121,6 @@ public final class Tournament {
             eliminationFraction, minParticipants, now);
     }
 
-    /** Безопасное изменение описания: DRAFT/REGISTRATION_OPEN/RUNNING. */
     public void updateDescription(String description) {
         requireStatus(TournamentStatus.DRAFT, TournamentStatus.REGISTRATION_OPEN,
             TournamentStatus.RUNNING);
@@ -153,20 +130,17 @@ public final class Tournament {
         this.description = description.trim();
     }
 
-    /** Изменение тегов: только в DRAFT (tagIds — параметры турнира). */
     public void replaceTags(Set<UUID> tagIds) {
         requireStatus(TournamentStatus.DRAFT);
         this.tagIds.clear();
         this.tagIds.addAll(tagIds == null ? Set.of() : tagIds);
     }
 
-    /** Приглашать можно в DRAFT/REGISTRATION_OPEN до дедлайна (раздел 7). */
     public boolean canInvite(Instant now) {
         return (status == TournamentStatus.DRAFT || status == TournamentStatus.REGISTRATION_OPEN)
             && now.isBefore(registrationDeadline);
     }
 
-    /** Принимать приглашения можно только в REGISTRATION_OPEN до дедлайна. */
     public boolean isAcceptingNow(Instant now) {
         return status == TournamentStatus.REGISTRATION_OPEN
             && now.isBefore(registrationDeadline);

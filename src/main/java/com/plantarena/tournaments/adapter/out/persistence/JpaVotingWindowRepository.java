@@ -17,12 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * JPA-реализация порта VotingWindowRepository: явный маппинг домена и
- * JPA-модели. Состав окна зафиксирован — участники только добавляются;
- * голоса добавляются/обновляются/удаляются (orphanRemoval). Блокировка —
- * PESSIMISTIC_WRITE (раздел 12.1).
- */
+
 @Repository
 public class JpaVotingWindowRepository implements VotingWindowRepository {
 

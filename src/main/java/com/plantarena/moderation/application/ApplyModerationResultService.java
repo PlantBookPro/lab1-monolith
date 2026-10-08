@@ -9,12 +9,7 @@ import java.time.Clock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Короткая tx применения результата (раздел 12, ADR-009): сначала
- * recordDecision (обязательное обновление заявки), затем job DONE —
- * «не ставь DONE до обязательного обновления заявки» (раздел 14).
- * Отступление «одна tx — один агрегат» описано в ADR-009 (план на лабу №2).
- */
+
 @Service
 public class ApplyModerationResultService {
 

@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Гостевые сессии (раздел 13): публичная выдача. Токен передаётся далее в
- * заголовке X-Guest-Token; гость голосует только в глобальных окнах.
- */
+
 @RestController
 @Tag(name = "guest-sessions")
 public class GuestSessionController {

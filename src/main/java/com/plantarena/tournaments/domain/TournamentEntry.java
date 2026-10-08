@@ -4,11 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат tournaments (раздел 7): участие пользователя с растением в
- * закрытом турнире. Создаётся при старте из READY-заявки; после старта
- * состав неизменяем. Уникальность (tournamentId, userId) — БД.
- */
+
 public final class TournamentEntry {
 
     private final UUID id;
@@ -30,14 +26,14 @@ public final class TournamentEntry {
         this.joinedAt = Objects.requireNonNull(joinedAt, "joinedAt");
     }
 
-    /** Допуск READY-заявки к старту (use case старта, ADR-010). */
+    
     public static TournamentEntry admit(UUID tournamentId, UUID userId, UUID plantId,
                                         UUID reservationId, Instant now) {
         return new TournamentEntry(UUID.randomUUID(), tournamentId, userId, plantId,
             reservationId, EntryStatus.ACTIVE, now);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static TournamentEntry restore(UUID id, UUID tournamentId, UUID userId,
                                           UUID plantId, UUID reservationId,
                                           EntryStatus status, Instant joinedAt) {
@@ -45,50 +41,50 @@ public final class TournamentEntry {
             status, joinedAt);
     }
 
-    /** Выбывание (закрытие окна, раздел 7): ACTIVE → ELIMINATED. */
+    
     public void eliminate() {
         requireActive();
         status = EntryStatus.ELIMINATED;
     }
 
-    /** Победа (закрытие окна, раздел 7): ACTIVE → WINNER. */
+    
     public void declareWinner() {
         requireActive();
         status = EntryStatus.WINNER;
     }
 
-    /** Глобальная заявка: одобренное растение в очередь следующей эпохи (раздел 8). */
+    
     public static TournamentEntry queueForGlobal(UUID tournamentId, UUID userId, UUID plantId,
                                                  UUID reservationId, Instant now) {
         return new TournamentEntry(UUID.randomUUID(), tournamentId, userId, plantId,
             reservationId, EntryStatus.QUEUED, now);
     }
 
-    /** Снятие заявки из очереди (раздел 13): только QUEUED. */
+    
     public void withdraw() {
         requireStatus(EntryStatus.QUEUED);
         status = EntryStatus.WITHDRAWN;
     }
 
-    /** Включение в эпоху отбора (раздел 8, алгоритм 2): QUEUED → QUALIFYING. */
+    
     public void startQualifying() {
         requireStatus(EntryStatus.QUEUED);
         status = EntryStatus.QUALIFYING;
     }
 
-    /** Победа в квалификации (алгоритм 5): QUALIFYING → FINAL_PENDING. */
+    
     public void promoteToFinalPending() {
         requireStatus(EntryStatus.QUALIFYING);
         status = EntryStatus.FINAL_PENDING;
     }
 
-    /** Включение в финальное окно (алгоритм 6): FINAL_PENDING → FINALIST. */
+    
     public void becomeFinalist() {
         requireStatus(EntryStatus.FINAL_PENDING);
         status = EntryStatus.FINALIST;
     }
 
-    /** Глобальное поражение (алгоритмы 3, 8): QUALIFYING/FINALIST → ELIMINATED. */
+    
     public void eliminateFromGlobal() {
         if (status != EntryStatus.QUALIFYING && status != EntryStatus.FINALIST) {
             throw new IllegalStateException("Итог участия уже зафиксирован: " + status);

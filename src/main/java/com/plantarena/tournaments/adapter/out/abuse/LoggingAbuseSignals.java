@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/** Логирующий адаптер журнала подозрительных действий (раздел 9). */
+
 @Component
 public class LoggingAbuseSignals implements AbuseSignals {
 

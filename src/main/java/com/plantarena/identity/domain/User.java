@@ -4,11 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Агрегат «Пользователь» (identity): роли, профиль, координаты, хэш пароля, статус.
- * Инварианты (aggregates.md): роль USER присутствует всегда; роли меняются только
- * отдельными командами; координаты в допустимых диапазонах (GeoPoint).
- */
+
 public class User {
 
     private final UUID id;
@@ -33,30 +29,30 @@ public class User {
         this.version = version;
     }
 
-    /** Создание обычного пользователя (создаёт модератор/админ): роль USER, ACTIVE. */
+    
     public static User registerUser(Email email, String displayName, String passwordHash) {
         return new User(UUID.randomUUID(), email, displayName, passwordHash,
             EnumSet.of(UserRole.USER), UserStatus.ACTIVE, null, 0);
     }
 
-    /** Bootstrap-админ из ENV (раздел 2 требований). */
+    
     public static User bootstrapAdmin(Email email, String displayName, String passwordHash) {
         return new User(UUID.randomUUID(), email, displayName, passwordHash,
             EnumSet.of(UserRole.USER, UserRole.ADMIN), UserStatus.ACTIVE, null, 0);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static User restore(UUID id, Email email, String displayName, String passwordHash,
                                Set<UserRole> roles, UserStatus status, GeoPoint location, long version) {
         return new User(id, email, displayName, passwordHash, roles, status, location, version);
     }
 
-    /** Назначить роль MODERATOR (идемпотентно). */
+    
     public void grantModerator() {
         roles.add(UserRole.MODERATOR);
     }
 
-    /** Снять роль MODERATOR, не удаляя USER (идемпотентно). */
+    
     public void revokeModerator() {
         roles.remove(UserRole.MODERATOR);
     }
@@ -72,7 +68,7 @@ public class User {
         this.location = newLocation;
     }
 
-    /** Деактивация учётной записи; обратной команды нет. */
+    
     public void deactivate() {
         this.status = UserStatus.DEACTIVATED;
     }

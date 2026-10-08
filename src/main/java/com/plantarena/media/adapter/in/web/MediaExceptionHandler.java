@@ -16,11 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-/**
- * Перевод исключений media в ProblemDetail-подобное тело (раздел 13:
- * 415 формат, 413 размер файла/пикселей, 404 не найден/скрыт).
- * Живёт в adapter.in.web: shared не зависит от контекстов (правило 10.2.8).
- */
+
 @RestControllerAdvice
 public class MediaExceptionHandler {
 
@@ -31,7 +27,7 @@ public class MediaExceptionHandler {
             e.getMessage(), request);
     }
 
-    /** Общий предел 10 MiB: проверка use case и предел Spring multipart — один код. */
+    
     @ExceptionHandler({FileTooLargeException.class, MaxUploadSizeExceededException.class})
     public ResponseEntity<ApiError> tooLarge(Exception e, HttpServletRequest request) {
         return respond(HttpStatus.PAYLOAD_TOO_LARGE, "FILE_TOO_LARGE",
@@ -50,7 +46,7 @@ public class MediaExceptionHandler {
         return respond(HttpStatus.NOT_FOUND, "MEDIA_ASSET_NOT_FOUND", e.getMessage(), request);
     }
 
-    /** 409: файл задействован растением — сначала архивируйте растение (ADR-008). */
+    
     @ExceptionHandler(AssetInUseException.class)
     public ResponseEntity<ApiError> inUse(AssetInUseException e, HttpServletRequest request) {
         return respond(HttpStatus.CONFLICT, "ASSET_IN_USE", e.getMessage(), request);

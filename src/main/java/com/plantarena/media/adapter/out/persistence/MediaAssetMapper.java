@@ -4,7 +4,7 @@ import com.plantarena.media.domain.ImageFingerprint;
 import com.plantarena.media.domain.ImageFormat;
 import com.plantarena.media.domain.MediaAsset;
 
-/** Явный маппинг домен ↔ JPA (раздел 5). */
+
 public final class MediaAssetMapper {
 
     private MediaAssetMapper() {

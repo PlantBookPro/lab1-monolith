@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Bootstrap-админ из ENV: идемпотентен, повторный запуск не создаёт дубликат.
- */
+
 @Service
 public class BootstrapAdminService implements BootstrapAdminUseCase {
 

@@ -4,11 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат media (раздел 6): неизменяемый загруженный файл и его метаданные.
- * Инвариант: неизменяем после создания — мутаторов нет; повторная загрузка
- * создаёт новый asset. storageKey — внутренний, наружу не публикуется.
- */
+
 public final class MediaAsset {
 
     private final UUID id;
@@ -50,7 +46,7 @@ public final class MediaAsset {
             width, height, rawSha256, fingerprint, createdAt);
     }
 
-    /** Восстановление из хранилища с сохранением id (JPA-адаптер). */
+    
     public static MediaAsset restore(UUID id, UUID ownerId, String storageKey, ImageFormat format,
                                      long byteSize, int width, int height, String rawSha256,
                                      ImageFingerprint fingerprint, Instant createdAt) {

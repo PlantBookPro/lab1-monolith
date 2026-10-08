@@ -11,11 +11,7 @@ import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель invitation (раздел 11): @ManyToOne LAZY → tournament (FK внутри
- * схемы-владельца). Мутирует (accept/rollback/decline/revoke/expire) —
- * optimistic locking через @Version.
- */
+
 @Entity
 @Table(name = "invitation", schema = "tournaments")
 public class InvitationJpaEntity {
@@ -68,7 +64,7 @@ public class InvitationJpaEntity {
         this.status = "INVITED";
     }
 
-    /** Мутации домена; tournament/user/invitedBy/invitedAt неизменяемы. */
+    
     void update(String status, Instant respondedAt, UUID submittedPlantId,
                 UUID reservationId, UUID submissionKey) {
         this.status = status;

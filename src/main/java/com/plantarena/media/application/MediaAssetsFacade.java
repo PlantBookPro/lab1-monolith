@@ -10,12 +10,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация опубликованного контракта MediaAssets: метаданные и байты без
- * внутренних деталей (storageKey остаётся в media). loadContent — для
- * внутреннего контракта монолита (moderation, ADR-009): права не проверяются,
- * вызов идёт по assetId из задания модерации.
- */
+
 @Service
 @Transactional(readOnly = true)
 public class MediaAssetsFacade implements MediaAssets {

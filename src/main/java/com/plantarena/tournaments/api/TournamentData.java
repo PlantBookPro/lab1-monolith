@@ -4,11 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Опубликованные данные турнира (раздел 13). reservationId и внутренние
- * детали заявок не раскрываются; маппинг из домена — в application
- * (TournamentAssembler): api не зависит от domain (LayerRules).
- */
+
 public record TournamentData(
         UUID id,
         UUID creatorId,

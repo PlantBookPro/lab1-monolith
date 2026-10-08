@@ -5,12 +5,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Гостевая сессия (раздел 9): анонимный субъект голосования глобальных окон.
- * Токен выдаётся клиенту один раз и в агрегате не существует — только хэш
- * (SHA-256 hex). Сессия неизменяема после создания (без version): повторная
- * выдача — новая сессия. Активна, пока now < expiresAt (полуинтервал).
- */
+
 public final class GuestSession {
 
     private final UUID id;
@@ -39,13 +34,13 @@ public final class GuestSession {
         return new GuestSession(id, tokenHash, now, now.plus(ttl));
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static GuestSession restore(UUID id, String tokenHash, Instant createdAt,
                                        Instant expiresAt) {
         return new GuestSession(id, tokenHash, createdAt, expiresAt);
     }
 
-    /** Активна, пока now < expiresAt (полуинтервал, как окна голосования). */
+    
     public boolean isActive(Instant now) {
         return now.isBefore(expiresAt);
     }

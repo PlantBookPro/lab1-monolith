@@ -8,13 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-/**
- * Связывание классификатора модерации (ADR-009): ONNX-адаптер основного
- * профиля; путь модели — конфиг plantarena.moderation.model-path. Бин не
- * требует файла модели при создании (честная незавершённость при classify).
- * @EnableScheduling — poller заданий модерации (fixedDelay 2с). config —
- * единственное место, знающее несколько контекстов (раздел 10.2, правило 9).
- */
+
 @Configuration
 @EnableScheduling
 public class ModerationWiringConfig {

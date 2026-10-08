@@ -9,14 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат tournaments (разделы 7, 9, 12.1): окно голосования с зафиксированным
- * составом. Инварианты: интервал [opensAt, closesAt); score участника = сумма
- * текущих голосов за него; один голос субъекта за участника; самоголосование
- * запрещено; повторное закрытие не меняет результатов. Изменяется только
- * через методы корня; время приходит аргументом. Блокировка (FOR UPDATE) —
- * ответственность хранилища, сериализует голоса и закрытие (раздел 12.1).
- */
+
 public final class VotingWindow {
 
     private final UUID id;
@@ -63,10 +56,7 @@ public final class VotingWindow {
         this.version = version;
     }
 
-    /**
-     * Открыть окно раунда: старт турнира (sequence 1) или закрытие предыдущего
-     * (sequence + 1, выжившие, счёт с нуля). Состав фиксируется и не меняется.
-     */
+    
     public static VotingWindow open(UUID tournamentId, int sequence,
                                      List<ParticipantSeed> seeds, Instant opensAt,
                                      Instant closesAt, Instant now) {
@@ -88,11 +78,7 @@ public final class VotingWindow {
         return window;
     }
 
-    /**
-     * Квалификационное окно кластера эпохи (раздел 8, алгоритм 2): минимум
-     * один участник (алгоритм 4 — единственный проходит без голосов).
-     * sequence = номер эпохи; уникальность (epochId, clusterId) — БД.
-     */
+    
     public static VotingWindow openQualification(UUID tournamentId, UUID epochId,
                                                  UUID clusterId, String clusterKey,
                                                  int sequence, List<ParticipantSeed> seeds,
@@ -102,10 +88,7 @@ public final class VotingWindow {
             epochId, clusterId, clusterKey, opensAt, closesAt, now);
     }
 
-    /**
-     * Финальное окно (раздел 8, алгоритм 6): выжившие предыдущего + новые
-     * финалисты; минимум один участник (n=1 — лидер, алгоритм 7).
-     */
+    
     public static VotingWindow openFinal(UUID tournamentId, int sequence,
                                          List<ParticipantSeed> seeds, Instant opensAt,
                                          Instant closesAt, Instant now) {
@@ -135,7 +118,7 @@ public final class VotingWindow {
         return window;
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static VotingWindow restore(UUID id, UUID tournamentId, int sequence,
                                        WindowScope scope, UUID epochId, UUID clusterId,
                                        String clusterKey, WindowStatus status, Instant opensAt,
@@ -151,10 +134,7 @@ public final class VotingWindow {
         return window;
     }
 
-    /**
-     * Установить голос субъекта (PUT, раздел 9); возвращает новый score.
-     * Повтор того же значения не меняет счёт, смена — ±2.
-     */
+    
     public long castVote(VotingSubject subject, UUID entryId, VoteValue value, Instant now) {
         requireAcceptingVotes(now);
         WindowParticipant participant = participant(entryId);
@@ -173,7 +153,7 @@ public final class VotingWindow {
         return participant.score();
     }
 
-    /** Удалить голос субъекта (DELETE, раздел 9); идемпотентно; возвращает score. */
+    
     public long removeVote(VotingSubject subject, UUID entryId, Instant now) {
         requireAcceptingVotes(now);
         WindowParticipant participant = participant(entryId);
@@ -184,12 +164,7 @@ public final class VotingWindow {
         return participant.score();
     }
 
-    /**
-     * Закрытие окна (разделы 7, 12.3): фиксирует итоговый рейтинг и результаты
-     * участников. Повторный вызов для CLOSED — ошибка состояния; идемпотентность
-     * повтора (windowId, sequence) — на уровне use case по статусу. Если после
-     * выбывания остаётся один — он WINNER (турнир FINISHED решает use case).
-     */
+    
     public CloseOutcome close(Instant now, EliminationAlgorithm algorithm,
                               double eliminationFraction) {
         if (status != WindowStatus.OPEN) {
@@ -223,11 +198,7 @@ public final class VotingWindow {
         return new CloseOutcome(List.copyOf(eliminated), List.copyOf(survived), winnerEntryId);
     }
 
-    /**
-     * Закрытие квалификационного окна (раздел 8, алгоритмы 3–5): top-1
-     * рейтинга — PROMOTED (в финал), остальные — ELIMINATED. Рейтинг:
-     * score DESC, joinedAt ASC, entryId ASC (допущение 8).
-     */
+    
     public QualificationCloseOutcome closeQualification(Instant now) {
         requireScope(WindowScope.QUALIFICATION);
         requireClosable(now);
@@ -244,11 +215,7 @@ public final class VotingWindow {
         return new QualificationCloseOutcome(top.entryId(), List.copyOf(eliminated));
     }
 
-    /**
-     * Закрытие финального окна (раздел 8, алгоритмы 7–8): n ≥ 2 — выбывает
-     * max(1, floor(n/2)) худших, выжившие SURVIVED; n = 1 — лидер остаётся
-     * (SURVIVED без выбывания). Повторное закрытие — ошибка состояния.
-     */
+    
     public FinalCloseOutcome closeFinal(Instant now) {
         requireScope(WindowScope.FINAL);
         requireClosable(now);
@@ -288,13 +255,13 @@ public final class VotingWindow {
         }
     }
 
-    /** Текущий голос субъекта за участника (null — голоса нет). */
+    
     public VoteValue myVote(String subjectKey, UUID entryId) {
         Vote vote = votesByKey.get(voteKey(subjectKey, entryId));
         return vote == null ? null : vote.value();
     }
 
-    /** Принимает ли окно новые голоса/удаления: OPEN и now < closesAt. */
+    
     public boolean isAcceptingVotes(Instant now) {
         return status == WindowStatus.OPEN && now.isBefore(closesAt);
     }
@@ -303,12 +270,12 @@ public final class VotingWindow {
         return participantsByEntry.containsKey(entryId);
     }
 
-    /** Владелец участия (проверка самоголосования; денормализация из entry). */
+    
     public UUID userIdOfEntry(UUID entryId) {
         return participant(entryId).userId();
     }
 
-    /** Счёт участника (инвариант: сумма текущих голосов). */
+    
     public long scoreOf(UUID entryId) {
         return participant(entryId).score();
     }
@@ -317,7 +284,7 @@ public final class VotingWindow {
         return List.copyOf(participantsByEntry.values());
     }
 
-    /** Голоса за участника окна (persistence-маппинг, проверка инварианта). */
+    
     public List<Vote> votesOf(UUID entryId) {
         return votesByKey.values().stream()
             .filter(vote -> vote.entryId().equals(entryId)).toList();
@@ -392,24 +359,24 @@ public final class VotingWindow {
         return version;
     }
 
-    /** Состав нового окна: entry + владелец + joinedAt (из TournamentEntry). */
+    
     public record ParticipantSeed(UUID entryId, UUID userId, Instant joinedAt) {
     }
 
-    /** Итог закрытия: выбывшие; выжившие (≥ 2 → следующий раунд) или победитель. */
+    
     public record CloseOutcome(List<UUID> eliminatedEntryIds, List<UUID> survivedEntryIds,
                                UUID winnerEntryId) {
     }
 
-    /** Итог квалификации: продвинутый в финал и выбывшие (алгоритмы 3–5). */
+    
     public record QualificationCloseOutcome(UUID promotedEntryId, List<UUID> eliminatedEntryIds) {
     }
 
-    /** Итог финала: выбывшие и выжившие (n=1 — оба списка пусты, лидер жив). */
+    
     public record FinalCloseOutcome(List<UUID> eliminatedEntryIds, List<UUID> survivedEntryIds) {
     }
 
-    /** Идентичность по id: JPA-адаптер пересобирает агрегат при чтении. */
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {

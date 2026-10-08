@@ -4,11 +4,7 @@ import com.plantarena.shared.event.IntegrationEvent;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Опубликованное событие: участник выбыл из турнира (раздел 16). Агрегат
- * процесса — закрывшееся окно. Подписчики — лента (итерация 8) и
- * notification-service лабы №4.
- */
+
 public record EntryEliminatedEvent(
         UUID eventId,
         String eventType,

@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Ручки приглашений (раздел 13): свои приглашения (/me/invitations) и
- * принятие/отказ адресатом. Чужое приглашение скрыто (404) — решает use case.
- */
+
 @RestController
 @Tag(name = "tournaments")
 public class InvitationController {

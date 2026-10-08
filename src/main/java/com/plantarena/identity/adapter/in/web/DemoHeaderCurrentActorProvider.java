@@ -8,12 +8,7 @@ import java.util.UUID;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-/**
- * Демо-идентификация через X-Demo-User-Id (ADR-005): только профили dev/test,
- * связывание — config.IdentityWiringConfig. Отсутствие заголовка = гость;
- * неизвестный/неактивный ID = ошибка; роли всегда из БД, не из заголовка.
- * Это механизм демонстрации, не аутентификация.
- */
+
 public class DemoHeaderCurrentActorProvider implements CurrentActorProvider {
 
     public static final String DEMO_USER_ID_HEADER = "X-Demo-User-Id";

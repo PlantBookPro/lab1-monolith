@@ -8,9 +8,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация контракта UserDirectory: публичный профиль без email и пароля.
- */
+
 @Service
 @Transactional(readOnly = true)
 public class UserDirectoryFacade implements UserDirectory {

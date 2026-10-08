@@ -4,7 +4,7 @@ import com.plantarena.tournaments.api.EntryData;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Ответ REST по участию (раздел 13). */
+
 public record EntryResponse(
         UUID id,
         UUID tournamentId,

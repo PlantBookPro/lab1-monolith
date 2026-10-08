@@ -10,11 +10,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/**
- * Снятие заявки из очереди (раздел 13): только владелец (чужая скрыта — 404)
- * и только QUEUED (включённое в окно — 409 ENTRY_IN_WINDOW); резерв
- * освобождается в той же tx.
- */
+
 @Service
 public class WithdrawGlobalEntryService implements WithdrawGlobalEntryUseCase {
 

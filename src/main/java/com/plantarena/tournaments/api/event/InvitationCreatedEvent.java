@@ -4,10 +4,7 @@ import com.plantarena.shared.event.IntegrationEvent;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Опубликованное событие: пользователя пригласили в турнир (раздел 16;
- * уведомления — лаба №4).
- */
+
 public record InvitationCreatedEvent(
         UUID eventId,
         String eventType,

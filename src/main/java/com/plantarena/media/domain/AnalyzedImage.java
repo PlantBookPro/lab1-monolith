@@ -1,9 +1,6 @@
 package com.plantarena.media.domain;
 
-/**
- * Результат анализа фактического содержимого файла (порт ImageAnalyzer):
- * формат, размеры и пиксели ARGB (как декодированы, без ресайза).
- */
+
 public record AnalyzedImage(ImageFormat format, int width, int height, int[] argb) {
 
     public AnalyzedImage {

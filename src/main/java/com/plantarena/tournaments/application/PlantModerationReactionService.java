@@ -12,15 +12,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реакция на PlantModerationDecided (раздел 4.3, 7): вызывается слушателем
- * tournaments.adapter.in.events синхронно в tx применения решения модерации
- * (обязательное последствие, раздел 10.3; ADR-010). APPROVED → READY только
- * при REGISTRATION_OPEN, now &lt; deadline и действующем резерве
- * (confirm); REJECTED → возврат в INVITED с освобождением резерва и
- * сохранением истории подачи. Терминальные статусы и заявки отменённого
- * турнира не меняются.
- */
+
 @Service
 public class PlantModerationReactionService implements OnPlantModerationDecidedUseCase {
 
@@ -59,11 +51,11 @@ public class PlantModerationReactionService implements OnPlantModerationDecidedU
             return;
         }
         if ("APPROVED".equals(decision) && tournament.isAcceptingNow(clock.instant())) {
-            // резерв ещё действителен: подтверждение существующим резервом (раздел 7)
+            
             eligibility.confirm(invitation.userId(), plantId, invitation.reservationId());
             invitation.markReady(clock.instant());
             invitations.save(invitation);
         }
-        // APPROVED после дедлайна/в отменённом турнире — заявка не меняется
+        
     }
 }

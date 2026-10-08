@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Связывание контекста geo: политика кластеризации из конфигурации. */
+
 @Configuration
 @EnableConfigurationProperties(GeoClusteringSettings.class)
 public class GeoWiringConfig {

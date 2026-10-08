@@ -38,12 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Ручки турниров (раздел 13). Контроллер обращается только к входным портам
- * application; видимость (404 скрытого) и права решают use case/AccessPolicy.
- * Фильтр статуса — строкой (разбор в application, LayerRules: web не зависит
- * от domain).
- */
+
 @RestController
 @RequestMapping("/api/v1/tournaments")
 @Tag(name = "tournaments")

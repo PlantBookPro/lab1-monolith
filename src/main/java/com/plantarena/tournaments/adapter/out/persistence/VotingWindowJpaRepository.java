@@ -11,10 +11,10 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/** Spring Data репозиторий окна (раздел 12.1: блокировка PESSIMISTIC_WRITE). */
+
 public interface VotingWindowJpaRepository extends JpaRepository<VotingWindowJpaEntity, UUID> {
 
-    /** SELECT ... FOR UPDATE: сериализует голоса и закрытие одного окна. */
+    
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select w from VotingWindowJpaEntity w where w.id = :id")
     Optional<VotingWindowJpaEntity> findByIdForUpdate(@Param("id") UUID id);

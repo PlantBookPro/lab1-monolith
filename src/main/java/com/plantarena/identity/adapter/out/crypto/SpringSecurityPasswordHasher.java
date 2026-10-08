@@ -4,10 +4,7 @@ import com.plantarena.identity.domain.PasswordHasher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-/**
- * Адаптер порта PasswordHasher на spring-security-crypto (раздел 2 требований):
- * домен не знает о реализации хэширования.
- */
+
 @Component
 public class SpringSecurityPasswordHasher implements PasswordHasher {
 

@@ -2,7 +2,7 @@ package com.plantarena.plants.api;
 
 import java.time.Instant;
 
-/** Растение не проходит проверки допуска (контракт PlantEligibility, раздел 6). */
+
 public final class PlantNotEligibleException extends RuntimeException {
 
     private final Reason reason;
@@ -22,7 +22,7 @@ public final class PlantNotEligibleException extends RuntimeException {
         return reason;
     }
 
-    /** Для RESTRICTED: момент, до которого изображение запрещено (null для PERMANENT). */
+    
     public Instant restrictedUntil() {
         return restrictedUntil;
     }

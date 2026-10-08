@@ -11,15 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import jakarta.annotation.PostConstruct;
 
-/**
- * Миграции Flyway по контекстам (ADR-003): у каждого контекста свой каталог
- * db/migration/&lt;context&gt; и своя flyway_schema_history в своей схеме.
- * Миграции выполняются при инициализации бина schemaMigrations (PostConstruct);
- * статический BeanFactoryPostProcessor (аналог Boot FlywayJpaDependencyConfigurer)
- * заставляет entityManagerFactory создаваться ПОСЛЕ миграций — в т.ч. в test-slice
- * (@DataJpaTest), где порядок создания бинов отличается от полного приложения,
- * поэтому Hibernate validate всегда видит уже мигрированные схемы.
- */
+
 @Configuration
 public class SchemaMigrationConfig {
 

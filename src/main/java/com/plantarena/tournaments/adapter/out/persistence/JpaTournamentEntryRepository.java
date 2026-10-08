@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Реализация порта TournamentEntryRepository (создание при старте). */
+
 @Repository
 @Transactional
 public class JpaTournamentEntryRepository implements TournamentEntryRepository {

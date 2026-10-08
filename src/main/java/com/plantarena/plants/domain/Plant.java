@@ -4,13 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат plants (раздел 6): заявка «это моё растение» на конкретном изображении.
- * Инварианты: asset и отпечаток неизменяемы после подачи (мутаторов нет);
- * переходы модерации PENDING → APPROVED/REJECTED однократны; DEAD необратим;
- * архивация скрывает растение, сохраняя запреты и историю (раздел 13).
- * Время приходит аргументом (Instant now), не Instant.now().
- */
+
 public final class Plant {
 
     private static final int TITLE_MAX = 100;
@@ -48,14 +42,14 @@ public final class Plant {
         this.version = version;
     }
 
-    /** Подача заявки: новый Plant всегда PENDING/ALIVE (раздел 6). */
+    
     public static Plant submit(UUID ownerId, UUID assetId, ImageFingerprint fingerprint,
                                String title, Instant now) {
         return new Plant(UUID.randomUUID(), ownerId, assetId, fingerprint, title,
             ModerationStatus.PENDING, null, LifeStatus.ALIVE, now, null, null, 0);
     }
 
-    /** Восстановление из хранилища с сохранением id и version (JPA-адаптер). */
+    
     public static Plant restore(UUID id, UUID ownerId, UUID assetId, ImageFingerprint fingerprint,
                                 String title, ModerationStatus moderationStatus, String moderationReason,
                                 LifeStatus lifeStatus, Instant createdAt, Instant diedAt,
@@ -64,13 +58,7 @@ public final class Plant {
             moderationReason, lifeStatus, createdAt, diedAt, archivedAt, version);
     }
 
-    /**
-     * Решение модерации. Идемпотентно для того же решения (повтор доставки);
-     * конфликтующее решение по решённой заявке — ошибка (устаревший результат
-     * не применяется, раздел 6).
-     *
-     * @return true, если состояние изменилось
-     */
+    
     public boolean applyDecision(ModerationStatus decision, String reason) {
         if (moderationStatus == decision) {
             return false;
@@ -84,12 +72,12 @@ public final class Plant {
         return true;
     }
 
-    /** Переименование: только title, asset/owner/status недоступны (раздел 13). */
+    
     public void rename(String newTitle) {
         this.title = requireTitle(newTitle);
     }
 
-    /** Архивация: скрытие с сохранением истории; идемпотентна. */
+    
     public boolean archive(Instant now) {
         if (archivedAt != null) {
             return false;
@@ -98,7 +86,7 @@ public final class Plant {
         return true;
     }
 
-    /** Гибель: ALIVE → DEAD необратим; идемпотентна для повторов доставки. */
+    
     public boolean die(Instant now) {
         if (lifeStatus == LifeStatus.DEAD) {
             return false;

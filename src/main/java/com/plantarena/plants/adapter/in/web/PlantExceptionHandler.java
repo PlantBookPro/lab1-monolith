@@ -16,13 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Перевод исключений plants в ProblemDetail-подобное тело (раздел 13:
- * 404 не найдено/скрыто, 409 конфликты задействованности/запретов/резерва).
- * PlantNotEligibleException/ReservationConflictException — контракт api для
- * tournaments (итерация 5), HTTP-перевода не имеют. Живёт в adapter.in.web:
- * shared не зависит от контекстов (правило 10.2.8).
- */
+
 @RestControllerAdvice
 public class PlantExceptionHandler {
 
@@ -44,7 +38,7 @@ public class PlantExceptionHandler {
         return respond(HttpStatus.CONFLICT, "ASSET_ALREADY_CLAIMED", e.getMessage(), request);
     }
 
-    /** 409 + retryAt: для COOLDOWN — срок истечения, для PERMANENT — null. */
+    
     @ExceptionHandler(ImageRestrictedException.class)
     public ResponseEntity<ApiError> imageRestricted(ImageRestrictedException e,
                                                     HttpServletRequest request) {

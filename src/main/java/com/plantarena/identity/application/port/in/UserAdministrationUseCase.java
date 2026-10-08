@@ -5,10 +5,7 @@ import com.plantarena.shared.security.CurrentActor;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Служебные операции над пользователями (раздел 13: /users, роли).
- * Доступ проверяет IdentityAccessPolicy.
- */
+
 public interface UserAdministrationUseCase {
 
     UserResult create(CurrentActor actor, CreateUserCommand command);

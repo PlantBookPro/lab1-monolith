@@ -4,12 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Запрос страницы ленты (раздел 9): seed и keyset-курсор + повторные фильтры
- * прав. Пустые participatedTournamentIds/excludedEntryIds означают «ничего
- * не совпало» (адаптер подставляет невозможный sentinel, чтобы SQL-IN не
- * пустовал).
- */
+
 public record FeedCardQuery(
         long seed,
         Instant snapshotCutoff,

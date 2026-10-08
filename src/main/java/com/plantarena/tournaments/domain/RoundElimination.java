@@ -1,9 +1,6 @@
 package com.plantarena.tournaments.domain;
 
-/**
- * ROUND_ELIMINATION (раздел 7): в каждом раунде из n &gt; 1 выбывает
- * min(n − 1, max(1, floor(n · eliminationFraction))) худших.
- */
+
 public final class RoundElimination implements EliminationAlgorithm {
 
     @Override

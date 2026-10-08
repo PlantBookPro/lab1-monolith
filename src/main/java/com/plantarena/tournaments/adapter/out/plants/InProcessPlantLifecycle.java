@@ -7,11 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * ACL (раздел 4.3): порт гибели tournaments → опубликованный контракт
- * plants.api.PlantLifecycle. В лабе №2 заменяется на сетевой адаптер с
- * повтором (идемпотентность гибели — plants).
- */
+
 @Component
 public class InProcessPlantLifecycle implements PlantLifecycleGateway {
 

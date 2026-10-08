@@ -15,12 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Проекция ленты (ADR-002): событие открытия окна → карточки (обогащение
- * title/assetId из plants, displayName из identity — снимок на момент
- * открытия); закрытие окна → удаление карточек. Вызывается синхронным
- * @EventListener в tx издателя (как PlantModerationDecidedHandler).
- */
+
 @Service
 public class FeedProjectionService implements ProjectWindowUseCase {
 

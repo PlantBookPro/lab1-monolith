@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
-/** Ответ REST по турниру (раздел 13): reservationId и детали заявок не раскрываются. */
+
 public record TournamentResponse(
         UUID id,
         UUID creatorId,

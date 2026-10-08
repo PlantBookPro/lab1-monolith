@@ -4,11 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Участник окна (раздел 9): участие entry в конкретном окне — счёт и итог.
- * Изменяется только агрегатом VotingWindow (package-private операции).
- * userId денормализован из entry: запрет самоголосования — правило окна.
- */
+
 public final class WindowParticipant {
 
     private final UUID id;
@@ -33,7 +29,7 @@ public final class WindowParticipant {
             ParticipantResult.ACTIVE, joinedAt);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static WindowParticipant restore(UUID id, UUID entryId, UUID userId, long score,
                                             ParticipantResult result, Instant joinedAt) {
         return new WindowParticipant(id, entryId, userId, score, result, joinedAt);

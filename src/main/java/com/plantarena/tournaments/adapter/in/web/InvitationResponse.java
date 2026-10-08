@@ -4,7 +4,7 @@ import com.plantarena.tournaments.api.InvitationData;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Ответ REST по приглашению (раздел 13): reservationId не раскрывается. */
+
 public record InvitationResponse(
         UUID id,
         UUID tournamentId,

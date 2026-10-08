@@ -4,7 +4,7 @@ import com.plantarena.media.application.MediaAssetResult;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Ответ POST /files: метаданные без storageKey и хэшей (раздел 6). */
+
 public record MediaAssetResponse(UUID id, UUID ownerId, String mimeType, long byteSize,
                                  int width, int height, Instant createdAt) {
 

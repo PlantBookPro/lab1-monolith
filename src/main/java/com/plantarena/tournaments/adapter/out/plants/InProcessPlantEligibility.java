@@ -11,13 +11,7 @@ import com.plantarena.tournaments.application.port.out.PlantEligibilityGateway;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * ACL-адаптер plants → tournaments (раздел 4.3, Consumer-driven): команды
- * допуска plants.api.PlantEligibility; исключения plants переводятся в
- * единый язык tournaments (retryAt — срок временного запрета изображения,
- * у остальных проверок — null). В лабе №2 меняется на HTTP-клиент
- * plant-service с той же трансляцией ошибок.
- */
+
 @Component
 public class InProcessPlantEligibility implements PlantEligibilityGateway {
 

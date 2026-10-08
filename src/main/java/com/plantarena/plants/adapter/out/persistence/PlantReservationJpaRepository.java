@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/** Spring Data для plant_reservation; findFirst — страховка от дублей. */
+
 public interface PlantReservationJpaRepository extends JpaRepository<PlantReservationJpaEntity, UUID> {
 
     Optional<PlantReservationJpaEntity> findByIdempotencyKey(UUID idempotencyKey);

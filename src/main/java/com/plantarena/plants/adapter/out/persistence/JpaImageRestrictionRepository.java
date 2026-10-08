@@ -9,10 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта ImageRestrictionRepository на JPA + PostgreSQL (раздел 14.2).
- * Append-only: save только создаёт записи, история не удаляется (раздел 6).
- */
+
 @Repository
 @Transactional
 public class JpaImageRestrictionRepository implements ImageRestrictionRepository {

@@ -4,14 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат tournaments (раздел 7): приглашение пользователя в закрытый
- * турнир и его заявка. Инварианты: переходы только по разделу 7;
- * submittedPlantId сохраняется при возврате в INVITED (история последней
- * подачи); reservationId/submissionKey живут только у принятой заявки
- * (освобождение резерва — команда application-слоя в той же tx, ADR-010).
- * Уникальность (tournamentId, userId) — БД. Время приходит аргументом.
- */
+
 public final class Invitation {
 
     private final UUID id;
@@ -43,13 +36,13 @@ public final class Invitation {
         this.version = version;
     }
 
-    /** Новое приглашение (организатор, до дедлайна — проверяет application). */
+    
     public static Invitation invite(UUID tournamentId, UUID userId, UUID invitedBy, Instant now) {
         return new Invitation(UUID.randomUUID(), tournamentId, userId, invitedBy,
             InvitationStatus.INVITED, now, null, null, null, null, 0);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static Invitation restore(UUID id, UUID tournamentId, UUID userId, UUID invitedBy,
                                      InvitationStatus status, Instant invitedAt,
                                      Instant respondedAt, UUID submittedPlantId,
@@ -58,10 +51,7 @@ public final class Invitation {
             respondedAt, submittedPlantId, reservationId, submissionKey, version);
     }
 
-    /**
-     * Принять приглашение с растением: APPROVED-растение → сразу READY,
-     * идущая модерация → ACCEPTED_PENDING_MODERATION (не допуск к голосованию).
-     */
+    
     public void accept(UUID plantId, UUID reservationId, UUID submissionKey,
                        boolean plantApproved, Instant now) {
         requireStatus(InvitationStatus.INVITED);
@@ -74,14 +64,14 @@ public final class Invitation {
         this.respondedAt = now;
     }
 
-    /** Модерация одобрила: ACCEPTED_PENDING_MODERATION → READY (дедлайн — в application). */
+    
     public void markReady(Instant now) {
         requireStatus(InvitationStatus.ACCEPTED_PENDING_MODERATION);
         status = InvitationStatus.READY;
         respondedAt = now;
     }
 
-    /** Модерация отклонила: возврат в INVITED, история подачи сохранена (раздел 7). */
+    
     public void rollbackToInvited(Instant now) {
         requireStatus(InvitationStatus.ACCEPTED_PENDING_MODERATION);
         status = InvitationStatus.INVITED;
@@ -90,7 +80,7 @@ public final class Invitation {
         respondedAt = now;
     }
 
-    /** Отказ адресата до старта (резерв освобождает application). */
+    
     public void decline(Instant now) {
         requireStatus(InvitationStatus.INVITED, InvitationStatus.ACCEPTED_PENDING_MODERATION,
             InvitationStatus.READY);
@@ -100,14 +90,14 @@ public final class Invitation {
         respondedAt = now;
     }
 
-    /** Отзыв организатором: только не принятое приглашение (раздел 7). */
+    
     public void revoke(Instant now) {
         requireStatus(InvitationStatus.INVITED);
         status = InvitationStatus.REVOKED;
         respondedAt = now;
     }
 
-    /** Дедлайн прошёл, заявка не READY (резерв освобождает application). */
+    
     public void expire(Instant now) {
         requireStatus(InvitationStatus.INVITED, InvitationStatus.ACCEPTED_PENDING_MODERATION);
         status = InvitationStatus.EXPIRED;

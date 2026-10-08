@@ -22,11 +22,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Запросы глобального турнира (раздел 8, алгоритм 9; раздел 13): публичные
- * конфигурация/кластеры/лидерборды (scope + windowId + closesAt + asOf) и
- * своё активное участие. Очки разных окон и кластеров не смешиваются.
- */
 @Service
 @Transactional(readOnly = true)
 public class GlobalQueryService implements GetGlobalInfoUseCase, ListGlobalClustersUseCase,

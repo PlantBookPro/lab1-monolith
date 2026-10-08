@@ -8,10 +8,7 @@ import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель plant (раздел 11); маппинг на домен — явный (в JpaPlantRepository).
- * Plant мутирует (модерация/жизнь/архив) — optimistic locking через @Version.
- */
+
 @Entity
 @Table(name = "plant", schema = "plants")
 public class PlantJpaEntity {
@@ -70,7 +67,7 @@ public class PlantJpaEntity {
         this.createdAt = createdAt;
     }
 
-    /** Мутации домена; id/owner/asset/fingerprint/created_at неизменяемы. */
+    
     void update(String title, String moderationStatus, String moderationReason,
                 String lifeStatus, Instant diedAt, Instant archivedAt) {
         this.title = title;

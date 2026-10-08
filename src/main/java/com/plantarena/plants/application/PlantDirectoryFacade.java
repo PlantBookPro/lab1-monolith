@@ -10,10 +10,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация read-контракта PlantDirectory: маппинг домена в api-DTO без
- * проверок прав (внутренний потребитель — tournaments, итерация 5).
- */
+
 @Service
 @Transactional(readOnly = true)
 public class PlantDirectoryFacade implements PlantDirectory {

@@ -3,10 +3,7 @@ package com.plantarena.geo.domain;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Участник кластеризации (раздел 8): глобальное участие + координаты
- * владельца на момент фиксации эпохи (locationVersion — версия профиля).
- */
+
 public record ClusterMember(UUID entryId, UUID userId, double latitude, double longitude,
                             long locationVersion) {
 

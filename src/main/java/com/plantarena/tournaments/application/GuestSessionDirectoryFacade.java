@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Фасад read-контракта feed (раздел 9): хэш токена + срок действия. */
+
 @Service
 public class GuestSessionDirectoryFacade implements GuestSessionDirectory {
 

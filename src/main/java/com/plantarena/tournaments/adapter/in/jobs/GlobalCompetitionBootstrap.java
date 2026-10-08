@@ -7,11 +7,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-/**
- * Создание единственной записи глобального турнира при старте (раздел 8,
- * ADR-012): идемпотентно, повторный запуск дубликат не создаёт. Работает во
- * всех профилях (после Flyway).
- */
+
 @Component
 public class GlobalCompetitionBootstrap implements ApplicationRunner {
 

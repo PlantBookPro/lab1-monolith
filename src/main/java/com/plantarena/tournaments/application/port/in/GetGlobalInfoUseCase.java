@@ -3,7 +3,7 @@ package com.plantarena.tournaments.application.port.in;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Публичная конфигурация и текущие окна глобального турнира (раздел 13). */
+
 public interface GetGlobalInfoUseCase {
 
     GlobalInfo globalInfo();

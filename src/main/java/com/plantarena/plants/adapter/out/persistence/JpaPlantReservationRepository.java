@@ -9,11 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта PlantReservationRepository на JPA + PostgreSQL (раздел 14.2).
- * find-or-create + update + saveAndFlush; set-инвариант «один активный резерв
- * на пару» — частичный уникальный индекс plant_reservation_active_pair_uidx.
- */
+
 @Repository
 @Transactional
 public class JpaPlantReservationRepository implements PlantReservationRepository {

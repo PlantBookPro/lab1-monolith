@@ -7,11 +7,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * JPA-модель plant_reservation (раздел 11). Единственный переход
- * ACTIVE→RELEASED идемпотентен (повтор release пишет то же состояние) —
- * version (optimistic locking) не нужен.
- */
+
 @Entity
 @Table(name = "plant_reservation", schema = "plants")
 public class PlantReservationJpaEntity {
@@ -57,7 +53,7 @@ public class PlantReservationJpaEntity {
         this.createdAt = createdAt;
     }
 
-    /** Единственная мутация: ACTIVE → RELEASED. */
+    
     void update(String status, Instant releasedAt) {
         this.status = status;
         this.releasedAt = releasedAt;

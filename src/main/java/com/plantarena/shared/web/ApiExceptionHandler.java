@@ -16,11 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-/**
- * Переводит технические исключения (shared) в ProblemDetail-подобное тело ApiError.
- * Доменные исключения контекстов переводятся их собственными advice-классами
- * в adapter.in.web — shared не зависит от контекстов (правило 10.2.8).
- */
+
 @RestControllerAdvice
 public class ApiExceptionHandler {
 

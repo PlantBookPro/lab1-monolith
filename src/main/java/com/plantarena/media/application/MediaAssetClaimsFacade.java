@@ -9,12 +9,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация команд задействованности (ADR-008). Один файл — одно
- * неархивированное растение: PK asset_id. Повтор claim того же растения —
- * upsert публичности (модерация APPROVED), чужого — конфликт; release
- * чужого растения и повтор release — no-op (идемпотентность доставки).
- */
+
 @Service
 public class MediaAssetClaimsFacade implements MediaAssetClaims {
 

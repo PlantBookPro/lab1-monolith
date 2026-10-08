@@ -11,11 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Лента (раздел 13): бесконечная прокрутка keyset-курсором без total.
- * Субъект — пользователь (X-Demo-User-Id в dev/test) либо гость
- * (X-Guest-Token; только глобальные карточки).
- */
+
 @RestController
 @Tag(name = "feed")
 public class FeedController {

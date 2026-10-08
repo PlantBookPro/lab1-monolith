@@ -13,12 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта PlantRepository на JPA + PostgreSQL (раздел 14.2).
- * find-or-create + update + saveAndFlush (паттерн JpaUserRepository):
- * конкурентные обновления ловит @Version в БД. Сортировка по id —
- * детерминированная пагинация с tie-break (раздел 13).
- */
+
 @Repository
 @Transactional
 public class JpaPlantRepository implements PlantRepository {
@@ -56,7 +51,7 @@ public class JpaPlantRepository implements PlantRepository {
     @Override
     @Transactional(readOnly = true)
     public List<Plant> findByOwner(UUID ownerId, int offset, int limit) {
-        // offset всегда page-aligned (page * size из use case, как в JpaUserRepository)
+        
         return plants.findByOwnerIdAndArchivedAtIsNull(ownerId, page(offset, limit)).stream()
             .map(JpaPlantRepository::toDomain).toList();
     }

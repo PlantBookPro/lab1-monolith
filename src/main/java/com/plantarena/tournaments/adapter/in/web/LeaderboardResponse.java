@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/** Лидерборд окна (раздел 13): счёт выбранного окна, позиции, итоги. */
+
 public record LeaderboardResponse(UUID windowId, int sequence, String status, Instant closesAt,
                                    List<Item> items) {
 

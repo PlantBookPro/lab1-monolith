@@ -4,11 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Голос (раздел 9): LIKE/DISLIKE субъекта за участника окна. Один голос
- * одного субъекта за участника в одном окне (уникальность — ключи агрегата
- * и UNIQUE в БД); значение можно менять до закрытия окна.
- */
+
 public final class Vote {
 
     private final UUID id;
@@ -32,7 +28,7 @@ public final class Vote {
         return new Vote(UUID.randomUUID(), entryId, subjectKey, value, now, now);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static Vote restore(UUID id, UUID entryId, String subjectKey, VoteValue value,
                                Instant createdAt, Instant updatedAt) {
         return new Vote(id, entryId, subjectKey, value, createdAt, updatedAt);

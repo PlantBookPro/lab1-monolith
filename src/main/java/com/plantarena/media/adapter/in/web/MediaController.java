@@ -22,11 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Ручки файлов (раздел 13). Контроллер обращается только к входным портам
- * application (правило 10.2.7); формат и размеры проверяет use case по
- * фактическому содержимому, а не по имени/MIME части запроса.
- */
+
 @RestController
 @RequestMapping("/api/v1/files")
 @Tag(name = "media")

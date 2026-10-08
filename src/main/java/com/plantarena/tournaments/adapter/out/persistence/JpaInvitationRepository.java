@@ -11,11 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта InvitationRepository: find-or-create + update +
- * saveAndFlush; нарушение UNIQUE(tournament_id, user_id) переводится в
- * DataIntegrityViolationException (как в PlantEligibilityService).
- */
+
 @Repository
 @Transactional
 public class JpaInvitationRepository implements InvitationRepository {

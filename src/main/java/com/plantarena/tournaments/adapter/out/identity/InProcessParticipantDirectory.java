@@ -5,12 +5,7 @@ import com.plantarena.tournaments.application.port.out.ParticipantDirectoryGatew
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * ACL-адаптер identity → tournaments (раздел 4.3): проверка известного
- * активного пользователя при приглашении через OHS-контракт
- * identity.api.UserDirectory (первое api-пакет identity, дизайн итерации 5,
- * решение 6). В лабе №2 меняется на HTTP-клиент.
- */
+
 @Component
 public class InProcessParticipantDirectory implements ParticipantDirectoryGateway {
 

@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Служебные ручки пользователей (раздел 13). Контроллер обращается только
- * к входным портам application (правило 10.2.7).
- */
+
 @RestController
 @RequestMapping("/api/v1/users")
 @Tag(name = "identity")

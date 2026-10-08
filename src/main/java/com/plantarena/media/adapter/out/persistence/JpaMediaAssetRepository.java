@@ -7,10 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Реализация порта MediaAssetRepository на JPA + PostgreSQL (раздел 14.2).
- * save — короткая транзакция регистрации метаданных (раздел 12).
- */
+
 @Repository
 @Transactional
 public class JpaMediaAssetRepository implements MediaAssetRepository {

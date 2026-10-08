@@ -9,13 +9,7 @@ import com.plantarena.shared.security.CurrentActor;
 import com.plantarena.shared.security.NotIdentifiedException;
 import org.springframework.stereotype.Component;
 
-/**
- * AccessPolicy контекста plants (раздел 2): правила единого языка контекста.
- * Видимость: своё растение — всегда; чужое — только APPROVED (черновики и
- * отклонённые не раскрываются, раздел 13); админ — служебный доступ ко всем
- * неархивированным. Изменения (rename/archive) — только владелец (раздел 13
- * не даёт админу прав на чужие растения). Скрытое — 404, не 403.
- */
+
 @Component
 public class PlantsAccessPolicy {
 
@@ -26,7 +20,7 @@ public class PlantsAccessPolicy {
         }
     }
 
-    /** Просмотр: владелец, админ или APPROVED-растение; иначе скрыто (404). */
+    
     public void requirePlantViewer(CurrentActor actor, Plant plant) {
         requireIdentified(actor);
         if (isOwner(actor, plant) || actor.hasRole(AppRole.ADMIN)
@@ -36,7 +30,7 @@ public class PlantsAccessPolicy {
         throw new PlantNotFoundException("Растение не найдено: " + plant.id());
     }
 
-    /** Изменение: только владелец (вызывается после requirePlantViewer). */
+    
     public void requirePlantOwner(CurrentActor actor, Plant plant) {
         if (isOwner(actor, plant)) {
             return;
@@ -44,7 +38,7 @@ public class PlantsAccessPolicy {
         throw new AccessDeniedException("Действие с растением доступно только владельцу");
     }
 
-    /** Статус модерации — приватная информация владельца (раздел 13). */
+    
     public void requireModerationViewer(CurrentActor actor, Plant plant) {
         requireIdentified(actor);
         if (isOwner(actor, plant)) {

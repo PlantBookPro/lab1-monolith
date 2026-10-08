@@ -11,13 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
-/**
- * ACL-адаптер media → plants (раздел 4.3, Customer–Supplier): in-process вызов
- * опубликованного контракта media.api. Потребитель владеет портом со своими
- * типами (MediaAssetsGateway/MediaAssetClaimsGateway); в лабе №2 адаптер
- * меняется на HTTP/Feign, домен и application plants не меняются.
- * Конфликт задействованности переводится в термины plants.
- */
+
 @Component
 public class InProcessMediaGateway implements MediaAssetsGateway, MediaAssetClaimsGateway {
 

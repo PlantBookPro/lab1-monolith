@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/** JPA-модель участника окна (раздел 11); UNIQUE(window_id, entry_id) в БД. */
+
 @Entity
 @Table(name = "window_participant", schema = "tournaments")
 public class WindowParticipantJpaEntity {

@@ -3,7 +3,7 @@ package com.plantarena.feed.application;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** Настройки ленты (раздел 9): секрет HMAC курсора и его TTL. */
+
 @ConfigurationProperties(prefix = "plantarena.feed")
 public record FeedSettings(String cursorSecret, Duration cursorTtl) {
 

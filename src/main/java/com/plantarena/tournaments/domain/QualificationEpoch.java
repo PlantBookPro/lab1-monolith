@@ -4,12 +4,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Агрегат tournaments (раздел 8, алгоритм 2): эпоха глобального отбора с
- * фиксированным интервалом [opensAt, closesAt). Состав эпохи — её окна
- * (кластеры geo + участия QUALIFYING); сам агрегат хранит только границы и
- * статус. Открывается только при наличии QUEUED-заявок (use case).
- */
+
 public final class QualificationEpoch {
 
     private final UUID id;
@@ -40,14 +35,14 @@ public final class QualificationEpoch {
         this.version = version;
     }
 
-    /** Открытие эпохи: id задаётся заранее (geo-снимки ссылаются на него). */
+    
     public static QualificationEpoch open(UUID id, UUID tournamentId, int sequence,
                                           Instant opensAt, Instant closesAt, Instant now) {
         return new QualificationEpoch(id, tournamentId, sequence, EpochStatus.OPEN,
             opensAt, closesAt, now, 0L);
     }
 
-    /** Восстановление из хранилища (использует только persistence-адаптер). */
+    
     public static QualificationEpoch restore(UUID id, UUID tournamentId, int sequence,
                                              EpochStatus status, Instant opensAt,
                                              Instant closesAt, Instant createdAt,
@@ -56,7 +51,7 @@ public final class QualificationEpoch {
             closesAt, createdAt, version);
     }
 
-    /** Закрытие эпохи: все её окна закрыты и дедлайн наступил. */
+    
     public void close(Instant now) {
         if (status != EpochStatus.OPEN) {
             throw new IllegalStateException("Эпоха уже закрыта: " + id);
