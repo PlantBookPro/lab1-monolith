@@ -5,19 +5,17 @@ import com.plantarena.identity.domain.UserRepository;
 import com.plantarena.identity.domain.UserStatus;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserDirectoryFacade implements UserDirectory {
 
     private final UserRepository users;
-
-    public UserDirectoryFacade(UserRepository users) {
-        this.users = users;
-    }
 
     @Override
     public Optional<UserData> findById(UUID userId) {

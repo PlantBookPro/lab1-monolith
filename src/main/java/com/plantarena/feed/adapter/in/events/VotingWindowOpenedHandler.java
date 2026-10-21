@@ -2,18 +2,16 @@ package com.plantarena.feed.adapter.in.events;
 
 import com.plantarena.feed.application.port.in.ProjectWindowUseCase;
 import com.plantarena.tournaments.api.event.VotingWindowOpenedEvent;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class VotingWindowOpenedHandler {
 
     private final ProjectWindowUseCase projection;
-
-    public VotingWindowOpenedHandler(ProjectWindowUseCase projection) {
-        this.projection = projection;
-    }
 
     @EventListener
     public void on(VotingWindowOpenedEvent event) {

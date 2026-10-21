@@ -5,21 +5,17 @@ import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import com.plantarena.tournaments.domain.VotingWindowRepository;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class FeedDirectoryFacade implements FeedDirectory {
 
     private final VotingWindowRepository windows;
     private final TournamentEntryRepository entries;
-
-    public FeedDirectoryFacade(VotingWindowRepository windows,
-                               TournamentEntryRepository entries) {
-        this.windows = windows;
-        this.entries = entries;
-    }
 
     @Override
     @Transactional(readOnly = true)

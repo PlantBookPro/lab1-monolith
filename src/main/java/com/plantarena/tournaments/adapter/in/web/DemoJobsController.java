@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/internal/demo/jobs")
 @Profile({"dev", "test"})
 @Tag(name = "demo")
+@lombok.RequiredArgsConstructor
 public class DemoJobsController {
 
     private final StartTournamentUseCase startTournament;
@@ -28,19 +29,6 @@ public class DemoJobsController {
     private final TournamentsAccessPolicy accessPolicy;
     private final CurrentActorProvider currentActorProvider;
     private final Clock clock;
-
-    public DemoJobsController(StartTournamentUseCase startTournament,
-                              CloseVotingWindowUseCase closeVotingWindow,
-                              AdvanceGlobalCompetitionUseCase advanceGlobalCompetition,
-                              TournamentsAccessPolicy accessPolicy,
-                              CurrentActorProvider currentActorProvider, Clock clock) {
-        this.startTournament = startTournament;
-        this.closeVotingWindow = closeVotingWindow;
-        this.advanceGlobalCompetition = advanceGlobalCompetition;
-        this.accessPolicy = accessPolicy;
-        this.currentActorProvider = currentActorProvider;
-        this.clock = clock;
-    }
 
     @PostMapping("/run-due")
     @Operation(operationId = "demo-run-due-jobs",

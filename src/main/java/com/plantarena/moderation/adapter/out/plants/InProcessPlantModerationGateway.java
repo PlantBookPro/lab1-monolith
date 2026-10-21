@@ -5,17 +5,15 @@ import com.plantarena.moderation.application.port.out.PlantModerationGateway;
 import com.plantarena.plants.api.ModerationAlreadyDecidedException;
 import com.plantarena.plants.api.PlantModeration;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class InProcessPlantModerationGateway implements PlantModerationGateway {
 
     private final PlantModeration plantModeration;
-
-    public InProcessPlantModerationGateway(PlantModeration plantModeration) {
-        this.plantModeration = plantModeration;
-    }
 
     @Override
     public void recordDecision(UUID plantId, Decision decision, String reason) {

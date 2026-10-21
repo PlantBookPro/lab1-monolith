@@ -21,16 +21,16 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CloseVotingWindowService implements CloseVotingWindowUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(CloseVotingWindowService.class);
 
     private final VotingWindowRepository windows;
     private final TournamentRepository tournaments;
@@ -39,22 +39,6 @@ public class CloseVotingWindowService implements CloseVotingWindowUseCase {
     private final PlantLifecycleGateway plantLifecycle;
     private final IntegrationEventPublisher eventPublisher;
     private final TransactionTemplate transactionTemplate;
-
-    public CloseVotingWindowService(VotingWindowRepository windows,
-                                    TournamentRepository tournaments,
-                                    TournamentEntryRepository entries,
-                                    PlantEligibilityGateway eligibility,
-                                    PlantLifecycleGateway plantLifecycle,
-                                    IntegrationEventPublisher eventPublisher,
-                                    TransactionTemplate transactionTemplate) {
-        this.windows = windows;
-        this.tournaments = tournaments;
-        this.entries = entries;
-        this.eligibility = eligibility;
-        this.plantLifecycle = plantLifecycle;
-        this.eventPublisher = eventPublisher;
-        this.transactionTemplate = transactionTemplate;
-    }
 
     @Override
     public int closeDue(Instant now, int limit) {

@@ -12,13 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "guest-sessions")
+@lombok.RequiredArgsConstructor
 public class GuestSessionController {
 
     private final CreateGuestSessionUseCase createGuestSession;
-
-    public GuestSessionController(CreateGuestSessionUseCase createGuestSession) {
-        this.createGuestSession = createGuestSession;
-    }
 
     @PostMapping("/api/v1/guest-sessions")
     @Operation(operationId = "guest-sessions-create",

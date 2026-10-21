@@ -1,8 +1,7 @@
 package com.plantarena.identity.adapter.in.jobs;
 
 import com.plantarena.identity.application.port.in.BootstrapAdminUseCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -10,9 +9,8 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@Slf4j
 public class BootstrapAdminRunner implements ApplicationRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(BootstrapAdminRunner.class);
 
     private final BootstrapAdminUseCase bootstrapAdmin;
     private final String email;

@@ -4,17 +4,15 @@ import com.plantarena.feed.application.port.out.PlantCatalog;
 import com.plantarena.plants.api.PlantDirectory;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class InProcessPlantCatalog implements PlantCatalog {
 
     private final PlantDirectory plantDirectory;
-
-    public InProcessPlantCatalog(PlantDirectory plantDirectory) {
-        this.plantDirectory = plantDirectory;
-    }
 
     @Override
     public Optional<PlantView> findPlant(UUID plantId) {

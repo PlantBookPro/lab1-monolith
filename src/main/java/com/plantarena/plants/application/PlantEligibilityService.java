@@ -17,12 +17,14 @@ import com.plantarena.plants.domain.ReservationStatus;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class PlantEligibilityService implements PlantEligibility {
 
     private final PlantRepository plants;
@@ -30,15 +32,6 @@ public class PlantEligibilityService implements PlantEligibility {
     private final PlantReservationRepository reservations;
     private final ImageReusePolicy reusePolicy = new ImageReusePolicy();
     private final Clock clock;
-
-    public PlantEligibilityService(PlantRepository plants,
-                                   ImageRestrictionRepository restrictions,
-                                   PlantReservationRepository reservations, Clock clock) {
-        this.plants = plants;
-        this.restrictions = restrictions;
-        this.reservations = reservations;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

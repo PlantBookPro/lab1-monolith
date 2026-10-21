@@ -5,21 +5,18 @@ import com.plantarena.identity.domain.GeoPoint;
 import com.plantarena.identity.domain.User;
 import com.plantarena.identity.domain.UserRepository;
 import com.plantarena.shared.security.CurrentActor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MyProfileService implements MyProfileUseCase {
 
     private final UserRepository users;
     private final IdentityAccessPolicy accessPolicy;
-
-    public MyProfileService(UserRepository users, IdentityAccessPolicy accessPolicy) {
-        this.users = users;
-        this.accessPolicy = accessPolicy;
-    }
 
     @Override
     public UserResult me(CurrentActor actor) {

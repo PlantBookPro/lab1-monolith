@@ -10,19 +10,17 @@ import com.plantarena.shared.security.NotIdentifiedException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ResolveActorService implements ResolveActorUseCase {
 
     private final UserRepository users;
-
-    public ResolveActorService(UserRepository users) {
-        this.users = users;
-    }
 
     @Override
     public CurrentActor resolve(UUID userId) {

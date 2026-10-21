@@ -8,13 +8,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@lombok.RequiredArgsConstructor
 public class InProcessParticipantLocations implements ParticipantLocationsGateway {
 
     private final UserDirectory userDirectory;
-
-    public InProcessParticipantLocations(UserDirectory userDirectory) {
-        this.userDirectory = userDirectory;
-    }
 
     @Override
     public Optional<UserLocation> findLocation(UUID userId) {

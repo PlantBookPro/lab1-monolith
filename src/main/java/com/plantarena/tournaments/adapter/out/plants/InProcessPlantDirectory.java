@@ -10,13 +10,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@lombok.RequiredArgsConstructor
 public class InProcessPlantDirectory implements PlantDirectoryGateway {
 
     private final PlantDirectory plantDirectory;
-
-    public InProcessPlantDirectory(PlantDirectory plantDirectory) {
-        this.plantDirectory = plantDirectory;
-    }
 
     @Override
     public Optional<PlantSnapshot> findById(UUID plantId) {

@@ -21,11 +21,13 @@ import java.time.Clock;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class VotingService implements VotingUseCase {
 
     private static final Set<InvitationStatus> ACTIVE_INVITATION_STATUSES = Set.of(
@@ -42,23 +44,6 @@ public class VotingService implements VotingUseCase {
     private final GuestSessionsSettings guestSettings;
     private final AbuseSignals abuseSignals;
     private final Clock clock;
-
-    public VotingService(VotingWindowRepository windows, TournamentRepository tournaments,
-                         InvitationRepository invitations, TournamentEntryRepository entries,
-                         GuestSessionRepository guestSessions, TournamentsAccessPolicy accessPolicy,
-                         FixedWindowRateLimiter rateLimiter, GuestSessionsSettings guestSettings,
-                         AbuseSignals abuseSignals, Clock clock) {
-        this.windows = windows;
-        this.tournaments = tournaments;
-        this.invitations = invitations;
-        this.entries = entries;
-        this.guestSessions = guestSessions;
-        this.accessPolicy = accessPolicy;
-        this.rateLimiter = rateLimiter;
-        this.guestSettings = guestSettings;
-        this.abuseSignals = abuseSignals;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

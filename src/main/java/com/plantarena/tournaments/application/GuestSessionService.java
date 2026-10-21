@@ -6,11 +6,13 @@ import com.plantarena.tournaments.domain.GuestSession;
 import com.plantarena.tournaments.domain.GuestSessionRepository;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class GuestSessionService implements CreateGuestSessionUseCase {
 
     private final GuestSessionRepository sessions;
@@ -18,16 +20,6 @@ public class GuestSessionService implements CreateGuestSessionUseCase {
     private final FixedWindowRateLimiter rateLimiter;
     private final AbuseSignals abuseSignals;
     private final Clock clock;
-
-    public GuestSessionService(GuestSessionRepository sessions, GuestSessionsSettings settings,
-                               FixedWindowRateLimiter rateLimiter, AbuseSignals abuseSignals,
-                               Clock clock) {
-        this.sessions = sessions;
-        this.settings = settings;
-        this.rateLimiter = rateLimiter;
-        this.abuseSignals = abuseSignals;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

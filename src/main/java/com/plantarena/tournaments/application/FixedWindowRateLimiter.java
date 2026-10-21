@@ -3,18 +3,16 @@ package com.plantarena.tournaments.application;
 import java.time.Clock;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.RequiredArgsConstructor;
 
 
+@RequiredArgsConstructor
 public class FixedWindowRateLimiter {
 
     private final Clock clock;
     private final ConcurrentHashMap<String, Window> windows = new ConcurrentHashMap<>();
 
     private record Window(long minute, AtomicInteger count) {
-    }
-
-    public FixedWindowRateLimiter(Clock clock) {
-        this.clock = clock;
     }
 
     

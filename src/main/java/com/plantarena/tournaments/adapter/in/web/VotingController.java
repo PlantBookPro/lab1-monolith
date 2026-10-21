@@ -21,15 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/windows")
 @Tag(name = "voting")
+@lombok.RequiredArgsConstructor
 public class VotingController {
 
     private final VotingUseCase voting;
     private final CurrentActorProvider currentActorProvider;
-
-    public VotingController(VotingUseCase voting, CurrentActorProvider currentActorProvider) {
-        this.voting = voting;
-        this.currentActorProvider = currentActorProvider;
-    }
 
     @PutMapping("/{windowId}/entries/{entryId}/vote")
     @Operation(operationId = "voting-cast-vote",

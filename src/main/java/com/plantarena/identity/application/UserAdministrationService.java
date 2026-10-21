@@ -8,24 +8,19 @@ import com.plantarena.identity.domain.UserRepository;
 import com.plantarena.shared.security.CurrentActor;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserAdministrationService implements UserAdministrationUseCase {
 
     private final UserRepository users;
     private final PasswordHasher passwordHasher;
     private final IdentityAccessPolicy accessPolicy;
-
-    public UserAdministrationService(UserRepository users, PasswordHasher passwordHasher,
-                                      IdentityAccessPolicy accessPolicy) {
-        this.users = users;
-        this.passwordHasher = passwordHasher;
-        this.accessPolicy = accessPolicy;
-    }
 
     @Override
     public UserResult create(CurrentActor actor, CreateUserCommand command) {

@@ -9,13 +9,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@lombok.RequiredArgsConstructor
 public class InProcessPlantLifecycle implements PlantLifecycleGateway {
 
     private final PlantLifecycle plantLifecycle;
-
-    public InProcessPlantLifecycle(PlantLifecycle plantLifecycle) {
-        this.plantLifecycle = plantLifecycle;
-    }
 
     @Override
     public void registerDeath(UUID plantId, RestrictionKind kind, Instant cooldownExpiresAt,

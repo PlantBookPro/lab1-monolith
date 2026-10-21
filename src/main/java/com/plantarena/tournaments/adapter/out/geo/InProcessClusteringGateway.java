@@ -8,13 +8,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@lombok.RequiredArgsConstructor
 public class InProcessClusteringGateway implements ClusteringGateway {
 
     private final ClusterAssignment clusterAssignment;
-
-    public InProcessClusteringGateway(ClusterAssignment clusterAssignment) {
-        this.clusterAssignment = clusterAssignment;
-    }
 
     @Override
     public List<AssignedCluster> assignClusters(UUID epochId, List<MemberLocation> members) {

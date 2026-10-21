@@ -22,11 +22,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class TournamentAdministrationService implements CreateTournamentUseCase,
         UpdateTournamentUseCase, DeleteTournamentUseCase, OpenRegistrationUseCase,
         CancelTournamentUseCase {
@@ -37,19 +39,6 @@ public class TournamentAdministrationService implements CreateTournamentUseCase,
     private final PlantEligibilityGateway eligibility;
     private final TournamentsAccessPolicy accessPolicy;
     private final Clock clock;
-
-    public TournamentAdministrationService(TournamentRepository tournaments,
-                                           TagRepository tags,
-                                           InvitationRepository invitations,
-                                           PlantEligibilityGateway eligibility,
-                                           TournamentsAccessPolicy accessPolicy, Clock clock) {
-        this.tournaments = tournaments;
-        this.tags = tags;
-        this.invitations = invitations;
-        this.eligibility = eligibility;
-        this.accessPolicy = accessPolicy;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

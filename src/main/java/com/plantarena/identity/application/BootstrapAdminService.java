@@ -5,24 +5,19 @@ import com.plantarena.identity.domain.Email;
 import com.plantarena.identity.domain.PasswordHasher;
 import com.plantarena.identity.domain.User;
 import com.plantarena.identity.domain.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class BootstrapAdminService implements BootstrapAdminUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(BootstrapAdminService.class);
 
     private final UserRepository users;
     private final PasswordHasher passwordHasher;
-
-    public BootstrapAdminService(UserRepository users, PasswordHasher passwordHasher) {
-        this.users = users;
-        this.passwordHasher = passwordHasher;
-    }
 
     @Override
     @Transactional

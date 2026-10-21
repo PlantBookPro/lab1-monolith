@@ -22,22 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "tournaments")
+@lombok.RequiredArgsConstructor
 public class InvitationController {
 
     private final AcceptInvitationUseCase acceptInvitation;
     private final DeclineInvitationUseCase declineInvitation;
     private final ListInvitationsUseCase listInvitations;
     private final CurrentActorProvider currentActorProvider;
-
-    public InvitationController(AcceptInvitationUseCase acceptInvitation,
-                                DeclineInvitationUseCase declineInvitation,
-                                ListInvitationsUseCase listInvitations,
-                                CurrentActorProvider currentActorProvider) {
-        this.acceptInvitation = acceptInvitation;
-        this.declineInvitation = declineInvitation;
-        this.listInvitations = listInvitations;
-        this.currentActorProvider = currentActorProvider;
-    }
 
     @GetMapping("/api/v1/me/invitations")
     @Operation(operationId = "invitations-list-mine",

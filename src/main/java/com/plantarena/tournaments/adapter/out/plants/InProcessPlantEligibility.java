@@ -13,13 +13,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@lombok.RequiredArgsConstructor
 public class InProcessPlantEligibility implements PlantEligibilityGateway {
 
     private final PlantEligibility plantEligibility;
-
-    public InProcessPlantEligibility(PlantEligibility plantEligibility) {
-        this.plantEligibility = plantEligibility;
-    }
 
     @Override
     public UUID reserve(UUID ownerId, UUID plantId, UUID idempotencyKey) {

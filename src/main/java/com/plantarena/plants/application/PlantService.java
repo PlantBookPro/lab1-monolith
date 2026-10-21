@@ -27,11 +27,13 @@ import com.plantarena.shared.security.CurrentActor;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class PlantService implements SubmitPlantUseCase, ListPlantsUseCase, GetPlantUseCase,
         RenamePlantUseCase, ArchivePlantUseCase, GetPlantModerationUseCase {
 
@@ -44,20 +46,6 @@ public class PlantService implements SubmitPlantUseCase, ListPlantsUseCase, GetP
     private final IntegrationEventPublisher eventPublisher;
     private final ImageReusePolicy reusePolicy = new ImageReusePolicy();
     private final Clock clock;
-
-    public PlantService(PlantRepository plants, ImageRestrictionRepository restrictions,
-                        PlantReservationRepository reservations, MediaAssetsGateway mediaAssets,
-                        MediaAssetClaimsGateway mediaClaims, PlantsAccessPolicy accessPolicy,
-                        IntegrationEventPublisher eventPublisher, Clock clock) {
-        this.plants = plants;
-        this.restrictions = restrictions;
-        this.reservations = reservations;
-        this.mediaAssets = mediaAssets;
-        this.mediaClaims = mediaClaims;
-        this.accessPolicy = accessPolicy;
-        this.eventPublisher = eventPublisher;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

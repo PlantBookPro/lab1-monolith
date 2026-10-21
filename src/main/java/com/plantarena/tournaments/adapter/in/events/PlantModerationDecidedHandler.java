@@ -7,13 +7,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@lombok.RequiredArgsConstructor
 public class PlantModerationDecidedHandler {
 
     private final OnPlantModerationDecidedUseCase onPlantModerationDecided;
-
-    public PlantModerationDecidedHandler(OnPlantModerationDecidedUseCase onPlantModerationDecided) {
-        this.onPlantModerationDecided = onPlantModerationDecided;
-    }
 
     @EventListener
     public void onPlantModerationDecided(PlantModerationDecidedEvent event) {

@@ -7,27 +7,19 @@ import com.plantarena.tournaments.domain.EntryStatus;
 import com.plantarena.tournaments.domain.TournamentEntry;
 import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 
 @Service
+@RequiredArgsConstructor
 public class WithdrawGlobalEntryService implements WithdrawGlobalEntryUseCase {
 
     private final TournamentEntryRepository entries;
     private final PlantEligibilityGateway eligibility;
     private final TournamentsAccessPolicy accessPolicy;
     private final TransactionTemplate transactionTemplate;
-
-    public WithdrawGlobalEntryService(TournamentEntryRepository entries,
-                                      PlantEligibilityGateway eligibility,
-                                      TournamentsAccessPolicy accessPolicy,
-                                      TransactionTemplate transactionTemplate) {
-        this.entries = entries;
-        this.eligibility = eligibility;
-        this.accessPolicy = accessPolicy;
-        this.transactionTemplate = transactionTemplate;
-    }
 
     @Override
     public void withdraw(CurrentActor actor, UUID entryId) {

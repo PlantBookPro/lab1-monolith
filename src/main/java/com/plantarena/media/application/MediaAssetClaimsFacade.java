@@ -6,20 +6,17 @@ import com.plantarena.media.application.port.out.AssetClaimRepository;
 import com.plantarena.media.domain.AssetClaim;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class MediaAssetClaimsFacade implements MediaAssetClaims {
 
     private final AssetClaimRepository claims;
     private final Clock clock;
-
-    public MediaAssetClaimsFacade(AssetClaimRepository claims, Clock clock) {
-        this.claims = claims;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

@@ -17,12 +17,14 @@ import com.plantarena.tournaments.domain.TournamentType;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class TournamentQueryService implements ListTournamentsUseCase, GetTournamentUseCase,
         ListEntriesUseCase {
 
@@ -34,16 +36,6 @@ public class TournamentQueryService implements ListTournamentsUseCase, GetTourna
     private final InvitationRepository invitations;
     private final TournamentEntryRepository entries;
     private final TournamentsAccessPolicy accessPolicy;
-
-    public TournamentQueryService(TournamentRepository tournaments,
-                                  InvitationRepository invitations,
-                                  TournamentEntryRepository entries,
-                                  TournamentsAccessPolicy accessPolicy) {
-        this.tournaments = tournaments;
-        this.invitations = invitations;
-        this.entries = entries;
-        this.accessPolicy = accessPolicy;
-    }
 
     @Override
     public TournamentListResult list(CurrentActor actor, String status, UUID tagId,

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "global")
+@lombok.RequiredArgsConstructor
 public class GlobalController {
 
     private final GetGlobalInfoUseCase globalInfo;
@@ -39,22 +40,6 @@ public class GlobalController {
     private final WithdrawGlobalEntryUseCase withdrawEntry;
     private final GetMyGlobalEntryUseCase myEntry;
     private final CurrentActorProvider currentActorProvider;
-
-    public GlobalController(GetGlobalInfoUseCase globalInfo,
-                            ListGlobalClustersUseCase listClusters,
-                            GetGlobalLeaderboardUseCase leaderboard,
-                            SubmitGlobalEntryUseCase submitEntry,
-                            WithdrawGlobalEntryUseCase withdrawEntry,
-                            GetMyGlobalEntryUseCase myEntry,
-                            CurrentActorProvider currentActorProvider) {
-        this.globalInfo = globalInfo;
-        this.listClusters = listClusters;
-        this.leaderboard = leaderboard;
-        this.submitEntry = submitEntry;
-        this.withdrawEntry = withdrawEntry;
-        this.myEntry = myEntry;
-        this.currentActorProvider = currentActorProvider;
-    }
 
     @GetMapping("/global")
     @Operation(operationId = "global-get-info",

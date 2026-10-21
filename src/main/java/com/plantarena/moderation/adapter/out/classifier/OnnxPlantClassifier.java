@@ -15,8 +15,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 import javax.imageio.ImageIO;
+import lombok.RequiredArgsConstructor;
 
 
+@RequiredArgsConstructor
 public class OnnxPlantClassifier implements PlantClassifier {
 
     public static final String MODEL_VERSION = "mobilenetv2-1.0-onnx-imagenet/plant-classes-v1";
@@ -34,10 +36,6 @@ public class OnnxPlantClassifier implements PlantClassifier {
         988, 989, 990, 998);           
 
     private final Path modelPath;
-
-    public OnnxPlantClassifier(Path modelPath) {
-        this.modelPath = modelPath;
-    }
 
     @Override
     public Classification classify(byte[] imageBytes) {

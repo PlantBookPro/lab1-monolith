@@ -1,30 +1,19 @@
 package com.plantarena.tournaments.domain;
 
 import java.time.Instant;
-import java.util.Objects;
 import java.util.UUID;
 
 
+@lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class TournamentEntry {
 
-    private final UUID id;
-    private final UUID tournamentId;
-    private final UUID userId;
-    private final UUID plantId;
-    private final UUID reservationId;
-    private EntryStatus status;
-    private final Instant joinedAt;
-
-    private TournamentEntry(UUID id, UUID tournamentId, UUID userId, UUID plantId,
-                            UUID reservationId, EntryStatus status, Instant joinedAt) {
-        this.id = Objects.requireNonNull(id, "id");
-        this.tournamentId = Objects.requireNonNull(tournamentId, "tournamentId");
-        this.userId = Objects.requireNonNull(userId, "userId");
-        this.plantId = Objects.requireNonNull(plantId, "plantId");
-        this.reservationId = Objects.requireNonNull(reservationId, "reservationId");
-        this.status = Objects.requireNonNull(status, "status");
-        this.joinedAt = Objects.requireNonNull(joinedAt, "joinedAt");
-    }
+    private final @lombok.NonNull UUID id;
+    private final @lombok.NonNull UUID tournamentId;
+    private final @lombok.NonNull UUID userId;
+    private final @lombok.NonNull UUID plantId;
+    private final @lombok.NonNull UUID reservationId;
+    private @lombok.NonNull EntryStatus status;
+    private final @lombok.NonNull Instant joinedAt;
 
     
     public static TournamentEntry admit(UUID tournamentId, UUID userId, UUID plantId,

@@ -6,23 +6,18 @@ import com.plantarena.moderation.domain.ModerationJob;
 import com.plantarena.moderation.domain.ModerationJobRepository;
 import com.plantarena.moderation.domain.ModerationReasonCode;
 import java.time.Clock;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class ApplyModerationResultService {
 
     private final ModerationJobRepository jobs;
     private final PlantModerationGateway plantModeration;
     private final Clock clock;
-
-    public ApplyModerationResultService(ModerationJobRepository jobs,
-                                        PlantModerationGateway plantModeration, Clock clock) {
-        this.jobs = jobs;
-        this.plantModeration = plantModeration;
-        this.clock = clock;
-    }
 
     @Transactional
     public void apply(ModerationJob job, PlantClassifier.Classification result) {

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/files")
+@RequiredArgsConstructor
 @Tag(name = "media")
 public class MediaController {
 
@@ -32,14 +34,6 @@ public class MediaController {
     private final DownloadMediaUseCase downloadMedia;
     private final DeleteMediaUseCase deleteMedia;
     private final CurrentActorProvider currentActorProvider;
-
-    public MediaController(UploadMediaUseCase uploadMedia, DownloadMediaUseCase downloadMedia,
-                           DeleteMediaUseCase deleteMedia, CurrentActorProvider currentActorProvider) {
-        this.uploadMedia = uploadMedia;
-        this.downloadMedia = downloadMedia;
-        this.deleteMedia = deleteMedia;
-        this.currentActorProvider = currentActorProvider;
-    }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(operationId = "media-upload-file",

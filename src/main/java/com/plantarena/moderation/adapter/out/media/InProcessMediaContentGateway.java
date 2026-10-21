@@ -4,17 +4,15 @@ import com.plantarena.media.api.MediaAssets;
 import com.plantarena.moderation.application.port.out.MediaContentGateway;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class InProcessMediaContentGateway implements MediaContentGateway {
 
     private final MediaAssets mediaAssets;
-
-    public InProcessMediaContentGateway(MediaAssets mediaAssets) {
-        this.mediaAssets = mediaAssets;
-    }
 
     @Override
     public Optional<MediaContent> loadContent(UUID assetId) {

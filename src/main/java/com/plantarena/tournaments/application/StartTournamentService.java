@@ -22,17 +22,17 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class StartTournamentService implements StartTournamentUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(StartTournamentService.class);
 
     private final TournamentRepository tournaments;
     private final InvitationRepository invitations;
@@ -43,25 +43,6 @@ public class StartTournamentService implements StartTournamentUseCase {
     private final IntegrationEventPublisher eventPublisher;
     private final Clock clock;
     private final TransactionTemplate transactionTemplate;
-
-    public StartTournamentService(TournamentRepository tournaments,
-                                  InvitationRepository invitations,
-                                  TournamentEntryRepository entries,
-                                  VotingWindowRepository windows,
-                                  PlantEligibilityGateway eligibility,
-                                  TournamentsAccessPolicy accessPolicy,
-                                  IntegrationEventPublisher eventPublisher, Clock clock,
-                                  TransactionTemplate transactionTemplate) {
-        this.tournaments = tournaments;
-        this.invitations = invitations;
-        this.entries = entries;
-        this.windows = windows;
-        this.eligibility = eligibility;
-        this.accessPolicy = accessPolicy;
-        this.eventPublisher = eventPublisher;
-        this.clock = clock;
-        this.transactionTemplate = transactionTemplate;
-    }
 
     @Override
     @Transactional

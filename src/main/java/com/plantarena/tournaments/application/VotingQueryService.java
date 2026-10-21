@@ -24,12 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class VotingQueryService implements ListRoundsUseCase, GetLeaderboardUseCase,
         ListResultsUseCase {
 
@@ -42,18 +44,6 @@ public class VotingQueryService implements ListRoundsUseCase, GetLeaderboardUseC
     private final TournamentEntryRepository entries;
     private final VotingWindowRepository windows;
     private final TournamentsAccessPolicy accessPolicy;
-
-    public VotingQueryService(TournamentRepository tournaments,
-                              InvitationRepository invitations,
-                              TournamentEntryRepository entries,
-                              VotingWindowRepository windows,
-                              TournamentsAccessPolicy accessPolicy) {
-        this.tournaments = tournaments;
-        this.invitations = invitations;
-        this.entries = entries;
-        this.windows = windows;
-        this.accessPolicy = accessPolicy;
-    }
 
     @Override
     public RoundListResult listRounds(CurrentActor actor, UUID tournamentId, int page, int size) {

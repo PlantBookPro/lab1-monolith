@@ -7,13 +7,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
+@lombok.RequiredArgsConstructor
 public class InProcessParticipantDirectory implements ParticipantDirectoryGateway {
 
     private final UserDirectory userDirectory;
-
-    public InProcessParticipantDirectory(UserDirectory userDirectory) {
-        this.userDirectory = userDirectory;
-    }
 
     @Override
     public boolean isKnownUser(UUID userId) {

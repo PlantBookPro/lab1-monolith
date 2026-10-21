@@ -9,19 +9,16 @@ import com.plantarena.plants.application.port.out.MediaAssetsGateway;
 import com.plantarena.plants.application.port.out.MediaAssetsGateway.AssetMetadata;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class InProcessMediaGateway implements MediaAssetsGateway, MediaAssetClaimsGateway {
 
     private final MediaAssets mediaAssets;
     private final MediaAssetClaims mediaAssetClaims;
-
-    public InProcessMediaGateway(MediaAssets mediaAssets, MediaAssetClaims mediaAssetClaims) {
-        this.mediaAssets = mediaAssets;
-        this.mediaAssetClaims = mediaAssetClaims;
-    }
 
     @Override
     public Optional<AssetMetadata> findById(UUID assetId) {

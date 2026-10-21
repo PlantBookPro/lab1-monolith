@@ -7,34 +7,22 @@ import com.plantarena.moderation.domain.ModerationJob;
 import com.plantarena.moderation.domain.ModerationJobRepository;
 import java.time.Clock;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ProcessModerationJobsService implements ProcessDueModerationJobsUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(ProcessModerationJobsService.class);
 
     private final ModerationJobRepository jobs;
     private final MediaContentGateway mediaContent;
     private final PlantClassifier classifier;
     private final ApplyModerationResultService applyResult;
     private final Clock clock;
-
-    public ProcessModerationJobsService(ModerationJobRepository jobs,
-                                        MediaContentGateway mediaContent,
-                                        PlantClassifier classifier,
-                                        ApplyModerationResultService applyResult,
-                                        Clock clock) {
-        this.jobs = jobs;
-        this.mediaContent = mediaContent;
-        this.classifier = classifier;
-        this.applyResult = applyResult;
-        this.clock = clock;
-    }
 
     @Override
     public int processDue(int limit) {

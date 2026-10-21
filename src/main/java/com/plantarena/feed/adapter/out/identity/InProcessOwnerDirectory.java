@@ -4,17 +4,15 @@ import com.plantarena.feed.application.port.out.OwnerDirectory;
 import com.plantarena.identity.api.UserDirectory;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class InProcessOwnerDirectory implements OwnerDirectory {
 
     private final UserDirectory userDirectory;
-
-    public InProcessOwnerDirectory(UserDirectory userDirectory) {
-        this.userDirectory = userDirectory;
-    }
 
     @Override
     public Optional<OwnerView> findOwner(UUID userId) {

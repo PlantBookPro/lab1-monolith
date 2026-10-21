@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/plants")
 @Tag(name = "plants")
+@RequiredArgsConstructor
 public class PlantController {
 
     private final SubmitPlantUseCase submitPlant;
@@ -40,20 +42,6 @@ public class PlantController {
     private final ArchivePlantUseCase archivePlant;
     private final GetPlantModerationUseCase getPlantModeration;
     private final CurrentActorProvider currentActorProvider;
-
-    public PlantController(SubmitPlantUseCase submitPlant, ListPlantsUseCase listPlants,
-                           GetPlantUseCase getPlant, RenamePlantUseCase renamePlant,
-                           ArchivePlantUseCase archivePlant,
-                           GetPlantModerationUseCase getPlantModeration,
-                           CurrentActorProvider currentActorProvider) {
-        this.submitPlant = submitPlant;
-        this.listPlants = listPlants;
-        this.getPlant = getPlant;
-        this.renamePlant = renamePlant;
-        this.archivePlant = archivePlant;
-        this.getPlantModeration = getPlantModeration;
-        this.currentActorProvider = currentActorProvider;
-    }
 
     @PostMapping
     @Operation(operationId = "plants-submit-plant",

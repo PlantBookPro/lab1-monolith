@@ -4,17 +4,15 @@ import com.plantarena.feed.application.port.out.VotingDirectory;
 import com.plantarena.tournaments.api.FeedDirectory;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class InProcessVotingDirectory implements VotingDirectory {
 
     private final FeedDirectory feedDirectory;
-
-    public InProcessVotingDirectory(FeedDirectory feedDirectory) {
-        this.feedDirectory = feedDirectory;
-    }
 
     @Override
     public Set<UUID> findVotedEntryIdsInOpenWindows(String subjectKey) {

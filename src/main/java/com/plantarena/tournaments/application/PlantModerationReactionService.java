@@ -9,26 +9,19 @@ import com.plantarena.tournaments.domain.Tournament;
 import com.plantarena.tournaments.domain.TournamentRepository;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class PlantModerationReactionService implements OnPlantModerationDecidedUseCase {
 
     private final TournamentRepository tournaments;
     private final InvitationRepository invitations;
     private final PlantEligibilityGateway eligibility;
     private final Clock clock;
-
-    public PlantModerationReactionService(TournamentRepository tournaments,
-                                          InvitationRepository invitations,
-                                          PlantEligibilityGateway eligibility, Clock clock) {
-        this.tournaments = tournaments;
-        this.invitations = invitations;
-        this.eligibility = eligibility;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

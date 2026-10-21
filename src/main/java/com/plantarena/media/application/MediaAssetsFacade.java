@@ -7,21 +7,18 @@ import com.plantarena.media.application.port.out.MediaAssetRepository;
 import com.plantarena.media.domain.FileStorage;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class MediaAssetsFacade implements MediaAssets {
 
     private final MediaAssetRepository repository;
     private final FileStorage fileStorage;
-
-    public MediaAssetsFacade(MediaAssetRepository repository, FileStorage fileStorage) {
-        this.repository = repository;
-        this.fileStorage = fileStorage;
-    }
 
     @Override
     public Optional<MediaAssetData> findById(UUID assetId) {

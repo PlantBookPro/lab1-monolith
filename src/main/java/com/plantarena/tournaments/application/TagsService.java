@@ -9,25 +9,19 @@ import com.plantarena.tournaments.domain.TournamentRepository;
 import java.time.Clock;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class TagsService implements TagsUseCase {
 
     private final TagRepository tags;
     private final TournamentRepository tournaments;
     private final TournamentsAccessPolicy accessPolicy;
     private final Clock clock;
-
-    public TagsService(TagRepository tags, TournamentRepository tournaments,
-                       TournamentsAccessPolicy accessPolicy, Clock clock) {
-        this.tags = tags;
-        this.tournaments = tournaments;
-        this.accessPolicy = accessPolicy;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

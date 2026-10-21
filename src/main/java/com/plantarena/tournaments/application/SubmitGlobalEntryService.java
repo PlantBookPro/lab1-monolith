@@ -9,11 +9,13 @@ import com.plantarena.tournaments.domain.TournamentEntry;
 import com.plantarena.tournaments.domain.TournamentEntryRepository;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 
 @Service
+@RequiredArgsConstructor
 public class SubmitGlobalEntryService implements SubmitGlobalEntryUseCase {
 
     private final PlantDirectoryGateway plants;
@@ -23,21 +25,6 @@ public class SubmitGlobalEntryService implements SubmitGlobalEntryUseCase {
     private final TournamentsAccessPolicy accessPolicy;
     private final Clock clock;
     private final TransactionTemplate transactionTemplate;
-
-    public SubmitGlobalEntryService(PlantDirectoryGateway plants,
-                                    ParticipantLocationsGateway locations,
-                                    PlantEligibilityGateway eligibility,
-                                    TournamentEntryRepository entries,
-                                    TournamentsAccessPolicy accessPolicy, Clock clock,
-                                    TransactionTemplate transactionTemplate) {
-        this.plants = plants;
-        this.locations = locations;
-        this.eligibility = eligibility;
-        this.entries = entries;
-        this.accessPolicy = accessPolicy;
-        this.clock = clock;
-        this.transactionTemplate = transactionTemplate;
-    }
 
     @Override
     public GlobalEntryView submit(CurrentActor actor, UUID plantId) {

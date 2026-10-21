@@ -10,29 +10,21 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class FeedProjectionService implements ProjectWindowUseCase {
-
-    private static final Logger log = LoggerFactory.getLogger(FeedProjectionService.class);
 
     private final FeedCardRepository cards;
     private final PlantCatalog plantCatalog;
     private final OwnerDirectory ownerDirectory;
     private final Clock clock;
-
-    public FeedProjectionService(FeedCardRepository cards, PlantCatalog plantCatalog,
-                                 OwnerDirectory ownerDirectory, Clock clock) {
-        this.cards = cards;
-        this.plantCatalog = plantCatalog;
-        this.ownerDirectory = ownerDirectory;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

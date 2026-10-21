@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/tournaments")
 @Tag(name = "tournaments")
+@lombok.RequiredArgsConstructor
 public class TournamentController {
 
     private final CreateTournamentUseCase createTournament;
@@ -60,40 +61,6 @@ public class TournamentController {
     private final GetLeaderboardUseCase getLeaderboard;
     private final ListResultsUseCase listResults;
     private final CurrentActorProvider currentActorProvider;
-
-    public TournamentController(CreateTournamentUseCase createTournament,
-                                UpdateTournamentUseCase updateTournament,
-                                DeleteTournamentUseCase deleteTournament,
-                                OpenRegistrationUseCase openRegistration,
-                                CancelTournamentUseCase cancelTournament,
-                                StartTournamentUseCase startTournament,
-                                ListTournamentsUseCase listTournaments,
-                                GetTournamentUseCase getTournament,
-                                ListEntriesUseCase listEntries,
-                                InviteUserUseCase inviteUser,
-                                RevokeInvitationUseCase revokeInvitation,
-                                ListInvitationsUseCase listInvitations,
-                                ListRoundsUseCase listRounds,
-                                GetLeaderboardUseCase getLeaderboard,
-                                ListResultsUseCase listResults,
-                                CurrentActorProvider currentActorProvider) {
-        this.createTournament = createTournament;
-        this.updateTournament = updateTournament;
-        this.deleteTournament = deleteTournament;
-        this.openRegistration = openRegistration;
-        this.cancelTournament = cancelTournament;
-        this.startTournament = startTournament;
-        this.listTournaments = listTournaments;
-        this.getTournament = getTournament;
-        this.listEntries = listEntries;
-        this.inviteUser = inviteUser;
-        this.revokeInvitation = revokeInvitation;
-        this.listInvitations = listInvitations;
-        this.listRounds = listRounds;
-        this.getLeaderboard = getLeaderboard;
-        this.listResults = listResults;
-        this.currentActorProvider = currentActorProvider;
-    }
 
     @PostMapping
     @Operation(operationId = "tournaments-create",

@@ -5,19 +5,17 @@ import com.plantarena.shared.security.CurrentActor;
 import com.plantarena.shared.security.CurrentActorProvider;
 import com.plantarena.shared.security.NotIdentifiedException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 
+@RequiredArgsConstructor
 public class DemoHeaderCurrentActorProvider implements CurrentActorProvider {
 
     public static final String DEMO_USER_ID_HEADER = "X-Demo-User-Id";
 
     private final ResolveActorUseCase resolveActor;
-
-    public DemoHeaderCurrentActorProvider(ResolveActorUseCase resolveActor) {
-        this.resolveActor = resolveActor;
-    }
 
     @Override
     public CurrentActor currentActor() {

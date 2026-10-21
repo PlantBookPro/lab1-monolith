@@ -6,20 +6,17 @@ import com.plantarena.tournaments.domain.GuestSessionRepository;
 import java.time.Clock;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class GuestSessionDirectoryFacade implements GuestSessionDirectory {
 
     private final GuestSessionRepository sessions;
     private final Clock clock;
-
-    public GuestSessionDirectoryFacade(GuestSessionRepository sessions, Clock clock) {
-        this.sessions = sessions;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional(readOnly = true)

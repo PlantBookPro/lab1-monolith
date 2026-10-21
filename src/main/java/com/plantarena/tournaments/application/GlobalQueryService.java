@@ -19,11 +19,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class GlobalQueryService implements GetGlobalInfoUseCase, ListGlobalClustersUseCase,
         GetGlobalLeaderboardUseCase, GetMyGlobalEntryUseCase {
 
@@ -33,19 +35,6 @@ public class GlobalQueryService implements GetGlobalInfoUseCase, ListGlobalClust
     private final GlobalCompetitionSettings settings;
     private final TournamentsAccessPolicy accessPolicy;
     private final Clock clock;
-
-    public GlobalQueryService(VotingWindowRepository windows,
-                              QualificationEpochRepository epochs,
-                              TournamentEntryRepository entries,
-                              GlobalCompetitionSettings settings,
-                              TournamentsAccessPolicy accessPolicy, Clock clock) {
-        this.windows = windows;
-        this.epochs = epochs;
-        this.entries = entries;
-        this.settings = settings;
-        this.accessPolicy = accessPolicy;
-        this.clock = clock;
-    }
 
     @Override
     public GlobalInfo globalInfo() {

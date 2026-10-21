@@ -24,16 +24,16 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetitionUseCase {
 
-    private static final Logger log =
-        LoggerFactory.getLogger(AdvanceGlobalCompetitionService.class);
     private static final int BATCH_SIZE = 50;
     private static final Duration GLOBAL_COOLDOWN = Duration.ofHours(24);
 
@@ -47,28 +47,6 @@ public class AdvanceGlobalCompetitionService implements AdvanceGlobalCompetition
     private final GlobalCompetitionSettings settings;
     private final IntegrationEventPublisher eventPublisher;
     private final TransactionTemplate transactionTemplate;
-
-    public AdvanceGlobalCompetitionService(VotingWindowRepository windows,
-                                           QualificationEpochRepository epochs,
-                                           TournamentEntryRepository entries,
-                                           PlantEligibilityGateway eligibility,
-                                           PlantLifecycleGateway plantLifecycle,
-                                           ParticipantLocationsGateway locations,
-                                           ClusteringGateway clustering,
-                                           GlobalCompetitionSettings settings,
-                                           IntegrationEventPublisher eventPublisher,
-                                           TransactionTemplate transactionTemplate) {
-        this.windows = windows;
-        this.epochs = epochs;
-        this.entries = entries;
-        this.eligibility = eligibility;
-        this.plantLifecycle = plantLifecycle;
-        this.locations = locations;
-        this.clustering = clustering;
-        this.settings = settings;
-        this.eventPublisher = eventPublisher;
-        this.transactionTemplate = transactionTemplate;
-    }
 
     @Override
     public AdvanceReport advance(Instant now) {

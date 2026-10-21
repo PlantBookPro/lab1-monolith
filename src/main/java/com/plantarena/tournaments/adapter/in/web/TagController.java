@@ -25,15 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/tags")
 @Tag(name = "tournaments")
+@lombok.RequiredArgsConstructor
 public class TagController {
 
     private final TagsUseCase tags;
     private final CurrentActorProvider currentActorProvider;
-
-    public TagController(TagsUseCase tags, CurrentActorProvider currentActorProvider) {
-        this.tags = tags;
-        this.currentActorProvider = currentActorProvider;
-    }
 
     @PostMapping
     @Operation(operationId = "tags-create", summary = "Создать тег (модератор/админ)")

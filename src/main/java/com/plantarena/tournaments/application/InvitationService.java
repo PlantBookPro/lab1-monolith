@@ -22,11 +22,13 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class InvitationService implements InviteUserUseCase, RevokeInvitationUseCase,
         AcceptInvitationUseCase, DeclineInvitationUseCase, ListInvitationsUseCase {
 
@@ -38,23 +40,6 @@ public class InvitationService implements InviteUserUseCase, RevokeInvitationUse
     private final TournamentsAccessPolicy accessPolicy;
     private final IntegrationEventPublisher eventPublisher;
     private final Clock clock;
-
-    public InvitationService(TournamentRepository tournaments,
-                             InvitationRepository invitations,
-                             PlantEligibilityGateway eligibility,
-                             PlantDirectoryGateway plantDirectory,
-                             ParticipantDirectoryGateway participants,
-                             TournamentsAccessPolicy accessPolicy,
-                             IntegrationEventPublisher eventPublisher, Clock clock) {
-        this.tournaments = tournaments;
-        this.invitations = invitations;
-        this.eligibility = eligibility;
-        this.plantDirectory = plantDirectory;
-        this.participants = participants;
-        this.accessPolicy = accessPolicy;
-        this.eventPublisher = eventPublisher;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

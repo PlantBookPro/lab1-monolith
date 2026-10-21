@@ -15,11 +15,13 @@ import java.time.Clock;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class FeedService implements GetFeedUseCase {
 
     private static final int DEFAULT_LIMIT = 20;
@@ -33,17 +35,6 @@ public class FeedService implements GetFeedUseCase {
     private final FeedOrdering ordering;
     private final FeedCursorCodec cursorCodec;
     private final Clock clock;
-
-    public FeedService(FeedCardRepository cards, VotingDirectory votingDirectory,
-                       GuestSessions guestSessions, FeedOrdering ordering,
-                       FeedCursorCodec cursorCodec, Clock clock) {
-        this.cards = cards;
-        this.votingDirectory = votingDirectory;
-        this.guestSessions = guestSessions;
-        this.ordering = ordering;
-        this.cursorCodec = cursorCodec;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional(readOnly = true)

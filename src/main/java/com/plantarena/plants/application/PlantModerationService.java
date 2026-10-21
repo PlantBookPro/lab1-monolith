@@ -15,25 +15,19 @@ import com.plantarena.plants.domain.PlantRepository;
 import com.plantarena.shared.event.IntegrationEventPublisher;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class PlantModerationService implements PlantModeration {
 
     private final PlantRepository plants;
     private final MediaAssetClaimsGateway mediaClaims;
     private final IntegrationEventPublisher eventPublisher;
     private final Clock clock;
-
-    public PlantModerationService(PlantRepository plants, MediaAssetClaimsGateway mediaClaims,
-                                  IntegrationEventPublisher eventPublisher, Clock clock) {
-        this.plants = plants;
-        this.mediaClaims = mediaClaims;
-        this.eventPublisher = eventPublisher;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

@@ -13,25 +13,19 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class PlantLifecycleService implements PlantLifecycle {
 
     private final PlantRepository plants;
     private final ImageRestrictionRepository restrictions;
     private final IntegrationEventPublisher eventPublisher;
     private final Clock clock;
-
-    public PlantLifecycleService(PlantRepository plants, ImageRestrictionRepository restrictions,
-                                 IntegrationEventPublisher eventPublisher, Clock clock) {
-        this.plants = plants;
-        this.restrictions = restrictions;
-        this.eventPublisher = eventPublisher;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

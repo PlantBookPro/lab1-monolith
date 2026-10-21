@@ -5,19 +5,16 @@ import com.plantarena.moderation.domain.ModerationJob;
 import com.plantarena.moderation.domain.ModerationJobRepository;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class CreateModerationJobService implements CreateModerationJobUseCase {
 
     private final ModerationJobRepository jobs;
     private final Clock clock;
-
-    public CreateModerationJobService(ModerationJobRepository jobs, Clock clock) {
-        this.jobs = jobs;
-        this.clock = clock;
-    }
 
     @Override
     public void onPlantSubmitted(UUID plantId, UUID assetId) {

@@ -16,10 +16,12 @@ import com.plantarena.media.domain.MediaAsset;
 import com.plantarena.shared.security.CurrentActor;
 import java.time.Clock;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCase, DeleteMediaUseCase {
 
     static final long MAX_BYTES = 10 * 1024 * 1024; 
@@ -31,17 +33,6 @@ public class MediaAssetService implements UploadMediaUseCase, DownloadMediaUseCa
     private final MediaAccessPolicy accessPolicy;
     private final Clock clock;
     private final ImageFingerprinter fingerprinter = new ImageFingerprinter();
-
-    public MediaAssetService(MediaAssetRepository repository, ImageAnalyzer imageAnalyzer,
-                             FileStorage fileStorage, AssetClaimRepository claims,
-                             MediaAccessPolicy accessPolicy, Clock clock) {
-        this.repository = repository;
-        this.imageAnalyzer = imageAnalyzer;
-        this.fileStorage = fileStorage;
-        this.claims = claims;
-        this.accessPolicy = accessPolicy;
-        this.clock = clock;
-    }
 
     @Override
     public MediaAssetResult upload(CurrentActor actor, byte[] content) {

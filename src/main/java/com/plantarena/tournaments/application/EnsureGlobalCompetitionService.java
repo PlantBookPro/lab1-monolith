@@ -4,20 +4,17 @@ import com.plantarena.tournaments.application.port.in.EnsureGlobalCompetitionUse
 import com.plantarena.tournaments.domain.Tournament;
 import com.plantarena.tournaments.domain.TournamentRepository;
 import java.time.Clock;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class EnsureGlobalCompetitionService implements EnsureGlobalCompetitionUseCase {
 
     private final TournamentRepository tournaments;
     private final Clock clock;
-
-    public EnsureGlobalCompetitionService(TournamentRepository tournaments, Clock clock) {
-        this.tournaments = tournaments;
-        this.clock = clock;
-    }
 
     @Override
     @Transactional

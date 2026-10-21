@@ -10,22 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
+@RequiredArgsConstructor
 public class ClusterAssignmentFacade implements ClusterAssignment {
 
     private final ClusteringPolicy policy;
     private final ClusterSnapshotRepository snapshots;
     private final Clock clock;
-
-    public ClusterAssignmentFacade(ClusteringPolicy policy,
-                                   ClusterSnapshotRepository snapshots, Clock clock) {
-        this.policy = policy;
-        this.snapshots = snapshots;
-        this.clock = clock;
-    }
 
     @Override
     public List<AssignedCluster> assignClusters(UUID epochId, List<Member> members) {
