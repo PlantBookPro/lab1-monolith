@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("ONNX-инференс MobileNetV2: ромашка — растение, собака — нет (ADR-009)")
 class OnnxPlantClassifierIT {
 
-    private static final Path MODEL = Path.of("target/models/mobilenetv2-1.0.onnx");
+    private static final Path MODEL = Path.of("build/models/mobilenetv2-1.0.onnx");
 
     private final OnnxPlantClassifier classifier = new OnnxPlantClassifier(MODEL);
 

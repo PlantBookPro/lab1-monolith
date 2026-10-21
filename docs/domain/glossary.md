@@ -20,7 +20,7 @@
 | Архив растения | `Plant.archive(...)` | plants | Скрытие растения владельцем с освобождением файла; история, запреты и резервы сохраняются |
 | Задание модерации | `ModerationJob` | moderation | Попытки автоматического распознавания растения |
 | Классификатор растений | `PlantClassifier` | moderation | Порт распознавания: байты изображения → растение/не растение с уверенностью; адаптеры — ONNX (основной) и детерминированный (тесты) |
-| Инференс | `OnnxPlantClassifier` / тег `inference` | moderation | Прямой прогон модели ONNX Runtime внутри монолита (ADR-009); демо: `./mvnw verify -P inference` |
+| Инференс | `OnnxPlantClassifier` / тег `inference` | moderation | Прямой прогон модели ONNX Runtime внутри монолита (ADR-009); демо: `./gradlew build -Pinference` |
 | Турнир | `Tournament` | tournaments | PRIVATE-турнир или единственный GLOBAL |
 | Приглашение | `Invitation` | tournaments | Приглашение пользователя в закрытый турнир и его заявка |
 | Участие, участник | `TournamentEntry` | tournaments | Участие конкретного растения пользователя в турнире |

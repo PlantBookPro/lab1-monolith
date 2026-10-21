@@ -41,7 +41,7 @@
    job DONE с reasonCode=STALE; повтор того же решения — no-op (идемпотентность
    plants). Новая заявка (переотправка) — новый Plant с новым id.
 7. **Inference-демо**: тег `inference` у `OnnxPlantClassifierIT`; в обычный
-   `verify` не входит (failsafe excludedGroups), запуск `./mvnw verify -P
+   `verify` не входит (failsafe excludedGroups), запуск `./gradlew build -P
    inference`; без модели — честный skip (assumption), не ошибка.
 8. **Сессия ONNX на каждый вызов**: нагрузка лабы №1 мизерная, состояние не
    держим; пул сессий — при выносе inference-сервиса (лаба №2).

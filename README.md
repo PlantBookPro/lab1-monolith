@@ -51,7 +51,7 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
   растением файл — 409 `ASSET_IN_USE` (итерация 3).
 
 Локальное хранилище: каталог `MEDIA_STORAGE_ROOT` (по умолчанию `./storage/media`,
-в Docker Compose — volume `storage`). Проверки: `./mvnw verify`.
+в Docker Compose — volume `storage`). Проверки: `./gradlew build`.
 
 ## Растения (plants)
 
@@ -85,9 +85,9 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
 - Модель (~13 МБ) скачивается автоматически при сборке в
   `target/models/mobilenetv2-1.0.onnx` (offline-сборка не ломается: задания
   честно уходят в RETRY, в логе видно `ClassifierUnavailableException`).
-- Ручной запуск: `MODERATION_MODEL_PATH=... ./mvnw spring-boot:run`.
+- Ручной запуск: `MODERATION_MODEL_PATH=... ./gradlew bootRun`.
 - Настоящий инференс на эталонных фото (ромашка/собака):
-  `./mvnw verify -P inference` (в обычный `verify` не входит).
+  `./gradlew build -Pinference` (в обычный `verify` не входит).
 - Решение видно владельцу: `GET /api/v1/plants/{id}/moderation` — статус,
   причина (`PLANT_DETECTED`/`NOT_A_PLANT`) и `retryUploadAllowed`.
 
@@ -189,31 +189,31 @@ scheduler идемпотентен — рестарт не убивает пов
 ## Проверка (единственная команда)
 
 ```bash
-./mvnw verify
+./gradlew build
 ```
 
-Запускает: unit- и application-тесты (Surefire), ArchUnit-правила границ,
-интеграционные/приёмочные тесты на Testcontainers PostgreSQL (Failsafe),
+Запускает: unit- и application-тесты (`test`), ArchUnit-правила границ,
+интеграционные/приёмочные тесты на Testcontainers PostgreSQL (`integrationTest`),
  отчёт и gate JaCoCo (LINE ≥ 70%). Настоящий ONNX-инференс — отдельно:
-`./mvnw verify -P inference`.
+`./gradlew build -Pinference`.
 
 ### Покрытие (JaCoCo)
 
-Единый отчёт по unit- и integration-прогонам (merge surefire + failsafe):
-`target/site/jacoco-merged/index.html`. Gate: LINE ≥ 70% (`jacoco:check`,
-упомянутый класс-точка-входа исключён). Текущее покрытие — LINE 95.8%,
-BRANCH 84.0%, INSTRUCTION 95.3% (589 тестов: 439 unit + 150 IT).
+Единый отчёт по unit- и integration-прогонам (обе exec-записи, без merge):
+`build/reports/jacoco/jacocoMergedReport/html/index.html`. Gate: LINE ≥ 70%
+(`jacocoMergedCheck`, класс-точка-входа исключён). Текущее покрытие —
+LINE 95.8%, BRANCH 84.0%, INSTRUCTION 95.3% (589 тестов: 439 unit + 150 IT).
 
 ### Готовность лабы №1 (раздел 17)
 
-- [x] `./mvnw verify` зелёный: unit, application, контрактные, приёмочные,
+- [x] `./gradlew build` зелёный: unit, application, контрактные, приёмочные,
       конкурентные, ArchUnit; JaCoCo gate LINE ≥ 70%
 - [x] ArchUnit: нет циклов и запрещённых межконтекстных зависимостей
 - [x] Каждое допущение раздела 3 и инвариант `aggregates.md` покрыто
       именованным тестом (таблица в `aggregates.md`)
 - [x] `docker compose up --build` из чистого состояния; сценарии — через
       Swagger UI (`docs/demo/scenarios.md`)
-- [x] Inference продемонстрирован: `./mvnw verify -P inference`
+- [x] Inference продемонстрирован: `./gradlew build -Pinference`
 - [x] Docs: глоссарий, context map, агрегаты, ADR, ER-диаграмма
       (`docs/domain/er-diagram.md`), процедура выделения сервиса
 
@@ -221,7 +221,7 @@ BRANCH 84.0%, INSTRUCTION 95.3% (589 тестов: 439 unit + 150 IT).
 
 - Ветки: `feat/...`, `fix/...`, `test/...`, `docs/...`, `refactor/...`
 - Conventional Commits; тесты коммитируются вместе с реализацией или раньше
-- `main` всегда зелёный (`./mvnw verify`); push в удалённый `main` — только по явной команде
+- `main` всегда зелёный (`./gradlew build`); push в удалённый `main` — только по явной команде
 
 ## Архитектура
 

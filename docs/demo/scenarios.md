@@ -64,7 +64,7 @@ docker compose exec postgres psql -U postgres -d plantarena -t -A -c \
    (`PLANT_DETECTED`); фото без растения → `REJECTED` (`NOT_A_PLANT`).
 3. Отклонение — не гибель и не запрет: повторная загрузка (новый файл →
    новый `POST /plants`) — новая заявка с новым ID.
-4. Настоящий ONNX-инференс (MobileNetV2): `./mvnw verify -P inference` —
+4. Настоящий ONNX-инференс (MobileNetV2): `./gradlew build -Pinference` —
    эталонные ромашка/собака (ADR-009).
 
 ## 5. Закрытый турнир — от черновика до старта
