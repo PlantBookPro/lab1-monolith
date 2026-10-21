@@ -197,6 +197,13 @@ scheduler идемпотентен — рестарт не убивает пов
  отчёт и gate JaCoCo (LINE ≥ 70%). Настоящий ONNX-инференс — отдельно:
 `./mvnw verify -P inference`.
 
+### Покрытие (JaCoCo)
+
+Единый отчёт по unit- и integration-прогонам (merge surefire + failsafe):
+`target/site/jacoco-merged/index.html`. Gate: LINE ≥ 70% (`jacoco:check`,
+упомянутый класс-точка-входа исключён). Текущее покрытие — LINE 95.8%,
+BRANCH 84.0%, INSTRUCTION 95.3% (589 тестов: 439 unit + 150 IT).
+
 ### Готовность лабы №1 (раздел 17)
 
 - [x] `./mvnw verify` зелёный: unit, application, контрактные, приёмочные,
