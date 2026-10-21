@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "Update tournament - Admin",
+    "type": "http",
+    "seq": 10
+  },
+  "http": {
+    "method": "PATCH",
+    "url": "{{baseUrl}}/api/v1/tournaments/:id",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{adminUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{tournamentId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"name\": \"{{tournamentName}}\",\n  \"description\": \"{{tournamentDescription}}\",\n  \"registrationDeadline\": \"{{registrationDeadline}}\",\n  \"roundDurationSeconds\": {{roundDurationSeconds}},\n  \"eliminationFraction\": {{eliminationFraction}},\n  \"minParticipants\": {{minParticipants}},\n  \"tagIds\": {{tagIdsJson}}\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tournaments/:id",
+        "method": "PATCH",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{adminUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{tournamentId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"name\": \"{{tournamentName}}\",\n  \"description\": \"{{tournamentDescription}}\",\n  \"registrationDeadline\": \"{{registrationDeadline}}\",\n  \"roundDurationSeconds\": {{roundDurationSeconds}},\n  \"eliminationFraction\": {{eliminationFraction}},\n  \"minParticipants\": {{minParticipants}},\n  \"tagIds\": {{tagIdsJson}}\n}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{tournamentId}}\",\n  \"creatorId\": \"{{organizerUserId}}\",\n  \"name\": \"{{tournamentName}}\",\n  \"description\": \"{{tournamentDescription}}\",\n  \"type\": \"PRIVATE\",\n  \"status\": \"DRAFT\",\n  \"algorithm\": \"ELIMINATION\",\n  \"registrationDeadline\": \"{{registrationDeadline}}\",\n  \"roundDurationSeconds\": 86400,\n  \"eliminationFraction\": 0.25,\n  \"minParticipants\": 2,\n  \"cancelReason\": null,\n  \"tagIds\": [],\n  \"createdAt\": \"2026-10-08T12:00:00Z\"\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Organizer or admin. Every field is optional; null means leave unchanged. Tournament parameters can change only in DRAFT; description has separate safe-update rules."
+}

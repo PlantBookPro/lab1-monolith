@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "Delete tournament - Organizer",
+    "type": "http",
+    "seq": 11
+  },
+  "http": {
+    "method": "DELETE",
+    "url": "{{baseUrl}}/api/v1/tournaments/:id",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{organizerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{tournamentId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "204 No Content",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tournaments/:id",
+        "method": "DELETE",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{organizerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{tournamentId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ]
+      }
+    }
+  ],
+  "docs": "Organizer or admin. Only an empty DRAFT can be deleted; otherwise 409."
+}

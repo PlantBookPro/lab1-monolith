@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "Get global tournament info - Public",
+    "type": "http",
+    "seq": 1
+  },
+  "http": {
+    "method": "GET",
+    "url": "{{baseUrl}}/api/v1/global",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{demoUserId}}",
+        "description": "Optional dev/test demo identity; roles are resolved from the database",
+        "disabled": true
+      }
+    ],
+    "params": []
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/global",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{demoUserId}}",
+            "description": "Optional dev/test demo identity; roles are resolved from the database",
+            "disabled": true
+          }
+        ],
+        "params": []
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"epochDurationSeconds\": 604800,\n  \"finalWindowDurationSeconds\": 86400,\n  \"currentEpoch\": {\n    \"id\": \"{{windowId}}\",\n    \"sequence\": 1,\n    \"opensAt\": \"2026-10-08T00:00:00Z\",\n    \"closesAt\": \"2026-10-15T00:00:00Z\"\n  },\n  \"currentFinalWindow\": null\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Public endpoint. Returns global qualification/final window configuration and current windows."
+}

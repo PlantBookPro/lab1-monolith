@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "Delete tag - Admin",
+    "type": "http",
+    "seq": 6
+  },
+  "http": {
+    "method": "DELETE",
+    "url": "{{baseUrl}}/api/v1/tags/:id",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{adminUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{tagId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "204 No Content",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tags/:id",
+        "method": "DELETE",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{adminUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{tagId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ]
+      }
+    }
+  ],
+  "docs": "Admin only. A tag already used by a tournament cannot be deleted (409)."
+}

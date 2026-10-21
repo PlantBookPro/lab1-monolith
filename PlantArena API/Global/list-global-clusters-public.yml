@@ -1,0 +1,104 @@
+{
+  "info": {
+    "name": "List global clusters - Public",
+    "type": "http",
+    "seq": 5
+  },
+  "http": {
+    "method": "GET",
+    "url": "{{baseUrl}}/api/v1/global/clusters",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{demoUserId}}",
+        "description": "Optional dev/test demo identity; roles are resolved from the database",
+        "disabled": true
+      }
+    ],
+    "params": [
+      {
+        "name": "page",
+        "value": "{{page}}",
+        "type": "query",
+        "description": "Zero-based page",
+        "disabled": true
+      },
+      {
+        "name": "size",
+        "value": "{{pageSize}}",
+        "type": "query",
+        "description": "Page size",
+        "disabled": true
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/global/clusters",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{demoUserId}}",
+            "description": "Optional dev/test demo identity; roles are resolved from the database",
+            "disabled": true
+          }
+        ],
+        "params": [
+          {
+            "name": "page",
+            "value": "{{page}}",
+            "type": "query",
+            "description": "Zero-based page",
+            "disabled": true
+          },
+          {
+            "name": "size",
+            "value": "{{pageSize}}",
+            "type": "query",
+            "description": "Page size",
+            "disabled": true
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "name": "X-Total-Count",
+            "value": "{{totalCount}}"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "[\n  {\n    \"clusterId\": \"{{clusterId}}\",\n    \"clusterKey\": \"cluster-key\",\n    \"windowId\": \"{{windowId}}\",\n    \"memberCount\": 2,\n    \"closesAt\": \"2026-10-09T12:00:00Z\"\n  }\n]"
+        }
+      }
+    }
+  ],
+  "docs": "Public endpoint. Lists clusters in the current qualification epoch; response includes X-Total-Count."
+}

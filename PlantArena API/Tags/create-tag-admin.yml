@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Create tag - Admin",
+    "type": "http",
+    "seq": 2
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/tags",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{adminUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"name\": \"{{tagName}}\"\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "201 Created",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tags",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{adminUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"name\": \"{{tagName}}\"\n}"
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{tagId}}\",\n  \"name\": \"{{tagName}}\"\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Moderator or admin only."
+}

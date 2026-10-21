@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "Run due jobs - Moderator",
+    "type": "http",
+    "seq": 1
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/internal/demo/jobs/run-due",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{moderatorUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": []
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/internal/demo/jobs/run-due",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{moderatorUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": []
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"processed\": 0,\n  \"closedWindows\": 0,\n  \"globalQualificationClosed\": 0,\n  \"globalFinalClosed\": 0,\n  \"globalFinalsOpened\": 0,\n  \"globalEpochsOpened\": 0\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Available only with dev/test profiles; moderator or admin. Processes due tournament and global-window jobs using the same use cases as scheduled jobs."
+}

@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Create tournament - Moderator",
+    "type": "http",
+    "seq": 1
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/tournaments",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{moderatorUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"name\": \"{{tournamentName}}\",\n  \"description\": \"{{tournamentDescription}}\",\n  \"registrationDeadline\": \"{{registrationDeadline}}\",\n  \"roundDurationSeconds\": {{roundDurationSeconds}},\n  \"eliminationFraction\": {{eliminationFraction}},\n  \"minParticipants\": {{minParticipants}},\n  \"tagIds\": {{tagIdsJson}}\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "201 Created",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tournaments",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{moderatorUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"name\": \"{{tournamentName}}\",\n  \"description\": \"{{tournamentDescription}}\",\n  \"registrationDeadline\": \"{{registrationDeadline}}\",\n  \"roundDurationSeconds\": {{roundDurationSeconds}},\n  \"eliminationFraction\": {{eliminationFraction}},\n  \"minParticipants\": {{minParticipants}},\n  \"tagIds\": {{tagIdsJson}}\n}"
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{tournamentId}}\",\n  \"creatorId\": \"{{organizerUserId}}\",\n  \"name\": \"{{tournamentName}}\",\n  \"description\": \"{{tournamentDescription}}\",\n  \"type\": \"PRIVATE\",\n  \"status\": \"DRAFT\",\n  \"algorithm\": \"ELIMINATION\",\n  \"registrationDeadline\": \"{{registrationDeadline}}\",\n  \"roundDurationSeconds\": 86400,\n  \"eliminationFraction\": 0.25,\n  \"minParticipants\": 2,\n  \"cancelReason\": null,\n  \"tagIds\": [],\n  \"createdAt\": \"2026-10-08T12:00:00Z\"\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Moderator or admin only. Creates a PRIVATE DRAFT. Deadline must be in the future; eliminationFraction must be greater than 0 and less than 1; minParticipants must be at least 2."
+}

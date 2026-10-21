@@ -1,0 +1,80 @@
+{
+  "info": {
+    "name": "Delete my vote - Guest",
+    "type": "http",
+    "seq": 4
+  },
+  "http": {
+    "method": "DELETE",
+    "url": "{{baseUrl}}/api/v1/windows/:windowId/entries/:entryId/vote",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Guest-Token",
+        "value": "{{guestToken}}",
+        "description": "Guest session token from POST /api/v1/guest-sessions"
+      }
+    ],
+    "params": [
+      {
+        "name": "windowId",
+        "value": "{{windowId}}",
+        "type": "path",
+        "description": "windowId path identifier"
+      },
+      {
+        "name": "entryId",
+        "value": "{{entryId}}",
+        "type": "path",
+        "description": "entryId path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "204 No Content",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/windows/:windowId/entries/:entryId/vote",
+        "method": "DELETE",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Guest-Token",
+            "value": "{{guestToken}}",
+            "description": "Guest session token from POST /api/v1/guest-sessions"
+          }
+        ],
+        "params": [
+          {
+            "name": "windowId",
+            "value": "{{windowId}}",
+            "type": "path",
+            "description": "windowId path identifier"
+          },
+          {
+            "name": "entryId",
+            "value": "{{entryId}}",
+            "type": "path",
+            "description": "entryId path identifier"
+          }
+        ]
+      }
+    }
+  ],
+  "docs": "Removes the current subject's vote before the window closes; idempotent. Guest global-window votes use X-Guest-Token."
+}

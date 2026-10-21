@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "Download image - Owner",
+    "type": "http",
+    "seq": 3
+  },
+  "http": {
+    "method": "GET",
+    "url": "{{baseUrl}}/api/v1/files/:id",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "*/*",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{ownerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{fileId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/files/:id",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "*/*",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{ownerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{fileId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "image/jpeg"
+          }
+        ],
+        "body": {
+          "type": "binary",
+          "data": "base64:<image-bytes>"
+        }
+      }
+    }
+  ],
+  "docs": "Requires an identified user. Owner can always download; other users can download only a publicly visible asset. Response is binary with the actual image Content-Type."
+}

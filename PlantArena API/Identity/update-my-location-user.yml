@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Update my location - User",
+    "type": "http",
+    "seq": 2
+  },
+  "http": {
+    "method": "PUT",
+    "url": "{{baseUrl}}/api/v1/me/location",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{userUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"latitude\": {{latitude}},\n  \"longitude\": {{longitude}}\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/me/location",
+        "method": "PUT",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{userUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"latitude\": {{latitude}},\n  \"longitude\": {{longitude}}\n}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{targetUserId}}\",\n  \"email\": \"{{newUserEmail}}\",\n  \"displayName\": \"{{newUserDisplayName}}\",\n  \"roles\": [\n    \"USER\"\n  ],\n  \"status\": \"ACTIVE\",\n  \"latitude\": 55.75,\n  \"longitude\": 37.62\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Updates coordinates used for the next global epoch. latitude range -90..90; longitude -180..180."
+}

@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "Rename plant - Owner",
+    "type": "http",
+    "seq": 5
+  },
+  "http": {
+    "method": "PATCH",
+    "url": "{{baseUrl}}/api/v1/plants/:id",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{ownerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{plantId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"title\": \"{{plantTitle}}\"\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/plants/:id",
+        "method": "PATCH",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{ownerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{plantId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"title\": \"{{plantTitle}}\"\n}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{plantId}}\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"assetId\": \"{{assetId}}\",\n  \"title\": \"{{plantTitle}}\",\n  \"moderationStatus\": \"PENDING\",\n  \"lifeStatus\": \"ALIVE\",\n  \"createdAt\": \"2026-10-08T12:00:00Z\",\n  \"diedAt\": null,\n  \"archivedAt\": null\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Only the owner can rename; title is the only writable field."
+}

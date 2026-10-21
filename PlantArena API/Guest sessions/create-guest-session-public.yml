@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "Create guest session - Public",
+    "type": "http",
+    "seq": 1
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/guest-sessions",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{demoUserId}}",
+        "description": "Optional dev/test demo identity; roles are resolved from the database",
+        "disabled": true
+      }
+    ],
+    "params": []
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "201 Created",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/guest-sessions",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{demoUserId}}",
+            "description": "Optional dev/test demo identity; roles are resolved from the database",
+            "disabled": true
+          }
+        ],
+        "params": []
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"token\": \"{{guestToken}}\",\n  \"expiresAt\": \"2026-10-09T12:00:00Z\"\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Public endpoint. Copy the returned token into guestToken and send it as X-Guest-Token for global feed and voting. Rate-limited with 429."
+}

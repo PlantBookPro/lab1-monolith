@@ -1,0 +1,112 @@
+{
+  "info": {
+    "name": "Cast vote - Guest",
+    "type": "http",
+    "seq": 2
+  },
+  "http": {
+    "method": "PUT",
+    "url": "{{baseUrl}}/api/v1/windows/:windowId/entries/:entryId/vote",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Guest-Token",
+        "value": "{{guestToken}}",
+        "description": "Guest session token from POST /api/v1/guest-sessions"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [
+      {
+        "name": "windowId",
+        "value": "{{windowId}}",
+        "type": "path",
+        "description": "windowId path identifier"
+      },
+      {
+        "name": "entryId",
+        "value": "{{entryId}}",
+        "type": "path",
+        "description": "entryId path identifier"
+      }
+    ],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"value\": \"{{voteValue}}\"\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/windows/:windowId/entries/:entryId/vote",
+        "method": "PUT",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Guest-Token",
+            "value": "{{guestToken}}",
+            "description": "Guest session token from POST /api/v1/guest-sessions"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [
+          {
+            "name": "windowId",
+            "value": "{{windowId}}",
+            "type": "path",
+            "description": "windowId path identifier"
+          },
+          {
+            "name": "entryId",
+            "value": "{{entryId}}",
+            "type": "path",
+            "description": "entryId path identifier"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"value\": \"{{voteValue}}\"\n}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"score\": 3\n}"
+        }
+      }
+    }
+  ],
+  "docs": "value must be LIKE or DISLIKE. Tournament windows require an eligible participant; global windows allow a guest with X-Guest-Token."
+}

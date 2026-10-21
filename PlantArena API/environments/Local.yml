@@ -1,0 +1,227 @@
+{
+  "name": "Local",
+  "variables": [
+    {
+      "name": "baseUrl",
+      "value": "http://localhost:8080",
+      "description": "API origin"
+    },
+    {
+      "name": "demoUserId",
+      "value": "",
+      "description": "Optional development identity UUID"
+    },
+    {
+      "name": "userUserId",
+      "value": "",
+      "description": "Active USER UUID for user scenarios"
+    },
+    {
+      "name": "moderatorUserId",
+      "value": "",
+      "description": "Active MODERATOR UUID"
+    },
+    {
+      "name": "adminUserId",
+      "value": "",
+      "description": "Active ADMIN UUID"
+    },
+    {
+      "name": "organizerUserId",
+      "value": "",
+      "description": "Tournament creator UUID"
+    },
+    {
+      "name": "participantUserId",
+      "value": "",
+      "description": "Tournament participant UUID"
+    },
+    {
+      "name": "invitedUserId",
+      "value": "",
+      "description": "Invitation addressee UUID"
+    },
+    {
+      "name": "ownerUserId",
+      "value": "",
+      "description": "Resource owner UUID"
+    },
+    {
+      "name": "targetUserId",
+      "value": "",
+      "description": "Target user UUID"
+    },
+    {
+      "name": "guestToken",
+      "value": "",
+      "description": "Guest session token from POST /api/v1/guest-sessions",
+      "secret": true
+    },
+    {
+      "name": "userId",
+      "value": "",
+      "description": "User UUID"
+    },
+    {
+      "name": "fileId",
+      "value": "",
+      "description": "Media asset UUID"
+    },
+    {
+      "name": "assetId",
+      "value": "",
+      "description": "Media asset UUID used to submit a plant"
+    },
+    {
+      "name": "plantId",
+      "value": "",
+      "description": "Plant UUID"
+    },
+    {
+      "name": "tournamentId",
+      "value": "",
+      "description": "Tournament UUID"
+    },
+    {
+      "name": "tagId",
+      "value": "",
+      "description": "Tag UUID"
+    },
+    {
+      "name": "invitationId",
+      "value": "",
+      "description": "Invitation UUID"
+    },
+    {
+      "name": "entryId",
+      "value": "",
+      "description": "Tournament/global entry UUID"
+    },
+    {
+      "name": "windowId",
+      "value": "",
+      "description": "Voting window UUID"
+    },
+    {
+      "name": "clusterId",
+      "value": "",
+      "description": "Global cluster UUID"
+    },
+    {
+      "name": "page",
+      "value": "0",
+      "description": "Zero-based page"
+    },
+    {
+      "name": "pageSize",
+      "value": "20",
+      "description": "Pagination page size"
+    },
+    {
+      "name": "feedLimit",
+      "value": "20",
+      "description": "Feed page limit"
+    },
+    {
+      "name": "feedCursor",
+      "value": "",
+      "description": "Feed cursor from nextCursor"
+    },
+    {
+      "name": "tournamentStatus",
+      "value": "DRAFT",
+      "description": "DRAFT, REGISTRATION_OPEN, RUNNING, FINISHED, or CANCELLED"
+    },
+    {
+      "name": "scope",
+      "value": "FINAL",
+      "description": "Global leaderboard scope; only FINAL is supported"
+    },
+    {
+      "name": "latitude",
+      "value": "55.75",
+      "description": "Latitude between -90 and 90"
+    },
+    {
+      "name": "longitude",
+      "value": "37.62",
+      "description": "Longitude between -180 and 180"
+    },
+    {
+      "name": "newUserEmail",
+      "value": "person@example.test",
+      "description": "Example email for user creation"
+    },
+    {
+      "name": "newUserPassword",
+      "value": "",
+      "description": "Password, 8 to 100 characters",
+      "secret": true
+    },
+    {
+      "name": "newUserDisplayName",
+      "value": "Demo User",
+      "description": "User display name"
+    },
+    {
+      "name": "plantTitle",
+      "value": "Demo plant",
+      "description": "Plant title"
+    },
+    {
+      "name": "tagName",
+      "value": "Demo tag",
+      "description": "Tag name"
+    },
+    {
+      "name": "tournamentName",
+      "value": "Demo tournament",
+      "description": "Tournament name"
+    },
+    {
+      "name": "tournamentDescription",
+      "value": "API example tournament",
+      "description": "Tournament description"
+    },
+    {
+      "name": "registrationDeadline",
+      "value": "2027-01-01T00:00:00Z",
+      "description": "Future ISO-8601 instant"
+    },
+    {
+      "name": "roundDurationSeconds",
+      "value": "86400",
+      "description": "Positive duration in seconds"
+    },
+    {
+      "name": "eliminationFraction",
+      "value": "0.25",
+      "description": "Greater than 0 and less than 1"
+    },
+    {
+      "name": "minParticipants",
+      "value": "2",
+      "description": "At least 2"
+    },
+    {
+      "name": "tagIdsJson",
+      "value": "[]",
+      "description": "JSON array of tag UUIDs"
+    },
+    {
+      "name": "voteValue",
+      "value": "LIKE",
+      "description": "LIKE or DISLIKE"
+    },
+    {
+      "name": "imageFilePath",
+      "value": "",
+      "description": "Local JPEG or PNG path"
+    },
+    {
+      "name": "totalCount",
+      "value": "1",
+      "description": "Illustrative list response count"
+    }
+  ]
+}

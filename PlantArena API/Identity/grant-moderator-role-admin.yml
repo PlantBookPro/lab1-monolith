@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "Grant moderator role - Admin",
+    "type": "http",
+    "seq": 13
+  },
+  "http": {
+    "method": "PUT",
+    "url": "{{baseUrl}}/api/v1/users/:id/roles/moderator",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{adminUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{targetUserId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/users/:id/roles/moderator",
+        "method": "PUT",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{adminUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{targetUserId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{targetUserId}}\",\n  \"email\": \"{{newUserEmail}}\",\n  \"displayName\": \"{{newUserDisplayName}}\",\n  \"roles\": [\n    \"USER\"\n  ],\n  \"status\": \"ACTIVE\",\n  \"latitude\": 55.75,\n  \"longitude\": 37.62\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Admin only; idempotent."
+}

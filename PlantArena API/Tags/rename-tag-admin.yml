@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "Rename tag - Admin",
+    "type": "http",
+    "seq": 5
+  },
+  "http": {
+    "method": "PATCH",
+    "url": "{{baseUrl}}/api/v1/tags/:id",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{adminUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{tagId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"name\": \"{{tagName}}\"\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tags/:id",
+        "method": "PATCH",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{adminUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{tagId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"name\": \"{{tagName}}\"\n}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{tagId}}\",\n  \"name\": \"{{tagName}}\"\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Admin only."
+}

@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "Invite user - Organizer",
+    "type": "http",
+    "seq": 19
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/tournaments/:id/invitations",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{organizerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{tournamentId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"userId\": \"{{targetUserId}}\"\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "201 Created",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tournaments/:id/invitations",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{organizerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{tournamentId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"userId\": \"{{targetUserId}}\"\n}"
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{invitationId}}\",\n  \"tournamentId\": \"{{tournamentId}}\",\n  \"userId\": \"{{invitedUserId}}\",\n  \"status\": \"INVITED\",\n  \"invitedAt\": \"2026-10-08T12:00:00Z\",\n  \"respondedAt\": null,\n  \"submittedPlantId\": null\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Organizer or admin. Invite before the registration deadline; duplicate tournament/user invitation returns 409."
+}

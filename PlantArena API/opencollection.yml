@@ -1,0 +1,185 @@
+opencollection: 1.0.0
+
+info:
+  name: PlantArena API
+  version: 1.0.0
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: baseUrl
+      value: http://localhost:8080
+      description: API origin
+    - name: demoUserId
+      value: ""
+      description: Optional development identity UUID
+    - name: userUserId
+      value: e73c5b4b-9bbc-4a8f-bc97-73fdb35f6c6e
+      description: 1nd user id
+    - name: userUserId
+      value: a0a9f301-f76b-44ec-bdc0-af9c7ba7e016
+      description: 2nd user id
+      disabled: true
+    - name: userUserId
+      value: ac98cafb-f02b-4dba-84cd-895bbb9215b0
+      description: 3rd user id
+      disabled: true
+    - name: moderatorUserId
+      value: ""
+      description: Active MODERATOR UUID
+    - name: adminUserId
+      value: 02d6f959-4ab2-457a-ace4-38f949459665
+      description: Active ADMIN UUID
+    - name: organizerUserId
+      value: ""
+      description: Tournament creator UUID
+    - name: participantUserId
+      value: ""
+      description: Tournament participant UUID
+    - name: invitedUserId
+      value: ""
+      description: Invitation addressee UUID
+    - name: ownerUserId
+      value: ""
+      description: Resource owner UUID
+    - name: targetUserId
+      value: ""
+      description: Target user UUID
+    - name: guestToken
+      value: ""
+      description: Guest session token from POST /api/v1/guest-sessions
+    - name: userId
+      value: ""
+      description: User UUID
+    - name: fileId
+      value: ""
+      description: Media asset UUID
+    - name: assetId
+      value: ""
+      description: Media asset UUID used to submit a plant
+    - name: plantId
+      value: ""
+      description: Plant UUID
+    - name: tournamentId
+      value: ""
+      description: Tournament UUID
+    - name: tagId
+      value: ""
+      description: Tag UUID
+    - name: invitationId
+      value: ""
+      description: Invitation UUID
+    - name: entryId
+      value: ""
+      description: Tournament/global entry UUID
+    - name: windowId
+      value: ""
+      description: Voting window UUID
+    - name: clusterId
+      value: ""
+      description: Global cluster UUID
+    - name: page
+      value: "0"
+      description: Zero-based page
+    - name: pageSize
+      value: "20"
+      description: Pagination page size
+    - name: feedLimit
+      value: "20"
+      description: Feed page limit
+    - name: feedCursor
+      value: ""
+      description: Feed cursor from nextCursor
+    - name: tournamentStatus
+      value: DRAFT
+      description: DRAFT, REGISTRATION_OPEN, RUNNING, FINISHED, or CANCELLED
+    - name: scope
+      value: FINAL
+      description: Global leaderboard scope; only FINAL is supported
+    - name: latitude
+      value: "55.75"
+      description: Latitude between -90 and 90
+    - name: longitude
+      value: "37.62"
+      description: Longitude between -180 and 180
+    - name: newUserEmail
+      value: person3@example.test
+      description: Example email for user creation
+    - name: newUserPassword
+      value: "12341234"
+      description: Password, 8 to 100 characters
+    - name: newUserDisplayName
+      value: Demo User3
+      description: User display name
+    - name: plantTitle
+      value: Demo plant1
+      description: Plant title
+    - name: tagName
+      value: Demo tag1
+      description: Tag name
+    - name: tournamentName
+      value: Demo tournament
+      description: Tournament name
+    - name: tournamentDescription
+      value: API example tournament
+      description: Tournament description
+    - name: registrationDeadline
+      value: 2027-01-01T00:00:00Z
+      description: Future ISO-8601 instant
+    - name: roundDurationSeconds
+      value: "86400"
+      description: Positive duration in seconds
+    - name: eliminationFraction
+      value: "0.25"
+      description: Greater than 0 and less than 1
+    - name: minParticipants
+      value: "2"
+      description: At least 2
+    - name: tagIdsJson
+      value: "[]"
+      description: JSON array of tag UUIDs
+    - name: voteValue
+      value: LIKE
+      description: LIKE or DISLIKE
+    - name: imageFilePath
+      value: /Users/vovabag/Downloads/pics/1.jpeg
+      description: 1 user private
+    - name: imageFilePath
+      value: /Users/vovabag/Downloads/pics/2.jpeg
+      description: 1 user public
+      disabled: true
+    - name: imageFilePath
+      value: /Users/vovabag/Downloads/pics/3.jpg
+      description: 2 user private
+      disabled: true
+    - name: imageFilePath
+      value: /Users/vovabag/Downloads/pics/4.jpg
+      description: 2 user public
+      disabled: true
+    - name: imageFilePath
+      value: /Users/vovabag/Downloads/pics/5.jpg
+      description: 3 user private
+      disabled: true
+    - name: imageFilePath
+      value: /Users/vovabag/Downloads/pics/6.jpg
+      description: 3 user public
+      disabled: true
+    - name: totalCount
+      value: "1"
+      description: Illustrative list response count
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Submit plant - Owner",
+    "type": "http",
+    "seq": 1
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/plants",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{ownerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"assetId\": \"{{assetId}}\",\n  \"title\": \"{{plantTitle}}\"\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "201 Created",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/plants",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{ownerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"assetId\": \"{{assetId}}\",\n  \"title\": \"{{plantTitle}}\"\n}"
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{plantId}}\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"assetId\": \"{{assetId}}\",\n  \"title\": \"{{plantTitle}}\",\n  \"moderationStatus\": \"PENDING\",\n  \"lifeStatus\": \"ALIVE\",\n  \"createdAt\": \"2026-10-08T12:00:00Z\",\n  \"diedAt\": null,\n  \"archivedAt\": null\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Requires an identified user and an image asset owned by that user."
+}

@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Submit global entry - Owner",
+    "type": "http",
+    "seq": 2
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/global/entries",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{ownerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "application/json",
+        "description": "JSON request body"
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "json",
+      "data": "{\n  \"plantId\": \"{{plantId}}\"\n}"
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "201 Created",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/global/entries",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{ownerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/json",
+            "description": "JSON request body"
+          }
+        ],
+        "params": [],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"plantId\": \"{{plantId}}\"\n}"
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{entryId}}\",\n  \"plantId\": \"{{plantId}}\",\n  \"status\": \"QUEUED\",\n  \"joinedAt\": \"2026-10-08T12:00:00Z\"\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Requires an identified user and an approved plant they own. Enters the queue for the next selection."
+}

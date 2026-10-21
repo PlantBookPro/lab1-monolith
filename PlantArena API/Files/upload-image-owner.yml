@@ -1,0 +1,104 @@
+{
+  "info": {
+    "name": "Upload image - Owner",
+    "type": "http",
+    "seq": 1
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/files",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{ownerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      },
+      {
+        "name": "Content-Type",
+        "value": "",
+        "description": "Set automatically with the multipart boundary",
+        "disabled": true
+      }
+    ],
+    "params": [],
+    "body": {
+      "type": "multipart-form",
+      "data": [
+        {
+          "name": "file",
+          "type": "file",
+          "value": ["{{imageFilePath}}"],
+          "description": "JPEG or PNG image file",
+          "contentType": "image/jpeg"
+        }
+      ]
+    }
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "201 Created",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/files",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{ownerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          },
+          {
+            "name": "Content-Type",
+            "value": "",
+            "description": "Set automatically with the multipart boundary",
+            "disabled": true
+          }
+        ],
+        "params": [],
+        "body": {
+          "type": "multipart-form",
+          "data": [
+            {
+              "name": "file",
+              "type": "file",
+              "value": ["{{imageFilePath}}"],
+              "description": "JPEG or PNG image file",
+              "contentType": "image/jpeg"
+            }
+          ]
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{fileId}}\",\n  \"ownerId\": \"{{ownerUserId}}\",\n  \"mimeType\": \"image/jpeg\",\n  \"byteSize\": 12345,\n  \"width\": 640,\n  \"height\": 480,\n  \"createdAt\": \"2026-10-08T12:00:00Z\"\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Multipart field file. Accepts JPEG/PNG up to 10 MiB and 20 million pixels. Do not set Content-Type manually; Bruno supplies the multipart boundary."
+}

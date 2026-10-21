@@ -1,0 +1,114 @@
+{
+  "info": {
+    "name": "List tournament rounds - Admin",
+    "type": "http",
+    "seq": 29
+  },
+  "http": {
+    "method": "GET",
+    "url": "{{baseUrl}}/api/v1/tournaments/:id/rounds",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{adminUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{tournamentId}}",
+        "type": "path",
+        "description": "id path identifier"
+      },
+      {
+        "name": "page",
+        "value": "{{page}}",
+        "type": "query",
+        "description": "Zero-based page",
+        "disabled": true
+      },
+      {
+        "name": "size",
+        "value": "{{pageSize}}",
+        "type": "query",
+        "description": "Page size",
+        "disabled": true
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tournaments/:id/rounds",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{adminUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{tournamentId}}",
+            "type": "path",
+            "description": "id path identifier"
+          },
+          {
+            "name": "page",
+            "value": "{{page}}",
+            "type": "query",
+            "description": "Zero-based page",
+            "disabled": true
+          },
+          {
+            "name": "size",
+            "value": "{{pageSize}}",
+            "type": "query",
+            "description": "Page size",
+            "disabled": true
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "name": "X-Total-Count",
+            "value": "{{totalCount}}"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "[\n  {\n    \"id\": \"{{windowId}}\",\n    \"sequence\": 1,\n    \"status\": \"OPEN\",\n    \"opensAt\": \"2026-10-08T12:00:00Z\",\n    \"closesAt\": \"2026-10-09T12:00:00Z\"\n  }\n]"
+        }
+      }
+    }
+  ],
+  "docs": "Tournament history; response includes X-Total-Count."
+}

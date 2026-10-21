@@ -1,0 +1,80 @@
+{
+  "info": {
+    "name": "Revoke invitation - Organizer",
+    "type": "http",
+    "seq": 23
+  },
+  "http": {
+    "method": "DELETE",
+    "url": "{{baseUrl}}/api/v1/tournaments/:id/invitations/:invitationId",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{organizerUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{tournamentId}}",
+        "type": "path",
+        "description": "id path identifier"
+      },
+      {
+        "name": "invitationId",
+        "value": "{{invitationId}}",
+        "type": "path",
+        "description": "invitationId path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "204 No Content",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/tournaments/:id/invitations/:invitationId",
+        "method": "DELETE",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{organizerUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{tournamentId}}",
+            "type": "path",
+            "description": "id path identifier"
+          },
+          {
+            "name": "invitationId",
+            "value": "{{invitationId}}",
+            "type": "path",
+            "description": "invitationId path identifier"
+          }
+        ]
+      }
+    }
+  ],
+  "docs": "Organizer or admin. Only a not-yet-accepted invitation can be revoked; history is retained."
+}

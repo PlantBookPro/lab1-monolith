@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "Deactivate user - Admin",
+    "type": "http",
+    "seq": 12
+  },
+  "http": {
+    "method": "DELETE",
+    "url": "{{baseUrl}}/api/v1/users/:id",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{adminUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{targetUserId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "204 No Content",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/users/:id",
+        "method": "DELETE",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{adminUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{targetUserId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ]
+      }
+    }
+  ],
+  "docs": "Admin only. Deactivation is irreversible; there is no reactivation endpoint."
+}

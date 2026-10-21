@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "Decline invitation - Invitee",
+    "type": "http",
+    "seq": 3
+  },
+  "http": {
+    "method": "POST",
+    "url": "{{baseUrl}}/api/v1/invitations/:id/decline",
+    "headers": [
+      {
+        "name": "Accept",
+        "value": "application/json",
+        "description": "Expected response format"
+      },
+      {
+        "name": "X-Demo-User-Id",
+        "value": "{{invitedUserId}}",
+        "description": "UUID of an existing active user; role is loaded from the database"
+      }
+    ],
+    "params": [
+      {
+        "name": "id",
+        "value": "{{invitationId}}",
+        "type": "path",
+        "description": "id path identifier"
+      }
+    ]
+  },
+  "settings": {
+    "encodeUrl": true,
+    "timeout": 0,
+    "followRedirects": true,
+    "maxRedirects": 5
+  },
+  "examples": [
+    {
+      "name": "200 Response",
+      "description": "Illustrative success response shape; replace example identifiers with values from your environment.",
+      "request": {
+        "url": "{{baseUrl}}/api/v1/invitations/:id/decline",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "description": "Expected response format"
+          },
+          {
+            "name": "X-Demo-User-Id",
+            "value": "{{invitedUserId}}",
+            "description": "UUID of an existing active user; role is loaded from the database"
+          }
+        ],
+        "params": [
+          {
+            "name": "id",
+            "value": "{{invitationId}}",
+            "type": "path",
+            "description": "id path identifier"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"id\": \"{{invitationId}}\",\n  \"tournamentId\": \"{{tournamentId}}\",\n  \"userId\": \"{{invitedUserId}}\",\n  \"status\": \"INVITED\",\n  \"invitedAt\": \"2026-10-08T12:00:00Z\",\n  \"respondedAt\": null,\n  \"submittedPlantId\": null\n}"
+        }
+      }
+    }
+  ],
+  "docs": "Only the invited user can decline before the tournament starts."
+}
