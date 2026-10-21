@@ -13,7 +13,7 @@ public final class PostgresSupport {
             .withUsername("postgres")
             .withPassword("postgres")
             // один контейнер на JVM для всех IT: ~15 кэшированных тест-контекстов
-            // (полные @SpringBootTest + @DataJpaTest-слайсы) держат пулы Hikari
+            // (полные @SpringBootTest + @JdbcTest-слайсы) держат пулы Hikari
             // открытыми; дефолтных max_connections=100 не хватает («too many
             // clients already»)
             .withCommand("postgres", "-c", "max_connections=400");

@@ -7,8 +7,8 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
-import jakarta.persistence.Entity;
-import org.springframework.data.repository.Repository;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -55,18 +55,19 @@ public class LayerRulesTest {
     }
 
     @ArchTest
-    static void jpa_сущности_только_в_adapter_out_persistence(JavaClasses classes) {
-        classes()
-            .that().areAnnotatedWith(Entity.class)
-            .should().resideInAPackage("..adapter.out.persistence..")
+    static void jpa_полностью_отсутствует(JavaClasses classes) {
+        noClasses()
+            .should().dependOnClassesThat().resideInAnyPackage(
+                "jakarta.persistence..", "org.springframework.data..", "org.hibernate..")
             .check(classes);
     }
 
     @ArchTest
-    static void spring_data_репозитории_только_в_adapter_out_persistence(JavaClasses classes) {
-        classes()
-            .that().areAssignableTo(Repository.class)
-            .should().resideInAPackage("..adapter.out.persistence..")
+    static void jdbc_доступен_только_в_adapter_out_persistence(JavaClasses classes) {
+        noClasses()
+            .that().resideOutsideOfPackage("com.plantarena..adapter.out.persistence..")
+            .should().dependOnClassesThat().areAssignableTo(JdbcClient.class)
+            .orShould().dependOnClassesThat().areAssignableTo(JdbcTemplate.class)
             .check(classes);
     }
 
@@ -93,7 +94,8 @@ public class LayerRulesTest {
 
         noClasses()
             .that().resideInAPackage("com.plantarena..adapter.in.web..")
-            .should().dependOnClassesThat().areAssignableTo(Repository.class)
+            .should().dependOnClassesThat().areAssignableTo(JdbcClient.class)
+            .orShould().dependOnClassesThat().areAssignableTo(JdbcTemplate.class)
             .check(classes);
     }
 

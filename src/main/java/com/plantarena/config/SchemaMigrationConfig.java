@@ -24,9 +24,9 @@ public class SchemaMigrationConfig {
     }
 
     @Bean
-    static BeanFactoryPostProcessor entityManagerFactoryDependsOnMigrations() {
+    static BeanFactoryPostProcessor jdbcInfrastructureDependsOnMigrations() {
         return beanFactory -> {
-            for (String dependent : new String[] { "entityManagerFactory", "jpaMappingContext" }) {
+            for (String dependent : new String[] { "jdbcClient", "jdbcTemplate" }) {
                 if (beanFactory.containsBeanDefinition(dependent)
                     && beanFactory.containsBeanDefinition("schemaMigrations")) {
                     BeanDefinition definition = beanFactory.getBeanDefinition(dependent);

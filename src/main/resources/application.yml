@@ -5,10 +5,6 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/plantarena}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    open-in-view: false
   flyway:
     enabled: false # миграции по схемам контекстов выполняет config.SchemaMigrationConfig (ADR-003)
   servlet:
