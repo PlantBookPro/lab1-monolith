@@ -42,11 +42,13 @@ public class FeedService implements GetFeedUseCase {
         int resolvedLimit = resolveLimit(limit);
         Subject subject = resolveSubject(actor, guestToken);
         FeedCursor current = resolveCursor(cursor, subject);
-        FeedCardQuery query = new FeedCardQuery(current.seed(), current.snapshotCutoff(),
+        FeedCardQuery query = new FeedCardQuery(
+                current.seed(), current.snapshotCutoff(),
             clock.instant(), subject.scopes(), subject.participatedTournamentIds(),
             subject.excludedOwnerUserId(),
             votingDirectory.findVotedEntryIdsInOpenWindows(subject.subjectKey()),
-            current.lastSortKey(), current.lastId(), resolvedLimit + 1);
+            current.lastSortKey(), current.lastId(), resolvedLimit + 1
+        );
         List<FeedCard> page = cards.page(query);
         boolean hasNext = page.size() > resolvedLimit;
         List<FeedCard> visible = hasNext ? page.subList(0, resolvedLimit) : page;

@@ -28,7 +28,8 @@ public class FeedController {
     public ResponseEntity<FeedPageResponse> get(
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) String cursor,
-            @RequestHeader(value = "X-Guest-Token", required = false) String guestToken) {
+            @RequestHeader(value = "X-Guest-Token", required = false) String guestToken
+    ) {
         CurrentActor actor = currentActorProvider.currentActor();
         GetFeedUseCase.FeedPage page = getFeed.get(actor, guestToken, limit, cursor);
         return ResponseEntity.ok(new FeedPageResponse(
