@@ -22,6 +22,10 @@ docker compose up --build
 [`docs/demo/scenarios.md`](docs/demo/scenarios.md) — от запуска и
 bootstrap-админа до ленты и гостевых сессий.
 
+Демо закрытого турнира через Bruno-коллекцию `PlantArena API`
+(админ → модератор → 3 юзера → турнир → победитель):
+[`docs/demo/bruno-demo.md`](docs/demo/bruno-demo.md).
+
 Автоматизированный happy-path прогон по REST API с отчётом «все
 запросы-ответы»: `./scripts/happy-path-review.sh` — параметры и чтение
 отчёта: [`docs/review/README.md`](docs/review/README.md).

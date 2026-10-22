@@ -13,43 +13,109 @@
     },
     {
       "name": "userUserId",
-      "value": "",
-      "description": "Active USER UUID for user scenarios"
+      "value": "e73c5b4b-9bbc-4a8f-bc97-73fdb35f6c6e",
+      "description": "user 1 id"
+    },
+    {
+      "name": "userUserId",
+      "value": "a0a9f301-f76b-44ec-bdc0-af9c7ba7e016",
+      "description": "user 2 id",
+      "disabled": true
+    },
+    {
+      "name": "userUserId",
+      "value": "ac98cafb-f02b-4dba-84cd-895bbb9215b0",
+      "description": "user 3 id",
+      "disabled": true
     },
     {
       "name": "moderatorUserId",
       "value": "",
-      "description": "Active MODERATOR UUID"
+      "description": "Moderator UUID created at demo step 1"
     },
     {
       "name": "adminUserId",
-      "value": "",
-      "description": "Active ADMIN UUID"
+      "value": "02d6f959-4ab2-457a-ace4-38f949459665",
+      "description": "Bootstrap admin UUID (select from DB by BOOTSTRAP_ADMIN_EMAIL)"
     },
     {
       "name": "organizerUserId",
       "value": "",
-      "description": "Tournament creator UUID"
+      "description": "Tournament organizer UUID (the demo moderator)"
     },
     {
       "name": "participantUserId",
       "value": "",
-      "description": "Tournament participant UUID"
+      "description": "user 1 id as voter/participant"
+    },
+    {
+      "name": "participantUserId",
+      "value": "",
+      "description": "user 2 id as voter/participant",
+      "disabled": true
+    },
+    {
+      "name": "participantUserId",
+      "value": "",
+      "description": "user 3 id as voter/participant",
+      "disabled": true
     },
     {
       "name": "invitedUserId",
       "value": "",
-      "description": "Invitation addressee UUID"
+      "description": "user 1 id accepting an invitation"
+    },
+    {
+      "name": "invitedUserId",
+      "value": "",
+      "description": "user 2 id accepting an invitation",
+      "disabled": true
+    },
+    {
+      "name": "invitedUserId",
+      "value": "",
+      "description": "user 3 id accepting an invitation",
+      "disabled": true
     },
     {
       "name": "ownerUserId",
       "value": "",
-      "description": "Resource owner UUID"
+      "description": "user 1 id as resource owner (upload/submit plant)"
+    },
+    {
+      "name": "ownerUserId",
+      "value": "",
+      "description": "user 2 id as resource owner (upload/submit plant)",
+      "disabled": true
+    },
+    {
+      "name": "ownerUserId",
+      "value": "",
+      "description": "user 3 id as resource owner (upload/submit plant)",
+      "disabled": true
     },
     {
       "name": "targetUserId",
       "value": "",
-      "description": "Target user UUID"
+      "description": "moderator id (grant moderator role)"
+    },
+    {
+      "name": "targetUserId",
+      "value": "",
+      "description": "user 1 id (invite to tournament)",
+      "disabled": true
+    },
+    {
+      "name": "targetUserId",
+      "value": "",
+      "description": "user 2 id (invite to tournament)",
+      "disabled": true
+    },
+    {
+      "name": "targetUserId",
+      "value": "",
+      "description": "user 3 id (invite to tournament)",
+      "disabled": true
     },
     {
       "name": "guestToken",
@@ -70,12 +136,36 @@
     {
       "name": "assetId",
       "value": "",
-      "description": "Media asset UUID used to submit a plant"
+      "description": "user 1 plant image asset id"
+    },
+    {
+      "name": "assetId",
+      "value": "",
+      "description": "user 2 plant image asset id",
+      "disabled": true
+    },
+    {
+      "name": "assetId",
+      "value": "",
+      "description": "user 3 plant image asset id",
+      "disabled": true
     },
     {
       "name": "plantId",
       "value": "",
-      "description": "Plant UUID"
+      "description": "user 1 plant id"
+    },
+    {
+      "name": "plantId",
+      "value": "",
+      "description": "user 2 plant id",
+      "disabled": true
+    },
+    {
+      "name": "plantId",
+      "value": "",
+      "description": "user 3 plant id",
+      "disabled": true
     },
     {
       "name": "tournamentId",
@@ -90,17 +180,47 @@
     {
       "name": "invitationId",
       "value": "",
-      "description": "Invitation UUID"
+      "description": "user 1 invitation id"
+    },
+    {
+      "name": "invitationId",
+      "value": "",
+      "description": "user 2 invitation id",
+      "disabled": true
+    },
+    {
+      "name": "invitationId",
+      "value": "",
+      "description": "user 3 invitation id",
+      "disabled": true
     },
     {
       "name": "entryId",
       "value": "",
-      "description": "Tournament/global entry UUID"
+      "description": "user 1 tournament entry id"
+    },
+    {
+      "name": "entryId",
+      "value": "",
+      "description": "user 2 tournament entry id",
+      "disabled": true
+    },
+    {
+      "name": "entryId",
+      "value": "",
+      "description": "user 3 tournament entry id",
+      "disabled": true
     },
     {
       "name": "windowId",
       "value": "",
-      "description": "Voting window UUID"
+      "description": "round 1 voting window id"
+    },
+    {
+      "name": "windowId",
+      "value": "",
+      "description": "round 2 voting window id",
+      "disabled": true
     },
     {
       "name": "clusterId",
@@ -149,24 +269,72 @@
     },
     {
       "name": "newUserEmail",
-      "value": "person@example.test",
-      "description": "Example email for user creation"
+      "value": "demo-mod@example.test",
+      "description": "moderator email (demo step 1)"
+    },
+    {
+      "name": "newUserEmail",
+      "value": "demo-user1@example.test",
+      "description": "user 1 email (demo step 2)",
+      "disabled": true
+    },
+    {
+      "name": "newUserEmail",
+      "value": "demo-user2@example.test",
+      "description": "user 2 email (demo step 2)",
+      "disabled": true
+    },
+    {
+      "name": "newUserEmail",
+      "value": "demo-user3@example.test",
+      "description": "user 3 email (demo step 2)",
+      "disabled": true
     },
     {
       "name": "newUserPassword",
-      "value": "",
-      "description": "Password, 8 to 100 characters",
+      "value": "12341234",
+      "description": "Password, 8 to 100 characters (shared by demo users)",
       "secret": true
     },
     {
       "name": "newUserDisplayName",
-      "value": "Demo User",
-      "description": "User display name"
+      "value": "Demo Moderator",
+      "description": "moderator display name (demo step 1)"
+    },
+    {
+      "name": "newUserDisplayName",
+      "value": "Demo User 1",
+      "description": "user 1 display name (demo step 2)",
+      "disabled": true
+    },
+    {
+      "name": "newUserDisplayName",
+      "value": "Demo User 2",
+      "description": "user 2 display name (demo step 2)",
+      "disabled": true
+    },
+    {
+      "name": "newUserDisplayName",
+      "value": "Demo User 3",
+      "description": "user 3 display name (demo step 2)",
+      "disabled": true
     },
     {
       "name": "plantTitle",
-      "value": "Demo plant",
-      "description": "Plant title"
+      "value": "Demo plant 1",
+      "description": "user 1 plant title"
+    },
+    {
+      "name": "plantTitle",
+      "value": "Demo plant 2",
+      "description": "user 2 plant title",
+      "disabled": true
+    },
+    {
+      "name": "plantTitle",
+      "value": "Demo plant 3",
+      "description": "user 3 plant title",
+      "disabled": true
     },
     {
       "name": "tagName",
@@ -211,12 +379,48 @@
     {
       "name": "voteValue",
       "value": "LIKE",
-      "description": "LIKE or DISLIKE"
+      "description": "LIKE vote"
+    },
+    {
+      "name": "voteValue",
+      "value": "DISLIKE",
+      "description": "DISLIKE vote",
+      "disabled": true
     },
     {
       "name": "imageFilePath",
-      "value": "",
-      "description": "Local JPEG or PNG path"
+      "value": "/Users/vovabag/Downloads/pics/1.jpeg",
+      "description": "user 1 image — private tournament plant"
+    },
+    {
+      "name": "imageFilePath",
+      "value": "/Users/vovabag/Downloads/pics/2.jpeg",
+      "description": "user 1 image — global tournament plant",
+      "disabled": true
+    },
+    {
+      "name": "imageFilePath",
+      "value": "/Users/vovabag/Downloads/pics/3.jpg",
+      "description": "user 2 image — private tournament plant",
+      "disabled": true
+    },
+    {
+      "name": "imageFilePath",
+      "value": "/Users/vovabag/Downloads/pics/4.jpg",
+      "description": "user 2 image — global tournament plant",
+      "disabled": true
+    },
+    {
+      "name": "imageFilePath",
+      "value": "/Users/vovabag/Downloads/pics/5.jpg",
+      "description": "user 3 image — private tournament plant",
+      "disabled": true
+    },
+    {
+      "name": "imageFilePath",
+      "value": "/Users/vovabag/Downloads/pics/6.jpg",
+      "description": "user 3 image — global tournament plant",
+      "disabled": true
     },
     {
       "name": "totalCount",
