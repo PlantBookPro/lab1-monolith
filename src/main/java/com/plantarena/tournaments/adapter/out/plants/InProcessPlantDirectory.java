@@ -6,11 +6,12 @@ import com.plantarena.plants.api.PlantModerationStatus;
 import com.plantarena.tournaments.application.port.out.PlantDirectoryGateway;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class InProcessPlantDirectory implements PlantDirectoryGateway {
 
     private final PlantDirectory plantDirectory;

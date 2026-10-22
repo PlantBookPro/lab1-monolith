@@ -4,11 +4,12 @@ import com.plantarena.identity.api.UserDirectory;
 import com.plantarena.tournaments.application.port.out.ParticipantLocationsGateway;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class InProcessParticipantLocations implements ParticipantLocationsGateway {
 
     private final UserDirectory userDirectory;

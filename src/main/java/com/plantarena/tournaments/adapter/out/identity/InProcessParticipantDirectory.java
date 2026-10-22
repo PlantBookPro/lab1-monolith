@@ -3,11 +3,12 @@ package com.plantarena.tournaments.adapter.out.identity;
 import com.plantarena.identity.api.UserDirectory;
 import com.plantarena.tournaments.application.port.out.ParticipantDirectoryGateway;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class InProcessParticipantDirectory implements ParticipantDirectoryGateway {
 
     private final UserDirectory userDirectory;

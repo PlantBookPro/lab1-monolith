@@ -2,13 +2,15 @@ package com.plantarena.tournaments.adapter.in.jobs;
 
 import com.plantarena.tournaments.application.port.in.AdvanceGlobalCompetitionUseCase;
 import java.time.Clock;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.extern.slf4j.Slf4j
-@lombok.RequiredArgsConstructor
+@Slf4j
+@RequiredArgsConstructor
 public class GlobalBoundaryPoller {
 
     private final AdvanceGlobalCompetitionUseCase advanceGlobalCompetition;

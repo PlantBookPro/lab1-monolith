@@ -2,17 +2,20 @@ package com.plantarena.tournaments.domain;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 
-@lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Vote {
 
-    private final @lombok.NonNull UUID id;
-    private final @lombok.NonNull UUID entryId;
-    private final @lombok.NonNull String subjectKey;
-    private @lombok.NonNull VoteValue value;
-    private final @lombok.NonNull Instant createdAt;
-    private @lombok.NonNull Instant updatedAt;
+    private final @NonNull UUID id;
+    private final @NonNull UUID entryId;
+    private final @NonNull String subjectKey;
+    private @NonNull VoteValue value;
+    private final @NonNull Instant createdAt;
+    private @NonNull Instant updatedAt;
 
     static Vote newVote(UUID entryId, String subjectKey, VoteValue value, Instant now) {
         return new Vote(UUID.randomUUID(), entryId, subjectKey, value, now, now);

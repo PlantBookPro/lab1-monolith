@@ -9,11 +9,12 @@ import com.plantarena.tournaments.application.InvitedPlantNotFoundException;
 import com.plantarena.tournaments.application.PlantNotReservableException;
 import com.plantarena.tournaments.application.port.out.PlantEligibilityGateway;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class InProcessPlantEligibility implements PlantEligibilityGateway {
 
     private final PlantEligibility plantEligibility;

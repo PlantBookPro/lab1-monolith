@@ -1,11 +1,12 @@
 package com.plantarena.tournaments.adapter.out.abuse;
 
 import com.plantarena.tournaments.application.port.out.AbuseSignals;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class LoggingAbuseSignals implements AbuseSignals {
 
     @Override

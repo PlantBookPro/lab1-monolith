@@ -5,11 +5,12 @@ import com.plantarena.tournaments.application.port.out.PlantLifecycleGateway;
 import com.plantarena.tournaments.application.port.out.PlantLifecycleGateway.RestrictionKind;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class InProcessPlantLifecycle implements PlantLifecycleGateway {
 
     private final PlantLifecycle plantLifecycle;

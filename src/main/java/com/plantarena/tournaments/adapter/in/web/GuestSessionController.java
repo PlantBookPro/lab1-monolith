@@ -4,6 +4,7 @@ import com.plantarena.tournaments.application.port.in.CreateGuestSessionUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "guest-sessions")
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class GuestSessionController {
 
     private final CreateGuestSessionUseCase createGuestSession;

@@ -2,12 +2,13 @@ package com.plantarena.tournaments.adapter.in.events;
 
 import com.plantarena.plants.api.event.PlantModerationDecidedEvent;
 import com.plantarena.tournaments.application.port.in.OnPlantModerationDecidedUseCase;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class PlantModerationDecidedHandler {
 
     private final OnPlantModerationDecidedUseCase onPlantModerationDecided;

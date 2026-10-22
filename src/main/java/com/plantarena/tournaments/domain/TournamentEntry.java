@@ -2,18 +2,21 @@ package com.plantarena.tournaments.domain;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 
-@lombok.RequiredArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TournamentEntry {
 
-    private final @lombok.NonNull UUID id;
-    private final @lombok.NonNull UUID tournamentId;
-    private final @lombok.NonNull UUID userId;
-    private final @lombok.NonNull UUID plantId;
-    private final @lombok.NonNull UUID reservationId;
-    private @lombok.NonNull EntryStatus status;
-    private final @lombok.NonNull Instant joinedAt;
+    private final @NonNull UUID id;
+    private final @NonNull UUID tournamentId;
+    private final @NonNull UUID userId;
+    private final @NonNull UUID plantId;
+    private final @NonNull UUID reservationId;
+    private @NonNull EntryStatus status;
+    private final @NonNull Instant joinedAt;
 
     
     public static TournamentEntry admit(UUID tournamentId, UUID userId, UUID plantId,

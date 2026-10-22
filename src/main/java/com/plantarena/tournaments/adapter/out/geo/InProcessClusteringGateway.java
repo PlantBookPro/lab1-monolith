@@ -4,11 +4,12 @@ import com.plantarena.geo.api.ClusterAssignment;
 import com.plantarena.tournaments.application.port.out.ClusteringGateway;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
 @Component
-@lombok.RequiredArgsConstructor
+@RequiredArgsConstructor
 public class InProcessClusteringGateway implements ClusteringGateway {
 
     private final ClusterAssignment clusterAssignment;
