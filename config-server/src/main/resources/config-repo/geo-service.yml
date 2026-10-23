@@ -1,0 +1,20 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://postgres:5432/geo
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://postgres:5432/geo
+    user: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    locations: classpath:db/migration
+    schemas: geo
+plantarena:
+  geo:
+    geohash-precision: 4
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
