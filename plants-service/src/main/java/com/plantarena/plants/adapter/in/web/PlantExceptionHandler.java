@@ -1,7 +1,9 @@
 package com.plantarena.plants.adapter.in.web;
 
 import com.plantarena.plants.api.ModerationAlreadyDecidedException;
+import com.plantarena.plants.api.PlantNotEligibleException;
 import com.plantarena.plants.api.PlantNotFoundException;
+import com.plantarena.plants.api.ReservationConflictException;
 import com.plantarena.plants.application.AssetAlreadyClaimedException;
 import com.plantarena.plants.application.AssetNotFoundException;
 import com.plantarena.plants.application.ImageRestrictedException;
@@ -48,6 +50,23 @@ public class PlantExceptionHandler {
             HttpStatus.CONFLICT.value(), e.getMessage(),
             URI.create(request.getRequestURI()), "IMAGE_RESTRICTED", List.of(), traceId,
             e.retryAt()));
+    }
+
+    @ExceptionHandler(PlantNotEligibleException.class)
+    public ResponseEntity<ApiError> plantNotEligible(PlantNotEligibleException e,
+                                                     HttpServletRequest request) {
+        String traceId = (String) request.getAttribute(TraceIdFilter.TRACE_ID_ATTRIBUTE);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError(
+            URI.create("about:blank"), HttpStatus.CONFLICT.getReasonPhrase(),
+            HttpStatus.CONFLICT.value(), e.getMessage(),
+            URI.create(request.getRequestURI()), "PLANT_NOT_ELIGIBLE", List.of(), traceId,
+            e.restrictedUntil()));
+    }
+
+    @ExceptionHandler(ReservationConflictException.class)
+    public ResponseEntity<ApiError> reservationConflict(ReservationConflictException e,
+                                                        HttpServletRequest request) {
+        return respond(HttpStatus.CONFLICT, "RESERVATION_CONFLICT", e.getMessage(), request);
     }
 
     @ExceptionHandler(PlantUnderReservationException.class)

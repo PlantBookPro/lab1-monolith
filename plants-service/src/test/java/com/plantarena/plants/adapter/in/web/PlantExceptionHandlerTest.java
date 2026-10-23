@@ -1,7 +1,9 @@
 package com.plantarena.plants.adapter.in.web;
 
 import com.plantarena.plants.api.ModerationAlreadyDecidedException;
+import com.plantarena.plants.api.PlantNotEligibleException;
 import com.plantarena.plants.api.PlantNotFoundException;
+import com.plantarena.plants.api.ReservationConflictException;
 import com.plantarena.plants.application.AssetAlreadyClaimedException;
 import com.plantarena.plants.application.AssetNotFoundException;
 import com.plantarena.plants.application.ImageRestrictedException;
@@ -95,5 +97,41 @@ class PlantExceptionHandlerTest {
         assertThat(reserved.getBody().code()).isEqualTo("PLANT_UNDER_RESERVATION");
         assertThat(decided.getStatusCode().value()).isEqualTo(409);
         assertThat(decided.getBody().code()).isEqualTo("MODERATION_ALREADY_DECIDED");
+    }
+
+    @Test
+    void неучастие_в_турнире_даёт_409_plant_not_eligible_со_сроком_повтора() {
+        PlantNotEligibleException exception = new PlantNotEligibleException(
+            PlantNotEligibleException.Reason.RESTRICTED,
+            "Растение под ограничением",
+            Instant.parse("2026-10-24T10:00:00Z"));
+
+        ResponseEntity<ApiError> response = handler.plantNotEligible(exception, request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(409);
+        assertThat(response.getBody().code()).isEqualTo("PLANT_NOT_ELIGIBLE");
+        assertThat(response.getBody().retryAt())
+            .isEqualTo(Instant.parse("2026-10-24T10:00:00Z"));
+    }
+
+    @Test
+    void неучастие_без_срока_даёт_409_plant_not_eligible_без_повтора() {
+        PlantNotEligibleException exception = new PlantNotEligibleException(
+            PlantNotEligibleException.Reason.DEAD, "Растение погибло");
+
+        ResponseEntity<ApiError> response = handler.plantNotEligible(exception, request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(409);
+        assertThat(response.getBody().code()).isEqualTo("PLANT_NOT_ELIGIBLE");
+        assertThat(response.getBody().retryAt()).isNull();
+    }
+
+    @Test
+    void конфликт_резерва_даёт_409_reservation_conflict() {
+        ResponseEntity<ApiError> response = handler.reservationConflict(
+            new ReservationConflictException("Резерв уже занят другим турниром"), request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(409);
+        assertThat(response.getBody().code()).isEqualTo("RESERVATION_CONFLICT");
     }
 }
