@@ -1,45 +1,92 @@
-# Plant Arena — Лабораторная №1 (модульный монолит)
+# Plant Arena — Лабораторная №2 (микросервисы)
 
 Турниры растений: профили, загрузка изображений с автоматической модерацией
 (ONNX), закрытые турниры с приглашениями, постоянный глобальный турнир с
 географическим отбором, голосование, лента.
 
-- Исходные требования: `docs/requirements.md` (полная спецификация)
-- Задание лабораторной: `docs/assignment-lab1.md`
-- Дизайн и решения: `docs/specs/`, `docs/domain/adr/`
-- Дорожная карта итераций: `docs/plans/2026-09-23-roadmap.md`
+Монолит лабы №1 разрезан на 7 сервисов по bounded contexts + инфраструктура
+(Eureka, Config Server, Gateway). Публичный API не изменился: те же
+`/api/v1/**` через gateway на `:8080` — Bruno-коллекция `PlantArena API`
+работает без изменений.
 
-## Запуск
+- Требования: `docs/requirements.md`; задание лабы №1: `docs/assignment-lab1.md`
+- Архитектура лабы №2: `docs/architecture.md` (диаграммы, порты, события)
+- Context map и эволюция лаба №1→№2→№4: `docs/domain/context-map.md`
+- Решения: `docs/domain/adr/` (ADR-014..019 — лаба №2)
+- Контракты внутренних API: `docs/api-contracts/`
+- Исходный монолит лабы №1 сохранён для сравнения: `monolith-reference/`
+  (отдельный Gradle-проект, не входит в корневую сборку)
+
+## Запуск (одна команда)
 
 ```bash
 docker compose up --build
-# Swagger UI: http://localhost:8080/swagger-ui/index.html
 ```
+
+Поднимает postgres (7 БД на сервис, ADR-019), eureka, config-server,
+gateway и 7 сервисов. Gateway: http://localhost:8080.
+
+### URL-карта
+
+| Что | URL |
+|---|---|
+| API (gateway) | http://localhost:8080/api/v1/** |
+| Eureka | http://localhost:8761 |
+| Config Server | http://localhost:8888 |
+| Swagger UI (по сервису) | http://localhost:8081..8087/swagger-ui/index.html |
+| Actuator health | http://localhost:8080/actuator/health (gateway), аналогично на портах сервисов |
+
+Порты сервисов: identity 8081, media 8082, plants 8083, moderation 8084,
+geo 8085, tournaments 8086, feed 8087 (полная таблица — `docs/architecture.md`).
+
+ENV (см. `.env.example`): `DB_USERNAME`/`DB_PASSWORD`, `BOOTSTRAP_ADMIN_*`
+(bootstrap-админ identity), `FEED_CURSOR_SECRET` (HMAC-курсор ленты).
+
+## Локальная разработка
+
+Инфраструктура — в Docker, сервисы — из IDE/`bootRun`:
+
+```bash
+docker compose up -d eureka-server   # discovery для Feign; порт 8761 опубликован
+psql -U postgres -f scripts/local/create-databases.sql   # 7 БД в локальном postgres :5432
+./gradlew :tournaments-service:bootRun   # любой :<svc>:bootRun
+```
+
+Config-server для локального запуска не обязателен (`spring.config.import:
+optional:configserver:...`): без него сервис берёт умолчания из локального
+`application.yml` (`localhost:5432`, `localhost:8761`, `localhost:8888`;
+переопределяется ENV `DB_URL`, `EUREKA_URL`, `CONFIG_SERVER_URL`). Если
+config-server запущен, он отдаёт docker-хосты (`postgres:5432`) — переменные
+ENV приоритетнее конфига с сервера. В Docker compose postgres доступен только
+внутри сети (порт не публикуется); его БД создаёт
+`scripts/docker/init-databases.sql` при первом старте volume.
+
+## Проверка
+
+```bash
+./gradlew build              # 13 модулей лабы №2: unit + integrationTest (Testcontainers)
+./gradlew :tournaments-service:test
+./gradlew build -Pinference  # + настоящий ONNX-инференс (moderation)
+```
+
+CI (`.github/workflows/ci.yml`): `./gradlew build` на ubuntu-latest
+(Testcontainers работает штатно).
 
 ## Демо-сценарии
 
-Пошаговый порядок демонстрации всех сценариев через Swagger UI:
-[`docs/demo/scenarios.md`](docs/demo/scenarios.md) — от запуска и
-bootstrap-админа до ленты и гостевых сессий.
+Пошаговые сценарии через Swagger UI: [`docs/demo/scenarios.md`](docs/demo/scenarios.md);
+демо закрытого турнира через Bruno: [`docs/demo/bruno-demo.md`](docs/demo/bruno-demo.md)
+(коллекция работает против `:8080` без изменений — gateway сохраняет пути).
 
-Демо закрытого турнира через Bruno-коллекцию `PlantArena API`
-(админ → модератор → 3 юзера → турнир → победитель):
-[`docs/demo/bruno-demo.md`](docs/demo/bruno-demo.md).
+## Демо-идентификация (ADR-005/016)
 
-Автоматизированный happy-path прогон по REST API с отчётом «все
-запросы-ответы»: `./scripts/happy-path-review.sh` — параметры и чтение
-отчёта: [`docs/review/README.md`](docs/review/README.md).
-
-## Демо-идентификация (ADR-005)
-
-В профилях `dev`/`test` пользователь передаётся заголовком `X-Demo-User-Id: <UUID>`
-(см. Swagger UI). Отсутствие заголовка = гость; неизвестный/деактивированный ID —
-ошибка 401; роли всегда берутся из БД. Это механизм демонстрации, не аутентификация.
-Гостевые сессии (итерация 8): `POST /api/v1/guest-sessions` (публично) выдаёт
-токен один раз; он передаётся заголовком `X-Guest-Token` (см. раздел «Лента»).
-Обычный профиль без адаптера идентификации падает при старте с явной ошибкой.
-Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV),
-повторный запуск дубликат не создаёт.
+В профилях `dev`/`test` пользователь передаётся заголовком `X-Demo-User-Id: <UUID>`.
+Отсутствие заголовка = гость; неизвестный/деактивированный ID — 401; роли
+всегда из БД identity (каждый сервис разрешает актёра через Feign — ADR-016).
+Гостевые сессии: `POST /api/v1/guest-sessions` (публично) выдаёт токен один
+раз; передаётся заголовком `X-Guest-Token`. Bootstrap-админ:
+`BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV), повторный запуск
+дубликат не создаёт.
 
 ## Файлы (media)
 
@@ -47,24 +94,24 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
 до 10 MiB и 20 млн пикселей, формат проверяется по фактическому содержимому.
 Ответ: `assetId` и метаданные (без внутренних путей хранилища). Повторная загрузка
 тех же байтов создаёт новый asset. Отпечаток изображения (алгоритм v1) игнорирует
-метаданные и альфа-канал — ADR-007; эталонные примеры: `src/test/resources/media/reference`.
+метаданные и альфа-канал — ADR-007.
 
 - Скачивание — `GET /api/v1/files/{id}`: владелец — всегда; чужим файл доступен
-  только через одобренное растение (ADR-008, итерация 3).
+  только через одобренное растение (ADR-008).
 - Удаление — `DELETE /api/v1/files/{id}`: владелец или админ; задействованный
-  растением файл — 409 `ASSET_IN_USE` (итерация 3).
+  растением файл — 409 `ASSET_IN_USE`.
 
 Локальное хранилище: каталог `MEDIA_STORAGE_ROOT` (по умолчанию `./storage/media`,
-в Docker Compose — volume `storage`). Проверки: `./gradlew build`.
+в Docker Compose — volume `storage`).
 
 ## Растения (plants)
 
 Подача заявки — `POST /api/v1/plants` (`assetId` своего файла + `title`): создаёт
 растение PENDING/ALIVE, задействует файл (один файл — одно неархивированное
-растение, ADR-008) и публикует `PlantSubmitted` (модерация — итерация 4).
-Повторное использование запрещённого изображения — 409 `IMAGE_RESTRICTED`:
-навсегда после поражения в закрытом турнире, на 24 часа после глобального
-(`retryAt` — срок истечения суточного).
+растение, ADR-008) и публикует `PlantSubmitted` (модерация получает его
+polling'ом — ADR-015). Повторное использование запрещённого изображения —
+409 `IMAGE_RESTRICTED`: навсегда после поражения в закрытом турнире, на 24 часа
+после глобального (`retryAt` — срок истечения суточного).
 
 - Список — `GET /api/v1/plants[?ownerId=]`: свои — все статусы, чужие — только
   APPROVED; пагинация `page`/`size`, заголовок `X-Total-Count`.
@@ -72,8 +119,8 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
   одобренные (скрытое — 404).
 - Переименование — `PATCH /api/v1/plants/{id}`: только владелец, только `title`.
 - Архивация — `DELETE /api/v1/plants/{id}`: только владелец, вне активного
-  резерва турнира (409 `PLANT_UNDER_RESERVATION`, резервы — итерация 5);
-  скрывает растение и освобождает файл.
+  резерва турнира (409 `PLANT_UNDER_RESERVATION`); скрывает растение и
+  освобождает файл.
 - Статус модерации — `GET /api/v1/plants/{id}/moderation`: только владелец.
 
 Одобрение модерации делает файл растения публично видимым чужим
@@ -82,30 +129,29 @@ Bootstrap-админ: `BOOTSTRAP_ADMIN_EMAIL` + `BOOTSTRAP_ADMIN_PASSWORD` (ENV)
 ## Модерация (moderation)
 
 Поданная заявка проходит автоматическое распознавание (ADR-009): MobileNetV2
-(ONNX Runtime) внутри монолита. Зелёное на фото — не гарантия: решает
+(ONNX Runtime) в moderation-service. Зелёное на фото — не гарантия: решает
 классификатор; ошибка распознавателя — не решение, заявка остаётся PENDING и
 будет повторена (backoff 1с → 2с → … → кап 1ч, без лимита попыток).
+PENDING-растения сервис забирает polling'ом (5с), задания обрабатывает
+poller'ом (2с) — ADR-015.
 
-- Модель (~13 МБ) скачивается автоматически при сборке в
-  `target/models/mobilenetv2-1.0.onnx` (offline-сборка не ломается: задания
-  честно уходят в RETRY, в логе видно `ClassifierUnavailableException`).
-- Ручной запуск: `MODERATION_MODEL_PATH=... ./gradlew bootRun`.
-- Настоящий инференс на эталонных фото (ромашка/собака):
-  `./gradlew build -Pinference` (в обычный `verify` не входит).
+- Модель (~13 МБ) скачивается автоматически при сборке; offline-сборка не
+  ломается (задания честно уходят в RETRY).
+- Настоящий инференс на эталонных фото: `./gradlew build -Pinference`.
 - Решение видно владельцу: `GET /api/v1/plants/{id}/moderation` — статус,
   причина (`PLANT_DETECTED`/`NOT_A_PLANT`) и `retryUploadAllowed`.
 
 ## Турниры (tournaments)
 
-Закрытые (PRIVATE) турниры с приглашениями (раздел 7): модератор/админ создаёт
-DRAFT (параметры + теги), приглашает пользователей; приём заявок — до дедлайна
-регистрации. Принятие приглашения резервирует изображение растения (одно
-изображение — один активный резерв, ADR-010): одобренное модерацией растение →
-заявка READY сразу, идущая модерация → ACCEPTED_PENDING_MODERATION (решение
-переводит в READY или возвращает в INVITED). Наступивший дедлайн стартует
-турнир scheduler'ом (fixedDelay 2с) или вручную — один use case: READY ≥
-minParticipants → RUNNING (участия ACTIVE, не-READY → EXPIRED, резервы
-подтверждены); иначе CANCELLED с причиной INSUFFICIENT_PARTICIPANTS и
+Закрытые (PRIVATE) турниры с приглашениями: модератор/админ создаёт DRAFT
+(параметры + теги), приглашает пользователей; приём заявок — до дедлайна
+регистрации. Принятие приглашения резервирует изображение растения через
+plants (Feign, saga reserve→confirm/release — ADR-010/015): одобренное
+модерацией растение → заявка READY сразу, идущая модерация →
+ACCEPTED_PENDING_MODERATION (решение переводит в READY или возвращает в
+INVITED — событие `PlantModerationDecided` по HTTP, ADR-015). Дедлайн
+стартует турнир scheduler'ом (fixedDelay 2с) или вручную: READY ≥
+minParticipants → RUNNING (резервы подтверждены); иначе CANCELLED с
 освобождением резервов (растения не погибают).
 
 - Создание и теги — `POST /api/v1/tournaments`, `POST /api/v1/tags` (M/A);
@@ -115,135 +161,78 @@ minParticipants → RUNNING (участия ACTIVE, не-READY → EXPIRED, ре
 - Старт/отмена — `POST /api/v1/tournaments/{id}/start|cancel`; участники —
   `GET /api/v1/tournaments/{id}/entries`.
 - Диагностика (dev/test, M/A): `POST /api/v1/internal/demo/jobs/run-due` —
-  тот же use case, что scheduler, без обхода правил; ответ — `processed`
-  (стартовавшие/отменённые турниры) и `closedWindows` (закрытые окна).
-- Старт создаёт первый раунд `VotingWindow` (sequence 1, длительность
-  roundDuration, счёт с нуля). Закрытие по дедлайну — scheduler (fixedDelay
-  2с) или demo-ручка. Выбывание: `min(n−1, max(1, floor(n·f)))` худших по
-  рейтингу (score DESC, joinedAt ASC, entryId ASC); выбывшие — гибель +
-  PERMANENT-запрет + освобождение резерва. Один выживший — WINNER, турнир
-  FINISHED, резерв победителя освобождён; иначе — следующий раунд
-  (sequence + 1, выжившие, счёт с нуля).
-- Раунды и итоги — `GET /api/v1/tournaments/{id}/rounds|leaderboard|results`
-  (организатор/админ или приглашённый/участник; X-Total-Count).
+  тот же use case, что scheduler.
+- Старт создаёт первый раунд `VotingWindow`; закрытие окна — выбывание худших,
+  гибель выбывших (команда plants `registerDeath`), PERMANENT-запрет; один
+  выживший — WINNER. Раунды и итоги — `GET /api/v1/tournaments/{id}/rounds|leaderboard|results`.
 
 ## Глобальный турнир (global)
 
-Постоянный глобальный турнир (раздел 8): заявка `POST /api/v1/global/entries`
-(своё APPROVED-растение, координаты в профиле обязательны — `PUT /me/location`;
-одно активное участие на пользователя) → очередь → эпоха отбора раз в
-`plantarena.global.epoch-duration` (по умолчанию 24 ч): гео-кластеры
-(geohash, `plantarena.geo.geohash-precision`), квалификационное окно на
-непустой кластер. Закрытие: top-1 — в финал (PROMOTED), остальные — гибель +
-суточный запрет совпавшей картинки (COOLDOWN 24 ч, `retryAt`) + освобождение
-резерва. Финал — непрерывные окна `final-window-duration`: из n ≥ 2 выбывает
-max(1, floor(n/2)) худших, единственный лидер остаётся; новых финалистов
-включает следующее окно. Порядок одновременных границ фиксирован (алгоритм 6);
-scheduler идемпотентен — рестарт не убивает повторно (ADR-012).
+Постоянный глобальный турнир: заявка `POST /api/v1/global/entries` (своё
+APPROVED-растение, координаты в профиле обязательны — `PUT /me/location`)
+→ очередь → эпоха отбора раз в 24 ч: гео-кластеры (geohash, geo-service —
+Feign, ADR-012), квалификационное окно на непустой кластер. Закрытие: top-1 —
+в финал (PROMOTED), остальные — гибель + суточный запрет совпавшей картинки +
+освобождение резерва. Финал — непрерывные окна: из n ≥ 2 выбывает
+max(1, floor(n/2)) худших. Порядок одновременных границ фиксирован;
+scheduler идемпотентен (ADR-012).
 
 - Конфигурация и текущие окна — `GET /api/v1/global` (публично).
 - Кластеры эпохи — `GET /api/v1/global/clusters`; отбор кластера —
   `GET /api/v1/global/clusters/{id}/leaderboard`; финал —
-  `GET /api/v1/global/leaderboard?scope=FINAL` (scope, windowId, closesAt, asOf).
+  `GET /api/v1/global/leaderboard?scope=FINAL`.
 - Своё участие — `GET /api/v1/me/global-entry`; снятие из очереди —
   `DELETE /api/v1/global/entries/{id}` (только QUEUED, иначе 409).
 - Голосовать в глобальных окнах может любой идентифицированный пользователь
-  или гость с активной сессией (`X-Guest-Token`); самоголосование запрещено.
-- Диагностика: `POST /api/v1/internal/demo/jobs/run-due` дополнительно
-  продвигает границы (ответ: globalQualificationClosed/globalFinalClosed/
-  globalFinalsOpened/globalEpochsOpened).
+  или гость с активной сессией; самоголосование запрещено.
 
 ## Голосование (voting)
 
 `PUT /api/v1/windows/{windowId}/entries/{entryId}/vote` (LIKE/DISLIKE),
-`DELETE .../vote`, `GET .../my-vote` — текущий голос субъекта. Голосовать
-может участник, допущенный к старту (выбывший — тоже, допущение 9);
-постороннему турнир скрыт (404), организатор-не-участник — 403. Гость
-(`X-Guest-Token`) голосует только в глобальных окнах: дельты как у USER,
-лимит 30/мин на сессию (429 `RATE_LIMITED` + `Retry-After`); закрытые
-турниры скрыты от гостя (404, не 401/403). Идентифицированный пользователь
-при обоих заголовках — всегда субъект USER. Самоголосование запрещено
-(403, допущение 6).
-Окно принимает голоса в интервале `[opensAt, closesAt)`; после дедлайна —
-409 `VOTING_CLOSED`. Дельты счёта: новый голос +1/−1, смена знака ±2, повтор 0,
-удаление — компенсация.
+`DELETE .../vote`, `GET .../my-vote`. Окно принимает голоса в
+`[opensAt, closesAt)`; после дедлайна — 409 `VOTING_CLOSED`. Дельты счёта:
+новый голос +1/−1, смена знака ±2, повтор 0, удаление — компенсация.
+Гость (`X-Guest-Token`) голосует только в глобальных окнах: лимит 30/мин
+на сессию (429 `RATE_LIMITED` + `Retry-After`); закрытые турниры скрыты
+от гостя (404). Самоголосование запрещено (403).
 
 ## Лента и гостевые сессии (feed)
 
-- `POST /api/v1/guest-sessions` — публично; токен возвращается один раз
-  (`{token, expiresAt}`), передаётся в заголовке `X-Guest-Token`.
-  Лимит выдачи — 10/мин на IP (429 + `Retry-After`,
-  `plantarena.guests.session-creation-limit-per-minute`).
-- `GET /api/v1/feed?limit=20&cursor=...` — пользователь
-  (`X-Demo-User-Id`) либо гость (`X-Guest-Token`; только глобальные
-  карточки). Ответ `{items, nextCursor, hasNext}` **без total** —
-  бесконечная прокрутка keyset-курсором (подписан HMAC,
-  `plantarena.feed.cursor-secret`/`FEED_CURSOR_SECRET`).
-  Невалидный курсор — 400 `FEED_CURSOR_INVALID`, истёкший (TTL
-  `plantarena.feed.cursor-ttl`, по умолчанию 1h) — 410
-  `FEED_CURSOR_EXPIRED` (начать новую ленту — без cursor).
+- `POST /api/v1/guest-sessions` — публично; токен возвращается один раз,
+  передаётся в `X-Guest-Token`. Лимит выдачи — 10/мин на IP (429).
+- `GET /api/v1/feed?limit=20&cursor=...` — пользователь либо гость (только
+  глобальные карточки). Ответ `{items, nextCursor, hasNext}` без total —
+  keyset-курсор с HMAC (`FEED_CURSOR_SECRET`). Невалидный курсор — 400
+  `FEED_CURSOR_INVALID`, истёкший (TTL 1h) — 410 `FEED_CURSOR_EXPIRED`.
 - Карточки: активные открытые окна, живые растения, чужие entry, ещё не
-  оценённые субъектом; псевдослучайный порядок от серверного seed
-  (`hashtextextended` в SQL, ADR-002); новые участники появляются после
-  обновления ленты (snapshotCutoff).
-- Голос гостя: глобальные окна, дельты как у USER, лимит 30/мин на сессию
-  (429); закрытые турниры скрыты (404). Идентифицированный пользователь
-  при обоих заголовках — субъект USER.
+  оценённые субъектом (оценённые и свои исключаются read-портами
+  tournaments — `docs/api-contracts/tournaments-internal.md`); порядок —
+  от серверного seed (ADR-002).
 
-## Проверка (единственная команда)
+## Архитектура (лаба №2)
 
-```bash
-./gradlew build
-```
+7 сервисов по bounded contexts + eureka/config/gateway, межсервисные вызовы —
+Feign через Eureka, события — HTTP-команды и polling (ADR-015), ошибки —
+единый `ApiError` поверх Feign (ADR-018), демо-идентификация сквозь сервисы
+(ADR-016), общие модули shared-lib/web/webflux (ADR-017), один postgres с
+БД на сервис (ADR-019). Стеки: MVC+JPA (identity, media, plants, moderation),
+WebFlux+JPA через `Blocking` (tournaments), R2DBC (geo), WebFlux+JdbcClient
+(feed) — ADR-014. Подробности и диаграммы: `docs/architecture.md`.
 
-Запускает: unit- и application-тесты (`test`), ArchUnit-правила границ,
-интеграционные/приёмочные тесты на Testcontainers PostgreSQL (`integrationTest`),
- отчёт и gate JaCoCo (LINE ≥ 70%). Настоящий ONNX-инференс — отдельно:
-`./gradlew build -Pinference`.
+## Готовность лабы №2
 
-### Покрытие (JaCoCo)
-
-Единый отчёт по unit- и integration-прогонам (обе exec-записи, без merge):
-`build/reports/jacoco/jacocoMergedReport/html/index.html`. Gate: LINE ≥ 70%
-(`jacocoMergedCheck`, класс-точка-входа исключён). Текущее покрытие —
-LINE 95.8%, BRANCH 84.0%, INSTRUCTION 95.3% (589 тестов: 439 unit + 150 IT).
-
-### Готовность лабы №1 (раздел 17)
-
-- [x] `./gradlew build` зелёный: unit, application, контрактные, приёмочные,
-      конкурентные, ArchUnit; JaCoCo gate LINE ≥ 70%
-- [x] ArchUnit: нет циклов и запрещённых межконтекстных зависимостей
-- [x] Каждое допущение раздела 3 и инвариант `aggregates.md` покрыто
-      именованным тестом (таблица в `aggregates.md`)
-- [x] `docker compose up --build` из чистого состояния; сценарии — через
-      Swagger UI (`docs/demo/scenarios.md`)
-- [x] Inference продемонстрирован: `./gradlew build -Pinference`
-- [x] Docs: глоссарий, context map, агрегаты, ADR, ER-диаграмма
-      (`docs/domain/er-diagram.md`), процедура выделения сервиса
+- [x] 13 модулей собираются: `./gradlew build` зелёный (unit + IT на
+      Testcontainers)
+- [x] `docker compose up --build` из чистого состояния: postgres (7 БД),
+      eureka, config, gateway, 7 сервисов; health-чеки зелёные
+- [x] Публичный API через gateway `:8080` не изменился — Bruno-коллекция
+      `PlantArena API` проходит без правок
+- [x] Межсервисные контракты задокументированы: `docs/api-contracts/`
+- [x] Архитектура и решения: `docs/architecture.md`, ADR-014..019
+- [x] CI на Gradle: `.github/workflows/ci.yml`
 
 ## Git workflow
 
 - Ветки: `feat/...`, `fix/...`, `test/...`, `docs/...`, `refactor/...`
 - Conventional Commits; тесты коммитируются вместе с реализацией или раньше
 - `main` всегда зелёный (`./gradlew build`); push в удалённый `main` — только по явной команде
-
-## Архитектура
-
-Один Maven-модуль, bounded contexts по DDD (пакеты `identity`, `media`, `plants`,
-`moderation`, `tournaments`, `geo`, `feed` + технический `shared` + `config`).
-Границы проверяются ArchUnit-тестами (`src/test/java/com/plantarena/architecture/`).
-Одна PostgreSQL, схема на контекст, миграции Flyway по каталогам контекстов.
-Подробности: `docs/domain/context-map.md`, `docs/domain/aggregates.md`.
-
-## Процедура выделения контекста в сервис (готовность к лабе №2)
-
-1. Создать новый Spring Boot проект и перенести пакет `<context>` целиком
-   и нужные части `shared`.
-2. Перенести схему и каталог миграций `db/migration/<context>` без изменений.
-3. `api`-фасады превратить в REST-контроллеры — DTO уже являются контрактом.
-4. У потребителей заменить `adapter.out.<context>` (in-process) на Feign-адаптер
-   с тем же портом.
-5. Синхронные подписки на события заменить идемпотентными HTTP-командами
-   с retry jobs (лаба №2) или outbox → Kafka → inbox (лаба №4).
-6. Доменные и application-тесты переносятся без изменений и остаются зелёными;
-   меняются только тесты адаптеров.

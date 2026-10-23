@@ -1,8 +1,10 @@
 # Context Map — границы bounded contexts
 
-Источник: `docs/requirements.md`, разделы 4.2–4.3. Направления зависимостей
-проверяются ArchUnit-тестом `ContextBoundaryTest` (включая отдельное правило на
-каждое запрещённое направление).
+Источник: `docs/requirements.md`, разделы 4.2–4.3. В лабе №1 направления
+зависимостей проверялись ArchUnit-тестом `ContextBoundaryTest` (перенесён в
+`monolith-reference`); в лабе №2 границы контекстов — отдельные сервисы,
+направления зависимостей реализованы Feign-клиентами (см. «Эволюция» и
+`docs/architecture.md`).
 
 ## Диаграмма контекстов (направления зависимостей)
 
@@ -93,3 +95,31 @@ graph TD
   через команды `plants.api`.
 - `@TransactionalEventListener(AFTER_COMMIT)` и `@Async` — только для
   необязательных побочных эффектов (уведомления, журнал), никогда для инвариантов.
+
+## Эволюция (лаба №1 → лаба №2 → лаба №4)
+
+**Лаба №1 (модульный монолит).** Все контексты — пакеты одного приложения:
+in-process ACL-адаптеры вызывают `api`-фасады соседних контекстов в той же
+транзакции; события — Spring ApplicationEvents (in-process, синхронно в tx).
+
+**Лаба №2 (микросервисы, текущее состояние).** Контекст = сервис
+(`docs/architecture.md`):
+
+- Синхронные запросы/команды через `api` — **Feign/HTTP** вместо in-process
+  ACL: у потребителя свой Feign-клиент со своими view-типами (порты
+  `adapter.out.<ctx>` не изменились, изменилась только реализация адаптера).
+  Контракты — `docs/api-contracts/`.
+- События — **HTTP-команды**: plants → tournaments `PlantModerationDecided`
+  (AFTER_COMMIT-relay, идемпотентная команда), tournaments → feed проекции
+  окон (POST/DELETE). Синхронные связки в одной tx стали saga/компенсациями
+  (резерв → confirm/release) и идемпотентными командами с повтором.
+- `PlantSubmitted` → moderation — **polling** (moderation опрашивает
+  PENDING-растения раз в 5с); retry заданий — внутренний poller (2с).
+- Транзакции «одна tx — один агрегат одного сервиса»: обязательные
+  межсервисные последствия — идемпотентные команды (ADR-015).
+
+**Лаба №4 (план).** Outbox → Kafka → inbox: `plant.moderation.v1`,
+`plant.lifecycle.v1`, команды plants/media, проекция feed из топиков;
+anti-doping-service за портом `AbuseSignals`; лимиты — внешняя политика.
+Домен и application не меняются — меняется только доставка
+(`IntegrationEventPublisher` → Kafka-издатель, ADR-006/010).
