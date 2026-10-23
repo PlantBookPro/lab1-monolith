@@ -1,12 +1,13 @@
 package com.plantarena.tournaments.api.client;
 
+import com.plantarena.tournaments.api.client.fallback.IdentityDirectoryClientFallback;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "identity-service")
+@FeignClient(name = "identity-service", fallback = IdentityDirectoryClientFallback.class)
 public interface IdentityDirectoryClient {
 
     @GetMapping("/internal/actors/{userId}")

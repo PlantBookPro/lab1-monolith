@@ -4,6 +4,7 @@ import com.plantarena.shared.web.ApiError;
 import com.plantarena.shared.webflux.TraceIdWebFilter;
 import com.plantarena.tournaments.application.ActiveGlobalEntryExistsException;
 import com.plantarena.tournaments.application.ClusterNotFoundException;
+import com.plantarena.tournaments.application.DependencyUnavailableException;
 import com.plantarena.tournaments.application.DuplicateInvitationException;
 import com.plantarena.tournaments.application.EntryNotInWindowException;
 import com.plantarena.tournaments.application.GlobalEntryNotFoundException;
@@ -212,6 +213,12 @@ public class TournamentsExceptionHandler {
             InternalFeedDirectoryController.GuestSessionNotFound e,
             ServerWebExchange exchange) {
         return respond(HttpStatus.NOT_FOUND, "GUEST_SESSION_NOT_FOUND", e.getMessage(), exchange);
+    }
+
+    @ExceptionHandler(DependencyUnavailableException.class)
+    public ResponseEntity<ApiError> dependencyUnavailable(DependencyUnavailableException e,
+                                                          ServerWebExchange exchange) {
+        return respond(HttpStatus.SERVICE_UNAVAILABLE, "DEPENDENCY_UNAVAILABLE", e.getMessage(), exchange);
     }
 
     @ExceptionHandler(RateLimitExceededException.class)
