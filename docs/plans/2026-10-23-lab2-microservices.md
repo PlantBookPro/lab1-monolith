@@ -536,7 +536,7 @@ git add -A && git commit -m "feat(lab2): eureka-server discovery :8761"
 
 **Files:** Create `config-server/build.gradle.kts`, `config-server/src/main/java/com/plantarena/config/ConfigServerApplication.java`, `config-server/src/main/resources/application.yml`, `config-server/src/main/resources/config-repo/{identity,media,plants,moderation,geo,tournaments,feed}-service.yml`
 
-- [ ] **Step 1: Build file + application**
+- [x] **Step 1: Build file + application**
 
 ```kotlin
 plugins {
@@ -582,7 +582,7 @@ server:
   port: 8888
 ```
 
-- [ ] **Step 2: config-repo files** (docker-oriented values; local defaults live in each service's own `application.yml`)
+- [x] **Step 2: config-repo files** (docker-oriented values; local defaults live in each service's own `application.yml`)
 
 `config-repo/identity-service.yml`:
 ```yaml
@@ -817,7 +817,7 @@ management:
         include: health,info,metrics,circuitbreakers
 ```
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 ./gradlew :config-server:build
