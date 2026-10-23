@@ -95,7 +95,7 @@ public class GlobalController {
                 withdrawEntry.withdraw(actor, entryId);
                 return null;
             }))
-            .map(v -> ResponseEntity.noContent().build());
+            .thenReturn(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/global/clusters")

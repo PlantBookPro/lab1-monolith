@@ -84,6 +84,6 @@ public class TagController {
                 tags.delete(actor, id);
                 return null;
             }))
-            .map(v -> ResponseEntity.noContent().build());
+            .thenReturn(ResponseEntity.noContent().build());
     }
 }

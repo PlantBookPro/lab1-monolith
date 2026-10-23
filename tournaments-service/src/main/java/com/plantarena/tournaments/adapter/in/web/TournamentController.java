@@ -133,7 +133,7 @@ public class TournamentController {
                 deleteTournament.delete(actor, id);
                 return null;
             }))
-            .map(v -> ResponseEntity.noContent().build());
+            .thenReturn(ResponseEntity.noContent().build());
     }
 
     @PostMapping("/{id}/open-registration")
@@ -204,7 +204,7 @@ public class TournamentController {
                 revokeInvitation.revoke(actor, id, invitationId);
                 return null;
             }))
-            .map(v -> ResponseEntity.noContent().build());
+            .thenReturn(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{id}/entries")

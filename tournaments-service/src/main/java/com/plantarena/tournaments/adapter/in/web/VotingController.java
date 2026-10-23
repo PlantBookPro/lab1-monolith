@@ -55,7 +55,7 @@ public class VotingController {
                 voting.remove(actor, guestToken, windowId, entryId);
                 return null;
             }))
-            .map(v -> ResponseEntity.noContent().build());
+            .thenReturn(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{windowId}/entries/{entryId}/my-vote")
