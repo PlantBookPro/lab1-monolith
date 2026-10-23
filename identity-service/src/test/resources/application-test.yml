@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: identity
+eureka:
+  client:
+    enabled: false
+plantarena:
+  bootstrap-admin:
+    email: admin@plantarena.local
+    password: admin-password
+    display-name: Admin
