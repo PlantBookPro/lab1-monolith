@@ -1,0 +1,138 @@
+services:
+  postgres:
+    image: postgres:17.5-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/docker/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  eureka-server:
+    build: { context: ., dockerfile: eureka-server/Dockerfile }
+    ports: ["8761:8761"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  config-server:
+    build: { context: ., dockerfile: config-server/Dockerfile }
+    ports: ["8888:8888"]
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  api-gateway:
+    build: { context: ., dockerfile: api-gateway/Dockerfile }
+    ports: ["8080:8080"]
+    environment:
+      EUREKA_URL: http://eureka-server:8761/eureka
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+  identity-service:
+    build: { context: ., dockerfile: identity-service/Dockerfile }
+    ports: ["8081:8081"]
+    environment: &service-env
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_URL: http://eureka-server:8761/eureka
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      BOOTSTRAP_ADMIN_DISPLAY_NAME: ${BOOTSTRAP_ADMIN_DISPLAY_NAME:-Admin}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  media-service:
+    build: { context: ., dockerfile: media-service/Dockerfile }
+    ports: ["8082:8082"]
+    environment:
+      <<: *service-env
+    volumes:
+      - media-storage:/app/storage/media
+    depends_on:
+      postgres: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+      config-server: { condition: service_healthy }
+
+  plants-service:
+    build: { context: ., dockerfile: plants-service/Dockerfile }
+    ports: ["8083:8083"]
+    environment:
+      <<: *service-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+      config-server: { condition: service_healthy }
+
+  moderation-service:
+    build: { context: ., dockerfile: moderation-service/Dockerfile }
+    ports: ["8084:8084"]
+    environment:
+      <<: *service-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+      config-server: { condition: service_healthy }
+
+  geo-service:
+    build: { context: ., dockerfile: geo-service/Dockerfile }
+    ports: ["8085:8085"]
+    environment:
+      <<: *service-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+      config-server: { condition: service_healthy }
+
+  tournaments-service:
+    build: { context: ., dockerfile: tournaments-service/Dockerfile }
+    ports: ["8086:8086"]
+    environment:
+      <<: *service-env
+    depends_on:
+      postgres: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+      config-server: { condition: service_healthy }
+
+  feed-service:
+    build: { context: ., dockerfile: feed-service/Dockerfile }
+    ports: ["8087:8087"]
+    environment:
+      <<: *service-env
+      FEED_CURSOR_SECRET: ${FEED_CURSOR_SECRET:-dev-only-cursor-secret}
+    depends_on:
+      postgres: { condition: service_healthy }
+      eureka-server: { condition: service_healthy }
+      config-server: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  media-storage:
