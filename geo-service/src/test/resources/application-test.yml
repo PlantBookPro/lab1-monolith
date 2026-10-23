@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: geo
+eureka:
+  client:
+    enabled: false
+plantarena:
+  geo:
+    geohash-precision: 4

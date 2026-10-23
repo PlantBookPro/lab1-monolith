@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: geo-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  r2dbc:
+    url: ${R2DBC_URL:r2dbc:postgresql://localhost:5432/geo}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  flyway:
+    enabled: true
+    url: ${FLYWAY_URL:jdbc:postgresql://localhost:5432/geo}
+    user: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    locations: classpath:db/migration
+    schemas: geo
+server:
+  port: 8085
+  forward-headers-strategy: framework
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+plantarena:
+  geo:
+    geohash-precision: 4
