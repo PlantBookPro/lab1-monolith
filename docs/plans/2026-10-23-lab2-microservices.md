@@ -65,7 +65,7 @@ lab2 (repo root)
 - Create: `settings.gradle.kts` (replace), `build.gradle.kts` (replace), `gradle/libs.versions.toml`, `.dockerignore`
 - Move: `src/`, `build.gradle.kts`, `Dockerfile`, `docker-compose.yml`, `scripts/` → `monolith-reference/`
 
-- [ ] **Step 1: Create branch and move monolith aside**
+- [x] **Step 1: Create branch and move monolith aside**
 
 ```bash
 git checkout main && git checkout -b lab2
@@ -78,7 +78,7 @@ git mv scripts monolith-reference/scripts
 rm settings.gradle.kts   # replaced below
 ```
 
-- [ ] **Step 2: Write `settings.gradle.kts`**
+- [x] **Step 2: Write `settings.gradle.kts`**
 
 ```kotlin
 rootProject.name = "plant-arena"
@@ -100,7 +100,7 @@ include(
 )
 ```
 
-- [ ] **Step 3: Write root `build.gradle.kts`**
+- [x] **Step 3: Write root `build.gradle.kts`**
 
 ```kotlin
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -132,7 +132,7 @@ subprojects {
 }
 ```
 
-- [ ] **Step 4: Write `gradle/libs.versions.toml`**
+- [x] **Step 4: Write `gradle/libs.versions.toml`**
 
 ```toml
 [versions]
@@ -174,7 +174,7 @@ testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgr
 awaitility = { module = "org.awaitility:awaitility" }
 ```
 
-- [ ] **Step 5: Write `.dockerignore`** (repo root — keeps Docker build contexts small)
+- [x] **Step 5: Write `.dockerignore`** (repo root — keeps Docker build contexts small)
 
 ```
 .git
@@ -190,7 +190,7 @@ PlantArena API
 use-case-diagram.png
 ```
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 ```bash
 ./gradlew projects   # expect: 13 subprojects listed, BUILD SUCCESSFUL
