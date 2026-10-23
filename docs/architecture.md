@@ -1,7 +1,7 @@
 # Архитектура лабы №2 — микросервисы
 
 Монолит лабы №1 разрезан на 7 сервисов по bounded contexts (план разрезания —
-`docs/plans/2026-10-23-lab2-microservices.md`; исходник — `monolith-reference/`).
+`docs/plans/2026-10-23-lab2-microservices.md`; исходник — ветка `main`).
 Инфраструктура: Eureka (service discovery), Config Server, Spring Cloud
 Gateway. Все межсервисные вызовы — Feign/HTTP через Eureka; события —
 HTTP-команды и polling (ADR-015).
