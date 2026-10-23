@@ -471,7 +471,7 @@ git add -A && git commit -m "build(lab2): shared-модули — ядро, serv
 
 **Files:** Create `eureka-server/build.gradle.kts`, `eureka-server/src/main/java/com/plantarena/eureka/EurekaServerApplication.java`, `eureka-server/src/main/resources/application.yml`
 
-- [ ] **Step 1: Build file**
+- [x] **Step 1: Build file**
 
 ```kotlin
 plugins {
@@ -484,7 +484,7 @@ dependencies {
 }
 ```
 
-- [ ] **Step 2: Application + config**
+- [x] **Step 2: Application + config**
 
 `EurekaServerApplication.java`:
 ```java
@@ -523,7 +523,7 @@ management:
         include: health,info
 ```
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 ./gradlew :eureka-server:build
