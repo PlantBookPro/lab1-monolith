@@ -1,0 +1,26 @@
+# Профиль test (IT на Testcontainers): eureka/config-server отключены,
+# миграции — Flyway по схеме tournaments; пул Hikari уменьшен — каждый
+# кэшированный тест-контекст держит открытые соединения, а контейнер
+# PostgreSQL один на JVM (PostgresSupport, singleton).
+spring:
+  cloud:
+    config:
+      enabled: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: tournaments
+  datasource:
+    hikari:
+      maximum-pool-size: 4
+eureka:
+  client:
+    enabled: false
+plantarena:
+  global:
+    epoch-duration: 24h
+    final-window-duration: 6h
+  guests:
+    session-ttl: 24h
+    session-creation-limit-per-minute: 10
+    vote-limit-per-minute: 30
