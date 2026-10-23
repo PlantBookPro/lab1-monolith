@@ -2,8 +2,12 @@ package com.plantarena.tournaments.adapter.out.persistence;
 
 import com.plantarena.support.PostgresSupport;
 import com.plantarena.tournaments.TournamentRepositoryContractTest;
+import com.plantarena.tournaments.domain.InvitationStatus;
 import com.plantarena.tournaments.domain.TagRepository;
 import com.plantarena.tournaments.domain.TournamentRepository;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +70,27 @@ class JpaTournamentRepositoryContractIT extends TournamentRepositoryContractTest
     @Override
     protected TagRepository tags() {
         return tags;
+    }
+
+    @Override
+    protected void givenInvitation(UUID tournamentId, UUID userId, InvitationStatus status) {
+        jdbcTemplate.update("""
+                insert into tournaments.invitation (id, tournament_id, user_id, invited_by,
+                    status, invited_at, version)
+                values (?, ?, ?, ?, ?, ?, 0)
+                """,
+            UUID.randomUUID(), tournamentId, userId, UUID.randomUUID(), status.name(),
+            Timestamp.from(Instant.now()));
+    }
+
+    @Override
+    protected void givenEntry(UUID tournamentId, UUID userId) {
+        jdbcTemplate.update("""
+                insert into tournaments.tournament_entry (id, tournament_id, user_id, plant_id,
+                    reservation_id, status, joined_at)
+                values (?, ?, ?, ?, ?, 'ACTIVE', ?)
+                """,
+            UUID.randomUUID(), tournamentId, userId, UUID.randomUUID(), UUID.randomUUID(),
+            Timestamp.from(Instant.now()));
     }
 }

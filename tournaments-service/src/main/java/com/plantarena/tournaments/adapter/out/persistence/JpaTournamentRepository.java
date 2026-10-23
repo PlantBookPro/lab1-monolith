@@ -5,17 +5,12 @@ import com.plantarena.tournaments.adapter.out.persistence.jpa.TournamentJpaRepos
 import com.plantarena.tournaments.domain.Tournament;
 import com.plantarena.tournaments.domain.TournamentRepository;
 import com.plantarena.tournaments.domain.TournamentStatus;
-import com.plantarena.tournaments.domain.TournamentType;
-import jakarta.persistence.criteria.Predicate;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +53,9 @@ public class JpaTournamentRepository implements TournamentRepository {
     @Override
     @Transactional(readOnly = true)
     public List<Tournament> search(TournamentFilter filter) {
-        return jpa.findAll(toSpecification(filter), toPageRequest(filter))
+        return jpa.search(filter.admin(), filter.userId(),
+                filter.status() == null ? null : filter.status().name(), filter.tagId(),
+                PageRequest.of(filter.offset() / filter.size(), filter.size()))
             .map(this::toDomain)
             .getContent();
     }
@@ -66,7 +63,8 @@ public class JpaTournamentRepository implements TournamentRepository {
     @Override
     @Transactional(readOnly = true)
     public long count(TournamentFilter filter) {
-        return jpa.count(toSpecification(filter));
+        return jpa.countForSearch(filter.admin(), filter.userId(),
+                filter.status() == null ? null : filter.status().name(), filter.tagId());
     }
 
     @Override
@@ -100,28 +98,6 @@ public class JpaTournamentRepository implements TournamentRepository {
         entity.setCancelReason(tournament.cancelReason());
         entity.getTagIds().clear();
         entity.getTagIds().addAll(new HashSet<>(tournament.tagIds()));
-    }
-
-    private Specification<TournamentEntity> toSpecification(TournamentFilter filter) {
-        return (root, query, builder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(builder.equal(root.get("type"), TournamentType.PRIVATE));
-            if (!filter.admin() && filter.userId() != null) {
-                predicates.add(builder.equal(root.get("creatorId"), filter.userId()));
-            }
-            if (filter.status() != null) {
-                predicates.add(builder.equal(root.get("status"), filter.status()));
-            }
-            if (filter.tagId() != null) {
-                predicates.add(builder.isMember(filter.tagId(), root.get("tagIds")));
-            }
-            return builder.and(predicates.toArray(Predicate[]::new));
-        };
-    }
-
-    private PageRequest toPageRequest(TournamentFilter filter) {
-        return PageRequest.of(filter.offset() / filter.size(), filter.size(),
-            Sort.by(Sort.Order.desc("createdAt"), Sort.Order.asc("id")));
     }
 
     private Tournament toDomain(TournamentEntity entity) {
