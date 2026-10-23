@@ -1,0 +1,37 @@
+[versions]
+springBoot = "4.0.8"
+springCloud = "2025.1.4"
+springdoc = "3.1.1"
+archunit = "1.5.0"
+onnxruntime = "1.20.0"
+
+[libraries]
+spring-boot-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+spring-boot-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
+spring-boot-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-r2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc" }
+spring-boot-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-security-crypto = { module = "org.springframework.security:spring-security-crypto" }
+eureka-server = { module = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-server" }
+eureka-client = { module = "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client" }
+config-client = { module = "org.springframework.cloud:spring-cloud-starter-config" }
+config-server = { module = "org.springframework.cloud:spring-cloud-config-server" }
+gateway-webflux = { module = "org.springframework.cloud:spring-cloud-starter-gateway-server-webflux" }
+openfeign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign" }
+circuitbreaker = { module = "org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j" }
+openapi-webmvc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+openapi-webflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
+flyway-core = { module = "org.flywaydb:flyway-core" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+postgresql = { module = "org.postgresql:postgresql" }
+r2dbc-postgresql = { module = "org.postgresql:r2dbc-postgresql" }
+onnxruntime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnxruntime" }
+archunit = { module = "com.tngtech.archunit:archunit-junit6", version.ref = "archunit" }
+spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-webmvc-test = { module = "org.springframework.boot:spring-boot-webmvc-test" }
+spring-boot-webflux-test = { module = "org.springframework.boot:spring-boot-webflux-test" }
+spring-boot-jdbc-test = { module = "org.springframework.boot:spring-boot-jdbc-test" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
+awaitility = { module = "org.awaitility:awaitility" }

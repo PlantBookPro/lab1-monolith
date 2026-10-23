@@ -1,0 +1,11 @@
+.git
+.gradle
+.idea
+build
+*/build
+docs
+monolith-reference
+storage
+PlantArena API
+.env
+use-case-diagram.png

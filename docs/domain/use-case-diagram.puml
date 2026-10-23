@@ -1,0 +1,159 @@
+@startuml use-case-diagram
+' Диаграмма вариантов использования Plant Arena (лаба №1, модульный монолит)
+' Источники: docs/requirements.md (разделы 2, 13), контроллеры <context>.adapter.in.web
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+
+actor "Гость\n(guest token)" as Guest
+actor "Пользователь\n(USER)" as User
+actor "Модератор\n(MODERATOR)" as Moderator
+actor "Администратор\n(ADMIN)" as Admin
+actor "Планировщик\n(Scheduler)" as Scheduler
+actor "ONNX-модель\n(автомодерация)" as Onnx
+
+User <|-- Moderator
+Moderator <|-- Admin
+
+rectangle "Plant Arena" {
+  package "identity" {
+    usecase "Создать учётную запись USER" as UC_CreateUser
+    usecase "Просмотреть список пользователей" as UC_ListUsers
+    usecase "Просмотреть профиль пользователя" as UC_GetUser
+    usecase "Изменить свой профиль (displayName)" as UC_PatchMe
+    usecase "Деактивировать пользователя" as UC_DeactivateUser
+    usecase "Назначить / снять роль MODERATOR" as UC_ManageRoles
+    usecase "Просмотреть свой профиль (/me)" as UC_GetMe
+    usecase "Задать свои координаты" as UC_SetLocation
+    usecase "Создать гостевую сессию\n(получить токен)" as UC_GuestSession
+  }
+
+  package "media" {
+    usecase "Загрузить изображение\n(POST /files)" as UC_Upload
+    usecase "Скачать изображение" as UC_Download
+    usecase "Удалить незадействованный файл" as UC_DeleteFile
+  }
+
+  package "plants" {
+    usecase "Зарегистрировать растение\n(POST /plants)" as UC_CreatePlant
+    usecase "Просмотреть свои растения\n(список, фильтры)" as UC_ListPlants
+    usecase "Просмотреть растение" as UC_GetPlant
+    usecase "Изменить название растения" as UC_PatchPlant
+    usecase "Архивировать растение" as UC_ArchivePlant
+    usecase "Проверить статус модерации\nрастения" as UC_ModerationStatus
+    usecase "Автоматически промодерировать\nизображение (approve / reject)" as UC_AutoModerate
+  }
+
+  package "tournaments (закрытые)" {
+    usecase "Создать приватный турнир (DRAFT)" as UC_CreateTournament
+    usecase "Изменить параметры турнира" as UC_PatchTournament
+    usecase "Удалить пустой DRAFT" as UC_DeleteTournament
+    usecase "Открыть приём заявок" as UC_OpenRegistration
+    usecase "Отменить турнир" as UC_CancelTournament
+    usecase "Пригласить пользователя" as UC_Invite
+    usecase "Отозвать приглашение" as UC_RevokeInvite
+    usecase "Просмотреть свои приглашения" as UC_MyInvites
+    usecase "Принять приглашение\n(с plantId)" as UC_AcceptInvite
+    usecase "Отклонить приглашение" as UC_DeclineInvite
+    usecase "Запустить турнир (после дедлайна)" as UC_StartTournament
+    usecase "Просмотреть доступные турниры\nи детали" as UC_ViewTournaments
+    usecase "Просмотреть участников / раунды /\nлидерборд / итоги" as UC_ViewResults
+    usecase "Управлять справочником тегов\n(CRUD)" as UC_Tags
+    usecase "Просмотреть справочник тегов" as UC_ViewTags
+    usecase "Обработать наступившие дедлайны\n(раунды, отбор, финал)" as UC_RunDueJobs
+  }
+
+  package "global + feed + voting" {
+    usecase "Подать растение в глобальный\nтурнир (очередь отбора)" as UC_GlobalEntry
+    usecase "Посмотреть своё участие" as UC_MyGlobalEntry
+    usecase "Снять заявку до включения\nв окно" as UC_WithdrawGlobal
+    usecase "Просмотреть конфигурацию и окна\nглобального турнира" as UC_ViewGlobal
+    usecase "Просмотреть кластеры\nи лидерборды (глобальные)" as UC_GlobalLeaderboards
+    usecase "Просмотреть ленту\n(feed, cursor)" as UC_Feed
+    usecase "Поставить / убрать голос\n(LIKE / DISLIKE)" as UC_Vote
+    usecase "Проверить свой голос" as UC_MyVote
+  }
+}
+
+' --- identity ---
+Moderator --> UC_CreateUser
+Admin --> UC_CreateUser
+Moderator --> UC_ListUsers
+Admin --> UC_ListUsers
+User --> UC_GetMe
+User --> UC_PatchMe
+User --> UC_SetLocation
+Admin --> UC_ManageRoles
+Admin --> UC_DeactivateUser
+User --> UC_GetUser
+Guest --> UC_GuestSession
+
+' --- media ---
+User --> UC_Upload
+User --> UC_Download
+Admin --> UC_Download
+User --> UC_DeleteFile
+Admin --> UC_DeleteFile
+
+' --- plants ---
+User --> UC_CreatePlant
+User --> UC_ListPlants
+User --> UC_GetPlant
+User --> UC_PatchPlant
+User --> UC_ArchivePlant
+User --> UC_ModerationStatus
+UC_CreatePlant ..> UC_AutoModerate : <<include>>
+Onnx --> UC_AutoModerate
+
+' --- закрытые турниры ---
+Moderator --> UC_CreateTournament
+Admin --> UC_CreateTournament
+Moderator --> UC_PatchTournament
+Admin --> UC_PatchTournament
+Moderator --> UC_DeleteTournament
+Admin --> UC_DeleteTournament
+Moderator --> UC_OpenRegistration
+Admin --> UC_OpenRegistration
+Moderator --> UC_CancelTournament
+Admin --> UC_CancelTournament
+Moderator --> UC_Invite
+Admin --> UC_Invite
+Moderator --> UC_RevokeInvite
+Admin --> UC_RevokeInvite
+Moderator --> UC_StartTournament
+Admin --> UC_StartTournament
+Moderator --> UC_Tags
+Admin --> UC_Tags
+User --> UC_MyInvites
+User --> UC_AcceptInvite
+User --> UC_DeclineInvite
+User --> UC_ViewTournaments
+User --> UC_ViewResults
+User --> UC_ViewTags
+Guest --> UC_ViewTags
+
+UC_AcceptInvite ..> UC_ModerationStatus : <<extend>>\n(если модерация ещё идёт)
+UC_StartTournament ..> UC_RunDueJobs : <<include>>\n(тот же use case)
+Scheduler --> UC_RunDueJobs
+
+' --- глобальный турнир, лента, голосование ---
+User --> UC_GlobalEntry
+User --> UC_MyGlobalEntry
+User --> UC_WithdrawGlobal
+Guest --> UC_ViewGlobal
+User --> UC_ViewGlobal
+Guest --> UC_GlobalLeaderboards
+User --> UC_GlobalLeaderboards
+Guest --> UC_Feed
+User --> UC_Feed
+Guest --> UC_Vote
+User --> UC_Vote
+Guest --> UC_MyVote
+User --> UC_MyVote
+
+UC_GlobalEntry ..> UC_CreatePlant : <<precondition>>\n(нужно одобренное растение)
+UC_Vote ..> UC_GuestSession : <<extend>>\n(гость голосует по токену)
+
+@enduml
