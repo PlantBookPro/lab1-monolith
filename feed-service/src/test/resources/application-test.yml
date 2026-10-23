@@ -1,0 +1,22 @@
+# Профиль test (IT на Testcontainers): eureka/config-server отключены,
+# миграции — Flyway по схеме feed; пул Hikari уменьшен — каждый
+# кэшированный тест-контекст держит открытые соединения, а контейнер
+# PostgreSQL один на JVM (PostgresSupport, singleton).
+spring:
+  cloud:
+    config:
+      enabled: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: feed
+  datasource:
+    hikari:
+      maximum-pool-size: 4
+eureka:
+  client:
+    enabled: false
+plantarena:
+  feed:
+    cursor-secret: test-only-cursor-secret
+    cursor-ttl: 1h
