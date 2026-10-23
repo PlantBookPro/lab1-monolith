@@ -1945,7 +1945,7 @@ git add -A && git commit -m "feat(lab2): moderation-service :8084 — Feign к p
 
 ### Task 10: geo-service (Reactor + R2DBC) ⭐
 
-- [ ] **Step 1: Copy the context**
+- [x] **Step 1: Copy the context**
 
 ```bash
 mkdir -p geo-service/src/main/java/com/plantarena geo-service/src/main/resources/db/migration
@@ -1957,7 +1957,7 @@ rm -rf geo-service/src/main/java/com/plantarena/geo/adapter/out/persistence
 ```
 Keep `geo/api/ClusterAssignment.java` (HTTP contract reference) and `geo/domain/*` (Geohash, policies, ClusterSnapshot, ClusterMember — unchanged).
 
-- [ ] **Step 2: `build.gradle.kts`**
+- [x] **Step 2: `build.gradle.kts`**
 
 ```kotlin
 plugins {
@@ -2006,7 +2006,7 @@ tasks.jar { enabled = false }
 ```
 NOTE: `spring-boot-starter-data-r2dbc` + `r2dbc-postgresql` — NO `spring-boot-starter-jdbc`, NO `spring-boot-starter-data-jpa` (acceptance criterion 6).
 
-- [ ] **Step 3: Application class**
+- [x] **Step 3: Application class**
 
 `geo-service/src/main/java/com/plantarena/geo/GeoServiceApplication.java`:
 ```java
@@ -2028,7 +2028,7 @@ public class GeoServiceApplication {
 ```
 (`DataSourceAutoConfiguration` excluded so the JDBC driver on the classpath (for Flyway) does not create a competing pooled `DataSource`; Flyway builds its own from `spring.flyway.url`. If Flyway autoconfig requires a `DataSource` bean and fails, instead keep autoconfig on and set `spring.flyway.url` — verify at build; the exclude approach is the standard one.)
 
-- [ ] **Step 4: Reactive repository port + R2DBC persistence**
+- [x] **Step 4: Reactive repository port + R2DBC persistence**
 
 Replace `geo/domain/ClusterSnapshotRepository.java` (blocking) with a reactive port:
 ```java
@@ -2160,7 +2160,7 @@ interface ClusterSnapshotRowRepository extends ReactiveCrudRepository<ClusterSna
 }
 ```
 
-- [ ] **Step 5: Reactive application service**
+- [x] **Step 5: Reactive application service**
 
 Replace `geo/application/ClusterAssignmentFacade.java` with `geo-service/.../geo/application/ClusterAssignmentService.java`:
 ```java
@@ -2225,7 +2225,7 @@ public class ClusterAssignmentService {
 ```
 NOTE (fix before writing): the double-construction above is clumsy — restructure: build the `ClusterSnapshot` list FIRST (each with its UUID), then `Flux.fromIterable(snapshots).flatMap(repository::save).then(...)` returning `snapshots.map(s -> new AssignedCluster(s.id(), s.clusterKey(), entryIds))`. Write it that way — single construction, no placeholder method. Match the real `ClusterSnapshot` factory (`fix(...)`) and `ClusterAssignment` record signatures from the copied code.
 
-- [ ] **Step 6: WebFlux controller**
+- [x] **Step 6: WebFlux controller**
 
 `geo-service/src/main/java/com/plantarena/geo/adapter/in/web/InternalClusterController.java`:
 ```java
@@ -2273,7 +2273,7 @@ public class InternalClusterController {
 ```
 NOTE: `ClusterAssignment.AssignedCluster` must be JSON-serializable (record ✓). If `AssignedCluster`'s real shape differs (e.g. `snapshotId` name), keep the domain record — Feign consumers (tournaments) define a matching view.
 
-- [ ] **Step 7: Config + yml**
+- [x] **Step 7: Config + yml**
 
 `geo-service/.../geo/config/GeoServiceConfig.java`: `@Configuration @EnableConfigurationProperties(GeoClusteringSettings.class)`, beans `Clock utcClock()`, `ClusteringPolicy geohashClusteringPolicy(GeoClusteringSettings s)` (copy from monolith `GeoWiringConfig`), OpenAPI bean (webflux title).
 
@@ -2314,7 +2314,7 @@ plantarena:
     geohash-precision: 4
 ```
 
-- [ ] **Step 8: Tests**
+- [x] **Step 8: Tests**
 
 - Keep unchanged: `GeohashTest`, `GeohashClusteringPolicyTest`, `ClusterSnapshotTest` (pure domain).
 - Rewrite `ClusterAssignmentFacadeTest` → `ClusterAssignmentServiceTest` using `StepVerifier` with a reactive in-memory fake `ClusterSnapshotRepository` (implement the reactive port over a `ConcurrentHashMap`).
@@ -2322,7 +2322,7 @@ plantarena:
 - `application-test.yml`: eureka/config off, `plantarena.geo.geohash-precision: 4`.
 - Add `architecture/GeoLayerRulesTest` — adapt: domain must not depend on Spring/infrastructure (allow `reactor.core` in domain — the reactive port requires it; document in the test's rule exceptions).
 
-- [ ] **Step 9: Verify and commit**
+- [x] **Step 9: Verify and commit**
 
 ```bash
 ./gradlew :geo-service:test :geo-service:integrationTest :geo-service:build
