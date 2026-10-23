@@ -3467,12 +3467,12 @@ git add -A && git commit -m "build(lab2): docker-compose (postgres 7 БД + 10 �
 
 ### Task 16: Документация + CI
 
-- [ ] **Step 1: `docs/architecture.md`** — mermaid diagram: Gateway → services → Eureka/Config; Feign dependency graph (identity←{media,plants,tournaments,feed}; media←{plants,moderation}; plants←{moderation,tournaments,feed}; geo←tournaments; tournaments←feed); DB-per-service table; ports table; event delivery table (plants→tournaments HTTP POST, tournaments→feed HTTP POST, moderation polling).
-- [ ] **Step 2: `docs/domain/context-map.md`** — update the "Эволюция" section: lab2 state (Feign/HTTP instead of in-process ACL; events over HTTP; polling for moderation), keep the lab4 Kafka plan.
-- [ ] **Step 3: `docs/domain/adr/`** — add ADR-014 (reactive+JPA pattern; R2DBC geo), ADR-015 (events over HTTP + moderation polling), ADR-016 (demo auth across services, internal endpoints trust), ADR-017 (shared module split lib/web/webflux), ADR-018 (ApiError error translation over Feign), ADR-019 (single postgres container, config-repo on classpath). Short format like existing ADRs.
-- [ ] **Step 4: `docs/api-contracts/`** — one markdown per internal contract: `identity-internal.md`, `media-internal.md`, `plants-internal.md`, `geo-internal.md`, `tournaments-internal.md`, `feed-internal.md` — endpoint, request/response JSON examples, error codes, which Feign client consumes it.
-- [ ] **Step 5: `README.md`** — rewrite for lab2: architecture summary, how to run (`docker compose up --build`, URL map, Eureka/Config/Gateway/Swagger URLs), local dev (create DBs via `scripts/local/create-databases.sql`, `./gradlew :<svc>:bootRun`, infra first), test commands, acceptance checklist. Note Bruno collection works against `:8080` unchanged.
-- [ ] **Step 6: `.github/workflows/ci.yml`** — replace `./mvnw verify` with `./gradlew build` (Testcontainers works on ubuntu-latest), drop the maven cache, add gradle cache:
+- [x] **Step 1: `docs/architecture.md`** — mermaid diagram: Gateway → services → Eureka/Config; Feign dependency graph (identity←{media,plants,tournaments,feed}; media←{plants,moderation}; plants←{moderation,tournaments,feed}; geo←tournaments; tournaments←feed); DB-per-service table; ports table; event delivery table (plants→tournaments HTTP POST, tournaments→feed HTTP POST, moderation polling).
+- [x] **Step 2: `docs/domain/context-map.md`** — update the "Эволюция" section: lab2 state (Feign/HTTP instead of in-process ACL; events over HTTP; polling for moderation), keep the lab4 Kafka plan.
+- [x] **Step 3: `docs/domain/adr/`** — add ADR-014 (reactive+JPA pattern; R2DBC geo), ADR-015 (events over HTTP + moderation polling), ADR-016 (demo auth across services, internal endpoints trust), ADR-017 (shared module split lib/web/webflux), ADR-018 (ApiError error translation over Feign), ADR-019 (single postgres container, config-repo on classpath). Short format like existing ADRs.
+- [x] **Step 4: `docs/api-contracts/`** — one markdown per internal contract: `identity-internal.md`, `media-internal.md`, `plants-internal.md`, `geo-internal.md`, `tournaments-internal.md`, `feed-internal.md` — endpoint, request/response JSON examples, error codes, which Feign client consumes it.
+- [x] **Step 5: `README.md`** — rewrite for lab2: architecture summary, how to run (`docker compose up --build`, URL map, Eureka/Config/Gateway/Swagger URLs), local dev (create DBs via `scripts/local/create-databases.sql`, `./gradlew :<svc>:bootRun`, infra first), test commands, acceptance checklist. Note Bruno collection works against `:8080` unchanged.
+- [x] **Step 6: `.github/workflows/ci.yml`** — replace `./mvnw verify` with `./gradlew build` (Testcontainers works on ubuntu-latest), drop the maven cache, add gradle cache:
 ```yaml
 name: ci
 on: [push, pull_request]
@@ -3486,7 +3486,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build
 ```
-- [ ] **Step 7: Update `.env.example`** (DB_USERNAME, DB_PASSWORD, BOOTSTRAP_ADMIN_*, FEED_CURSOR_SECRET) and commit:
+- [x] **Step 7: Update `.env.example`** (DB_USERNAME, DB_PASSWORD, BOOTSTRAP_ADMIN_*, FEED_CURSOR_SECRET) and commit:
 ```bash
 git add -A && git commit -m "docs(lab2): архитектура, context map, api-контракты, ADR-014..019, README, CI на Gradle"
 ```
