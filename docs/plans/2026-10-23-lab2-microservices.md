@@ -2333,7 +2333,7 @@ git add -A && git commit -m "feat(lab2): geo-service :8085 — полность�
 
 ### Task 11: tournaments-service, часть 1 — ядро + JPA (Tournament, Tag)
 
-- [ ] **Step 1: Copy the context**
+- [x] **Step 1: Copy the context**
 
 ```bash
 mkdir -p tournaments-service/src/main/java/com/plantarena tournaments-service/src/main/resources/db/migration
@@ -2350,7 +2350,7 @@ rm tournaments-service/src/main/java/com/plantarena/tournaments/adapter/out/pers
 rm tournaments-service/src/main/java/com/plantarena/tournaments/adapter/out/persistence/JdbcTagRepository.java
 ```
 
-- [ ] **Step 2: `build.gradle.kts`**
+- [x] **Step 2: `build.gradle.kts`**
 
 ```kotlin
 plugins {
@@ -2403,7 +2403,7 @@ tasks.jar { enabled = false }
 ```
 NOTE: `spring-boot-starter-data-jpa` brings Hibernate + `JpaTransactionManager`; the remaining `JdbcClient` repositories participate in JPA transactions on the same `DataSource` (documented pattern, ADR-014). `spring-boot-starter-webflux` (NOT webmvc) — Netty stack.
 
-- [ ] **Step 3: JPA entities + repositories for Tournament and Tag**
+- [x] **Step 3: JPA entities + repositories for Tournament and Tag**
 
 `adapter/out/persistence/jpa/TournamentEntity.java`:
 ```java
@@ -2577,7 +2577,7 @@ public interface TagJpaRepository extends JpaRepository<TagEntity, UUID> {
 }
 ```
 
-- [ ] **Step 4: Domain-port adapters over JPA**
+- [x] **Step 4: Domain-port adapters over JPA**
 
 `adapter/out/persistence/JpaTournamentRepository.java` — implements the existing domain port `com.plantarena.tournaments.domain.TournamentRepository` (`save`, `findById`, `delete`, `search(TournamentFilter)`, `count(filter)`, `findDueForStart(now, limit)`):
 - `save`: if `jpa.existsById(t.id())` → load entity, copy mutable fields from the domain object (name, description, status, type, algorithm, registrationDeadline, roundDuration, eliminationFraction, minParticipants, cancelReason, tagIds), keep `@Version`; else create new entity from domain (version starts 0). After `jpa.save`, map back to domain with the post-save version.
@@ -2587,7 +2587,7 @@ public interface TagJpaRepository extends JpaRepository<TagEntity, UUID> {
 
 `adapter/out/persistence/JpaTagRepository.java` — implements domain port `TagRepository` (`save`, `findById`, `findByName`, `findAll(paged)`, `count`, `delete`, `isUsedByTournament`): `isUsedByTournament` via a `@Query("select count(t) > 0 from TournamentEntity t where :tagId member of t.tagIds")` on `TournamentJpaRepository`.
 
-- [ ] **Step 5: Config + yml + application class**
+- [x] **Step 5: Config + yml + application class**
 
 `TournamentsServiceApplication.java`:
 ```java
@@ -2671,14 +2671,14 @@ resilience4j:
         baseConfig: default
 ```
 
-- [ ] **Step 6: Tests (part 1)**
+- [x] **Step 6: Tests (part 1)**
 
 - Keep: all domain tests, all application tests + fakes (ports unchanged), JDBC contract ITs for entry/invitation/window/epoch/guest-session.
 - Replace `JdbcTournamentRepositoryContractIT` → `JpaTournamentRepositoryContractIT` and `JdbcTagRepositoryContractIT` → `JpaTagRepositoryContractIT`: same abstract contracts (`TournamentRepositoryContractTest`, `TagRepositoryContractTest`), now against the JPA adapters on Testcontainers PG (with Flyway migrations). Delete the old JDBC impls' ITs.
 - `application-test.yml`: eureka/config off + `plantarena.*` test values (copy from monolith test resources if any).
 - Adapted `AbstractIntegrationTest` — WebFlux flavor: `@SpringBootTest(webEnvironment = RANDOM_PORT)` + `WebTestClient` (no MockMvc). Provide it now; controller ITs come in Task 12.
 
-- [ ] **Step 7: Verify and commit**
+- [x] **Step 7: Verify and commit**
 
 ```bash
 ./gradlew :tournaments-service:test :tournaments-service:integrationTest :tournaments-service:build
