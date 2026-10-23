@@ -1252,7 +1252,7 @@ git add -A && git commit -m "feat(lab2): identity-service :8081 — контек
 
 **Files:** analogous to Task 6 + Feign identity client + remote actor provider + internal media endpoints.
 
-- [ ] **Step 1: Copy the context**
+- [x] **Step 1: Copy the context**
 
 ```bash
 mkdir -p media-service/src/main/java/com/plantarena media-service/src/main/resources/db/migration
@@ -1263,14 +1263,14 @@ cp -r monolith-reference/src/test/java/com/plantarena/media media-service/src/te
 cp -r monolith-reference/src/test/java/com/plantarena/support media-service/src/test/java/com/plantarena/
 ```
 
-- [ ] **Step 2: `build.gradle.kts`** — same as identity-service (Task 6 Step 2) with additions:
+- [x] **Step 2: `build.gradle.kts`** — same as identity-service (Task 6 Step 2) with additions:
 ```kotlin
     implementation(libs.openfeign)
     implementation(libs.circuitbreaker)
 ```
 and on the application class `@EnableFeignClients`. Full file = identity's file + the two lines above (keep `tasks.jar { enabled = false }`, IT task, BOM imports).
 
-- [ ] **Step 3: Application class**
+- [x] **Step 3: Application class**
 
 `media-service/src/main/java/com/plantarena/media/MediaServiceApplication.java`:
 ```java
@@ -1289,7 +1289,7 @@ public class MediaServiceApplication {
 }
 ```
 
-- [ ] **Step 4: Feign identity client + remote actor provider**
+- [x] **Step 4: Feign identity client + remote actor provider**
 
 `media-service/src/main/java/com/plantarena/media/api/client/IdentityDirectoryClient.java`:
 ```java
@@ -1365,7 +1365,7 @@ public class RemoteHeaderCurrentActorProvider implements CurrentActorProvider {
 }
 ```
 
-- [ ] **Step 5: Internal media endpoints**
+- [x] **Step 5: Internal media endpoints**
 
 `media-service/src/main/java/com/plantarena/media/adapter/in/web/InternalMediaController.java`:
 ```java
@@ -1425,7 +1425,7 @@ public class InternalMediaController {
 ```
 (`MediaExceptionHandler` already maps `MediaAssetNotFoundException` → 404 and `AssetInUseException` → 409 — no changes.)
 
-- [ ] **Step 6: Config + yml**
+- [x] **Step 6: Config + yml**
 
 `media-service/src/main/java/com/plantarena/media/config/MediaServiceConfig.java`:
 ```java
@@ -1462,7 +1462,7 @@ plantarena:
       root: ${MEDIA_STORAGE_ROOT:./storage/media}
 ```
 
-- [ ] **Step 7: Tests**
+- [x] **Step 7: Tests**
 
 - `application-test.yml` (test resources) — same pattern as identity's, with `flyway.schemas: media` and `plantarena.media.storage.root: ${java.io.tmpdir}/media-test` (see monolith `AbstractIntegrationTest` for how it set temp storage — replicate).
 - Adapt `AbstractIntegrationTest` (copied in Step 1) same as Task 6 Step 6.
@@ -1470,7 +1470,7 @@ plantarena:
 - Keep: all media unit tests + fakes, `JdbcMediaAssetRepositoryContractIT`, `JdbcAssetClaimRepositoryIT`, `MediaApiIT` — **adapt `MediaApiIT`**: replace DB-backed actor resolution with the stub (add `X-Demo-Roles` headers where the monolith relied on identity roles; e.g. admin actions send `X-Demo-Roles: ADMIN`).
 - Add `architecture/MediaLayerRulesTest` (same adaptation as Task 6 Step 6).
 
-- [ ] **Step 8: Verify and commit**
+- [x] **Step 8: Verify and commit**
 
 ```bash
 ./gradlew :media-service:test :media-service:integrationTest :media-service:build
