@@ -1,13 +1,13 @@
 package com.plantarena.tournaments.api.client;
 
-import com.plantarena.tournaments.api.client.fallback.GeoClustersClientFallback;
+import com.plantarena.tournaments.api.client.fallback.GeoClustersClientFallbackFactory;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "geo-service", fallback = GeoClustersClientFallback.class)
+@FeignClient(name = "geo-service", fallbackFactory = GeoClustersClientFallbackFactory.class)
 public interface GeoClustersClient {
 
     @PostMapping("/internal/clusters/assignments")

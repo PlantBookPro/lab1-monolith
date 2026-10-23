@@ -1,6 +1,6 @@
 package com.plantarena.tournaments.api.client;
 
-import com.plantarena.tournaments.api.client.fallback.FeedEventsClientFallback;
+import com.plantarena.tournaments.api.client.fallback.FeedEventsClientFallbackFactory;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "feed-service", fallback = FeedEventsClientFallback.class)
+@FeignClient(name = "feed-service", fallbackFactory = FeedEventsClientFallbackFactory.class)
 public interface FeedEventsClient {
 
     @PostMapping("/internal/feed/projections")

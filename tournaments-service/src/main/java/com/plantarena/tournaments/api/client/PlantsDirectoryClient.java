@@ -1,6 +1,6 @@
 package com.plantarena.tournaments.api.client;
 
-import com.plantarena.tournaments.api.client.fallback.PlantsDirectoryClientFallback;
+import com.plantarena.tournaments.api.client.fallback.PlantsDirectoryClientFallbackFactory;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "plants-service", fallback = PlantsDirectoryClientFallback.class)
+@FeignClient(name = "plants-service", fallbackFactory = PlantsDirectoryClientFallbackFactory.class)
 public interface PlantsDirectoryClient {
 
     @GetMapping("/internal/plants/{plantId}")

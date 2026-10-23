@@ -18,4 +18,8 @@ public final class ApiErrorDecoder {
             return Optional.empty();
         }
     }
+
+    public static boolean isBusinessError(Throwable cause) {
+        return cause instanceof FeignException e && decode(e).isPresent();
+    }
 }
