@@ -968,7 +968,7 @@ git add -A && git commit -m "feat(lab2): api-gateway :8080 — роуты сер
 - Create: `identity-service/build.gradle.kts`, `IdentityServiceApplication.java`, `application.yml`, `config/` wiring, `adapter/in/web/InternalDirectoryController.java`, `adapter/in/web/InternalExceptionHandler.java`, test support
 - Copy: identity context (main + tests), migrations
 
-- [ ] **Step 1: Copy the context**
+- [x] **Step 1: Copy the context**
 
 ```bash
 mkdir -p identity-service/src/main/java/com/plantarena identity-service/src/main/resources/db/migration
@@ -978,7 +978,7 @@ mkdir -p identity-service/src/test/java/com/plantarena
 cp -r monolith-reference/src/test/java/com/plantarena/identity identity-service/src/test/java/com/plantarena/
 ```
 
-- [ ] **Step 2: `build.gradle.kts`**
+- [x] **Step 2: `build.gradle.kts`**
 
 ```kotlin
 plugins {
@@ -1027,7 +1027,7 @@ tasks.named("check") { dependsOn(integrationTestTask) }
 tasks.jar { enabled = false }
 ```
 
-- [ ] **Step 3: Application class + config**
+- [x] **Step 3: Application class + config**
 
 `identity-service/src/main/java/com/plantarena/identity/IdentityServiceApplication.java`:
 ```java
@@ -1082,7 +1082,7 @@ NOTE: the monolith `IdentityWiringConfig` gated `DemoHeaderCurrentActorProvider`
 ```
 Delete `identity/adapter/in/jobs/BootstrapAdminRunner`'s dependency on old config — it stays as-is (it reads `plantarena.bootstrap-admin.*` properties itself).
 
-- [ ] **Step 4: `application.yml`**
+- [x] **Step 4: `application.yml`**
 
 ```yaml
 spring:
@@ -1123,7 +1123,7 @@ plantarena:
     display-name: ${BOOTSTRAP_ADMIN_DISPLAY_NAME:Admin}
 ```
 
-- [ ] **Step 5: Internal endpoints (the service's published contract)**
+- [x] **Step 5: Internal endpoints (the service's published contract)**
 
 `identity-service/src/main/java/com/plantarena/identity/adapter/in/web/InternalDirectoryController.java`:
 ```java
@@ -1203,7 +1203,7 @@ public class InternalExceptionHandler {
 ```
 NOTE: match `ApiError`'s real constructor (see the actual record in `monolith-reference`); if it has a `retryAt` component pass `null`.
 
-- [ ] **Step 6: Tests**
+- [x] **Step 6: Tests**
 
 Copy test support base (adjust from monolith `support/`):
 ```bash
@@ -1237,7 +1237,7 @@ Test adjustments:
 - `IdentityWiringConfigTest` — delete (wiring changed; the provider is now unconditional).
 - Add `identity-service/src/test/java/com/plantarena/architecture/IdentityLayerRulesTest.java`: copy `monolith-reference/src/test/java/com/plantarena/architecture/LayerRulesTest.java`, keep rules 1, 2, 4, 5, 6 (layering, domain purity, JDBC only in `adapter.out.persistence`, controllers clean, shared independence) scoped to `com.plantarena.identity`; drop JPA-absence rule 3 for this service (still true here — keep it if it passes trivially).
 
-- [ ] **Step 7: Verify and commit**
+- [x] **Step 7: Verify and commit**
 
 ```bash
 ./gradlew :identity-service:test            # unit tests green
