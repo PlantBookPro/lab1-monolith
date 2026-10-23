@@ -3278,7 +3278,7 @@ git add -A && git commit -m "feat(lab2): feed-service :8087 — WebFlux + JdbcCl
 
 **Files:** Create `docker-compose.yml`, `scripts/docker/init-databases.sql`, `scripts/local/create-databases.sql`, `<svc>/Dockerfile` ×10.
 
-- [ ] **Step 1: DB init scripts**
+- [x] **Step 1: DB init scripts**
 
 `scripts/docker/init-databases.sql` (mounted into the postgres container; runs once on empty volume):
 ```sql
@@ -3292,7 +3292,7 @@ CREATE DATABASE feed;
 ```
 `scripts/local/create-databases.sql` — same content (for local `psql -U postgres -f`).
 
-- [ ] **Step 2: Dockerfile template** (one per Boot module: eureka-server, config-server, api-gateway, 7 services; context = repo root)
+- [x] **Step 2: Dockerfile template** (one per Boot module: eureka-server, config-server, api-gateway, 7 services; context = repo root)
 
 `<module>/Dockerfile`:
 ```dockerfile
@@ -3311,7 +3311,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 `moderation-service/Dockerfile` additionally downloads the ONNX model (copy the approach from `monolith-reference/Dockerfile`: run the `downloadModerationModel` gradle task in the build stage and `COPY --from=build /build/moderation-service/build/models/ /app/models/`, set `ENV MODERATION_MODEL_PATH=/app/models/mobilenetv2-1.0.onnx`).
 
-- [ ] **Step 3: `docker-compose.yml`**
+- [x] **Step 3: `docker-compose.yml`**
 
 ```yaml
 services:
@@ -3455,7 +3455,7 @@ volumes:
 ```
 NOTE: `SPRING_CONFIG_IMPORT: configserver:...` (non-optional) in docker — config server must be up (healthcheck-gated). The `&service-env`/`<<: *service-env` YAML anchors keep it DRY; if compose complains about anchor merging with `depends_on`, inline the env per service.
 
-- [ ] **Step 4: Validate and commit**
+- [x] **Step 4: Validate and commit**
 
 ```bash
 docker compose config -q && echo OK
