@@ -830,7 +830,7 @@ git add -A && git commit -m "feat(lab2): config-server :8888 (native, classpath 
 
 **Files:** Create `api-gateway/build.gradle.kts`, `api-gateway/src/main/java/com/plantarena/gateway/ApiGatewayApplication.java`, `api-gateway/src/main/resources/application.yml`
 
-- [ ] **Step 1: Build file + application**
+- [x] **Step 1: Build file + application**
 
 ```kotlin
 plugins {
@@ -860,7 +860,7 @@ public class ApiGatewayApplication {
 }
 ```
 
-- [ ] **Step 2: `application.yml`** (route order matters: tournaments first so `/api/v1/me/invitations/**` and `/api/v1/me/global-entry` are not shadowed by identity's `/api/v1/me/**`)
+- [x] **Step 2: `application.yml`** (route order matters: tournaments first so `/api/v1/me/invitations/**` and `/api/v1/me/global-entry` are not shadowed by identity's `/api/v1/me/**`)
 
 ```yaml
 server:
@@ -953,7 +953,7 @@ management:
         include: health,info,gateway
 ```
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 ```bash
 ./gradlew :api-gateway:build
