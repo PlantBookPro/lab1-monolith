@@ -3495,13 +3495,13 @@ git add -A && git commit -m "docs(lab2): архитектура, context map, ap
 
 ### Task 17: Финальная верификация + удаление monolith-reference
 
-- [ ] **Step 1: Full build**
+- [x] **Step 1: Full build**
 
 ```bash
 ./gradlew clean build   # все 13 модулей: unit + IT (Testcontainers) зелёные
 ```
 
-- [ ] **Step 2: Smoke test via docker compose** (requires Docker; if unavailable, document and skip with a note)
+- [x] **Step 2: Smoke test via docker compose** (requires Docker; if unavailable, document and skip with a note)
 
 ```bash
 docker compose up --build -d
@@ -3519,7 +3519,7 @@ Acceptance checks:
 8. Bruno: прогнать пару запросов из `PlantArena API` против `:8080`.
 9. `docker compose down -v`.
 
-- [ ] **Step 3: Remove monolith-reference and finalize**
+- [x] **Step 3: Remove monolith-reference and finalize**
 
 ```bash
 git rm -r monolith-reference
@@ -3527,7 +3527,7 @@ git rm -r monolith-reference
 git add -A && git commit -m "chore(lab2): удалён monolith-reference — декомпозиция завершена"
 ```
 
-- [ ] **Step 4: Report** — summarize acceptance criteria status (10 пунктов из спеки) to the user.
+- [x] **Step 4: Report** — summarize acceptance criteria status (10 пунктов из спеки) to the user.
 
 ---
 
