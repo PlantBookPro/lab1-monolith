@@ -206,7 +206,7 @@ git add -A && git commit -m "build(lab2): каркас монорепо — 13 �
 - Create: `shared-web/build.gradle.kts` + `TraceIdFilter`, `ApiExceptionHandler`, `SharedWebConfig`
 - Create: `shared-webflux/build.gradle.kts` + `TraceIdWebFilter`, `ReactiveApiExceptionHandler`, `SharedWebfluxConfig`, `ReactiveCurrentActorProvider`, `Blocking`
 
-- [ ] **Step 1: `shared-lib` — pure Java shared kernel**
+- [x] **Step 1: `shared-lib` — pure Java shared kernel**
 
 `shared-lib/build.gradle.kts`:
 ```kotlin
@@ -230,7 +230,7 @@ done
 ```
 Copied files need **no changes** (they are pure Java; verify none import servlet/Spring — `ApiError`, `PaginationParams`, `InvalidPaginationException`, all of `event/` and `security/` are pure).
 
-- [ ] **Step 2: `shared-web` — servlet web shared (MVC services only)**
+- [x] **Step 2: `shared-web` — servlet web shared (MVC services only)**
 
 `shared-web/build.gradle.kts`:
 ```kotlin
@@ -275,7 +275,7 @@ public class SharedWebConfig {
 ```
 (`ApiExceptionHandler` and `TraceIdFilter` copied unchanged.)
 
-- [ ] **Step 3: `shared-webflux` — reactive web shared (WebFlux services only)**
+- [x] **Step 3: `shared-webflux` — reactive web shared (WebFlux services only)**
 
 `shared-webflux/build.gradle.kts`:
 ```kotlin
@@ -458,7 +458,7 @@ public final class Blocking {
 }
 ```
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```bash
 ./gradlew :shared-lib:build :shared-web:build :shared-webflux:build
