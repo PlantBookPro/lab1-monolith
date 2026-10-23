@@ -1483,7 +1483,7 @@ git add -A && git commit -m "feat(lab2): media-service :8082 — контекс�
 
 **Files:** copy plants context; replace `adapter/out/media` with Feign adapter; add identity client + actor provider; add internal endpoints (incl. new PENDING query); add event relay to tournaments.
 
-- [ ] **Step 1: Copy the context**
+- [x] **Step 1: Copy the context**
 
 ```bash
 mkdir -p plants-service/src/main/java/com/plantarena plants-service/src/main/resources/db/migration
@@ -1495,11 +1495,11 @@ cp -r monolith-reference/src/test/java/com/plantarena/support plants-service/src
 rm -rf plants-service/src/main/java/com/plantarena/plants/adapter/out/media
 ```
 
-- [ ] **Step 2: `build.gradle.kts`** — identity's file (Task 6 Step 2) + `implementation(libs.openfeign)` + `implementation(libs.circuitbreaker)`; `name`/dirs implied by module path.
+- [x] **Step 2: `build.gradle.kts`** — identity's file (Task 6 Step 2) + `implementation(libs.openfeign)` + `implementation(libs.circuitbreaker)`; `name`/dirs implied by module path.
 
-- [ ] **Step 3: Application class** — same pattern as media (Task 7 Step 3): `PlantsServiceApplication`, `scanBasePackages = {"com.plantarena.plants", "com.plantarena.shared.web"}`, `@EnableFeignClients(basePackages = "com.plantarena.plants.api.client")`.
+- [x] **Step 3: Application class** — same pattern as media (Task 7 Step 3): `PlantsServiceApplication`, `scanBasePackages = {"com.plantarena.plants", "com.plantarena.shared.web"}`, `@EnableFeignClients(basePackages = "com.plantarena.plants.api.client")`.
 
-- [ ] **Step 4: Feign clients**
+- [x] **Step 4: Feign clients**
 
 `plants-service/src/main/java/com/plantarena/plants/api/client/IdentityDirectoryClient.java` — exact copy of media's (Task 7 Step 4), package `com.plantarena.plants.api.client`.
 
@@ -1555,7 +1555,7 @@ public interface TournamentsEventsClient {
 }
 ```
 
-- [ ] **Step 5: HTTP adapter replacing `InProcessMediaGateway`**
+- [x] **Step 5: HTTP adapter replacing `InProcessMediaGateway`**
 
 `plants-service/src/main/java/com/plantarena/plants/adapter/out/media/HttpMediaGateway.java` — implements BOTH ports (`MediaAssetsGateway`, `MediaAssetClaimsGateway`), mirroring the in-process translation (404 → `null`/`AssetNotFoundException` semantics, 409 `ASSET_IN_USE` → `AssetAlreadyClaimedException`):
 ```java
@@ -1603,9 +1603,9 @@ public class HttpMediaGateway implements MediaAssetsGateway, MediaAssetClaimsGat
 ```
 NOTE: check the exact signatures/record names of `MediaAssetsGateway.AssetMetadata` and `AssetAlreadyClaimedException`'s constructor in the copied code and match them (the in-process adapter in `monolith-reference/src/main/java/com/plantarena/plants/adapter/out/media/InProcessMediaGateway.java` is the reference — replicate its translations exactly).
 
-- [ ] **Step 6: Actor provider** — copy media's `RemoteHeaderCurrentActorProvider` (Task 7 Step 4) into `com.plantarena.plants.adapter.in.web`, importing `com.plantarena.plants.api.client.IdentityDirectoryClient`.
+- [x] **Step 6: Actor provider** — copy media's `RemoteHeaderCurrentActorProvider` (Task 7 Step 4) into `com.plantarena.plants.adapter.in.web`, importing `com.plantarena.plants.api.client.IdentityDirectoryClient`.
 
-- [ ] **Step 7: New repository port method for moderation polling**
+- [x] **Step 7: New repository port method for moderation polling**
 
 In `plants-service/.../plants/domain/PlantRepository.java` add:
 ```java
@@ -1613,7 +1613,7 @@ java.util.List<Plant> findByModerationStatus(ModerationStatus status, int limit)
 ```
 Implement in `adapter/out/persistence/JdbcPlantRepository.java` (`SELECT ... WHERE moderation_status = :status ORDER BY created_at, id LIMIT :limit`, same row mapping as `findById`) and in the test fake `application/support/InMemoryPlantRepository.java` (filter + sort by createdAt, limit). Extend `PlantRepositoryContractTest` with a case: saved PENDING/APPROVED plants are returned filtered and limited.
 
-- [ ] **Step 8: Internal endpoints**
+- [x] **Step 8: Internal endpoints**
 
 `plants-service/src/main/java/com/plantarena/plants/adapter/in/web/InternalPlantController.java`:
 ```java
@@ -1708,7 +1708,7 @@ public class InternalPlantController {
 ```
 NOTE (fix before writing): remove the two placeholder imports at the top (`PlantRepositoryPortLike`, the inline `ModerationQueueQuery` reference is the real design): create a small application port `com.plantarena.plants.application.port.in.QueryPendingPlantsUseCase` (or `port/out` query port) with `List<PendingPlant> findPending(int limit)` implemented by a tiny application service that calls `PlantRepository.findByModerationStatus(PENDING, limit)` and maps to `record PendingPlant(UUID plantId, UUID assetId)`. Use it in the controller. `PlantExceptionHandler` already maps plants exceptions (404/409 with `retryAt`) — no changes needed.
 
-- [ ] **Step 9: Event relay to tournaments**
+- [x] **Step 9: Event relay to tournaments**
 
 `plants-service/src/main/java/com/plantarena/plants/adapter/out/events/TournamentsEventRelay.java`:
 ```java
@@ -1756,9 +1756,9 @@ public class TournamentsEventRelay {
 ```
 Also copy `EventWiringConfig` semantics: `plants-service/.../plants/config/PlantsServiceConfig.java` must declare the `IntegrationEventPublisher` bean bridging to Spring's `ApplicationEventPublisher` (copy from `monolith-reference/src/main/java/com/plantarena/config/EventWiringConfig.java`, package `com.plantarena.plants.config`), plus `Clock` and OpenAPI beans (same pattern as Task 7 Step 6).
 
-- [ ] **Step 10: `application.yml`** — identity's template with: `name: plants-service`, `port: 8083`, db `plants`, `flyway.schemas: plants`. No `plantarena.*` settings (plants has none).
+- [x] **Step 10: `application.yml`** — identity's template with: `name: plants-service`, `port: 8083`, db `plants`, `flyway.schemas: plants`. No `plantarena.*` settings (plants has none).
 
-- [ ] **Step 11: Tests**
+- [x] **Step 11: Tests**
 
 - `application-test.yml` + adapted `AbstractIntegrationTest` + `TestHeaderCurrentActorProvider` (copy from media-service, adjust packages).
 - Keep: all plants domain/application unit tests + fakes; repository contract ITs (3 JDBC ones); `PlantExceptionHandlerTest`.
@@ -1766,7 +1766,7 @@ Also copy `EventWiringConfig` semantics: `plants-service/.../plants/config/Plant
 - Extend `PlantRepositoryContractTest` per Step 7.
 - Add `architecture/PlantsLayerRulesTest` (pattern from Task 6).
 
-- [ ] **Step 12: Verify and commit**
+- [x] **Step 12: Verify and commit**
 
 ```bash
 ./gradlew :plants-service:test :plants-service:integrationTest :plants-service:build
