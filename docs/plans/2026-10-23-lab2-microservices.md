@@ -2689,7 +2689,7 @@ git add -A && git commit -m "feat(lab2): tournaments-service :8086 — ядро 
 
 ### Task 12: tournaments-service, часть 2 — WebFlux web-слой + реактивный актёр + внутренние эндпоинты
 
-- [ ] **Step 1: Reactive actor infrastructure**
+- [x] **Step 1: Reactive actor infrastructure**
 
 `tournaments-service/.../tournaments/adapter/in/web/ActorContextWebFilter.java`:
 ```java
@@ -2775,7 +2775,7 @@ public class DemoHeaderReactiveCurrentActorProvider implements ReactiveCurrentAc
 }
 ```
 
-- [ ] **Step 2: Convert the 7 controllers + exception handler to WebFlux**
+- [x] **Step 2: Convert the 7 controllers + exception handler to WebFlux**
 
 Pattern (apply to EVERY endpoint of `TournamentController`, `InvitationController`, `VotingController`, `TagController`, `GuestSessionController`, `GlobalController`, `DemoJobsController`):
 - Return type `Mono<X>` (or `Mono<ResponseEntity<X>>`, `Mono<Void>` for 204).
@@ -2798,7 +2798,7 @@ public Mono<ResponseEntity<TournamentResponse>> create(@Valid @RequestBody Creat
 
 `TournamentsExceptionHandler` → WebFlux: replace `HttpServletRequest` params with `ServerWebExchange`, traceId from `exchange.getAttribute(TraceIdWebFilter.TRACE_ID_ATTRIBUTE)`, keep ALL ~28 exception→ApiError mappings and codes verbatim (incl. `Retry-After` header for `RateLimitExceededException` via `ResponseEntity.status(429).header(...)`).
 
-- [ ] **Step 3: Internal endpoints**
+- [x] **Step 3: Internal endpoints**
 
 `tournaments-service/.../tournaments/adapter/in/web/InternalFeedDirectoryController.java`:
 ```java
@@ -2885,7 +2885,7 @@ public class InternalEventsController {
 ```
 NOTE: `Mono.fromRunnable` runs on the event loop — the use case is blocking (JDBC). Wrap: `Blocking.call(() -> { onPlantModerationDecided...; return null; }).then()`. Same for the directory endpoints above — wrap the blocking calls in `Blocking.call`/`Mono.fromSupplier(...).subscribeOn(boundedElastic)` — use `Blocking.call` consistently.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```bash
 ./gradlew :tournaments-service:test :tournaments-service:build
