@@ -1,7 +1,7 @@
 package com.plantarena.tournaments.adapter.in.web;
 
-import com.plantarena.shared.security.CurrentActor;
-import com.plantarena.shared.security.CurrentActorProvider;
+import com.plantarena.shared.webflux.Blocking;
+import com.plantarena.shared.webflux.ReactiveCurrentActorProvider;
 import com.plantarena.tournaments.application.TournamentsAccessPolicy;
 import com.plantarena.tournaments.application.port.in.AdvanceGlobalCompetitionUseCase;
 import com.plantarena.tournaments.application.port.in.CloseVotingWindowUseCase;
@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 
 @RestController
@@ -28,23 +29,24 @@ public class DemoJobsController {
     private final CloseVotingWindowUseCase closeVotingWindow;
     private final AdvanceGlobalCompetitionUseCase advanceGlobalCompetition;
     private final TournamentsAccessPolicy accessPolicy;
-    private final CurrentActorProvider currentActorProvider;
+    private final ReactiveCurrentActorProvider actors;
     private final Clock clock;
 
     @PostMapping("/run-due")
     @Operation(operationId = "demo-run-due-jobs",
         summary = "Обработать наступившие дедлайны турниров и окон (dev/test, M/A)")
-    public Map<String, Integer> runDue() {
-        CurrentActor actor = currentActorProvider.currentActor();
-        accessPolicy.requireModeratorOrAdmin(actor);
-        AdvanceGlobalCompetitionUseCase.AdvanceReport report =
-            advanceGlobalCompetition.advance(clock.instant());
-        return Map.of(
-            "processed", startTournament.startDue(clock.instant(), 10),
-            "closedWindows", closeVotingWindow.closeDue(clock.instant(), 10),
-            "globalQualificationClosed", report.qualificationClosed(),
-            "globalFinalClosed", report.finalClosed(),
-            "globalFinalsOpened", report.finalsOpened(),
-            "globalEpochsOpened", report.epochsOpened());
+    public Mono<Map<String, Integer>> runDue() {
+        return actors.currentActor().flatMap(actor -> Blocking.call(() -> {
+                accessPolicy.requireModeratorOrAdmin(actor);
+                AdvanceGlobalCompetitionUseCase.AdvanceReport report =
+                    advanceGlobalCompetition.advance(clock.instant());
+                return Map.of(
+                    "processed", startTournament.startDue(clock.instant(), 10),
+                    "closedWindows", closeVotingWindow.closeDue(clock.instant(), 10),
+                    "globalQualificationClosed", report.qualificationClosed(),
+                    "globalFinalClosed", report.finalClosed(),
+                    "globalFinalsOpened", report.finalsOpened(),
+                    "globalEpochsOpened", report.epochsOpened());
+            }));
     }
 }

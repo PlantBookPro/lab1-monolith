@@ -1,8 +1,8 @@
 package com.plantarena.tournaments.adapter.in.web;
 
-import com.plantarena.shared.security.CurrentActor;
-import com.plantarena.shared.security.CurrentActorProvider;
 import com.plantarena.shared.web.PaginationParams;
+import com.plantarena.shared.webflux.Blocking;
+import com.plantarena.shared.webflux.ReactiveCurrentActorProvider;
 import com.plantarena.tournaments.application.port.in.TagsUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 
 @RestController
@@ -30,52 +31,59 @@ import org.springframework.web.bind.annotation.RestController;
 public class TagController {
 
     private final TagsUseCase tags;
-    private final CurrentActorProvider currentActorProvider;
+    private final ReactiveCurrentActorProvider actors;
 
     @PostMapping
     @Operation(operationId = "tags-create", summary = "Создать тег (модератор/админ)")
-    public ResponseEntity<TagResponse> create(@Valid @RequestBody CreateTagRequest request) {
-        CurrentActor actor = currentActorProvider.currentActor();
-        var tag = tags.create(actor, request.name());
-        return ResponseEntity
-            .created(URI.create("/api/v1/tags/" + tag.id()))
-            .body(TagResponse.from(tag));
+    public Mono<ResponseEntity<TagResponse>> create(@Valid @RequestBody CreateTagRequest request) {
+        return actors.currentActor().flatMap(actor -> Blocking.call(() -> {
+                var tag = tags.create(actor, request.name());
+                return ResponseEntity
+                    .created(URI.create("/api/v1/tags/" + tag.id()))
+                    .body(TagResponse.from(tag));
+            }));
     }
 
     @GetMapping
     @Operation(operationId = "tags-list", summary = "Справочник тегов (X-Total-Count)")
-    public ResponseEntity<List<TagResponse>> list(
+    public Mono<ResponseEntity<List<TagResponse>>> list(
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
-        CurrentActor actor = currentActorProvider.currentActor();
-        PaginationParams pagination = PaginationParams.of(page, size);
-        TagsUseCase.TagListResult result = tags.list(actor, pagination.page(), pagination.size());
-        return ResponseEntity.ok()
-            .header("X-Total-Count", String.valueOf(result.total()))
-            .body(result.items().stream().map(TagResponse::from).toList());
+        return actors.currentActor().flatMap(actor -> Blocking.call(() -> {
+                PaginationParams pagination = PaginationParams.of(page, size);
+                TagsUseCase.TagListResult result = tags.list(actor, pagination.page(), pagination.size());
+                return ResponseEntity.ok()
+                    .header("X-Total-Count", String.valueOf(result.total()))
+                    .body(result.items().stream().map(TagResponse::from).toList());
+            }));
     }
 
     @GetMapping("/{id}")
     @Operation(operationId = "tags-get", summary = "Тег по id")
-    public TagResponse get(@PathVariable UUID id) {
-        CurrentActor actor = currentActorProvider.currentActor();
-        return TagResponse.from(tags.get(actor, id));
+    public Mono<TagResponse> get(@PathVariable UUID id) {
+        return actors.currentActor()
+            .flatMap(actor -> Blocking.call(() -> tags.get(actor, id)))
+            .map(TagResponse::from);
     }
 
     @PatchMapping("/{id}")
     @Operation(operationId = "tags-update", summary = "Переименовать тег (админ)")
-    public TagResponse update(@PathVariable UUID id,
-                              @Valid @RequestBody UpdateTagRequest request) {
-        CurrentActor actor = currentActorProvider.currentActor();
-        return TagResponse.from(tags.rename(actor, id, request.name()));
+    public Mono<TagResponse> update(@PathVariable UUID id,
+                                    @Valid @RequestBody UpdateTagRequest request) {
+        return actors.currentActor()
+            .flatMap(actor -> Blocking.call(() -> tags.rename(actor, id, request.name())))
+            .map(TagResponse::from);
     }
 
     @DeleteMapping("/{id}")
     @Operation(operationId = "tags-delete",
         summary = "Удалить тег (админ; используемый турниром — 409)")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        CurrentActor actor = currentActorProvider.currentActor();
-        tags.delete(actor, id);
-        return ResponseEntity.noContent().build();
+    public Mono<ResponseEntity<Void>> delete(@PathVariable UUID id) {
+        return actors.currentActor()
+            .flatMap(actor -> Blocking.call(() -> {
+                tags.delete(actor, id);
+                return null;
+            }))
+            .map(v -> ResponseEntity.noContent().build());
     }
 }

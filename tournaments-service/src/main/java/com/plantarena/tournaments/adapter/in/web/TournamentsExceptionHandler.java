@@ -207,9 +207,16 @@ public class TournamentsExceptionHandler {
         return respond(HttpStatus.BAD_REQUEST, "GLOBAL_SCOPE_UNKNOWN", e.getMessage(), exchange);
     }
 
+    @ExceptionHandler(InternalFeedDirectoryController.GuestSessionNotFound.class)
+    public ResponseEntity<ApiError> guestSessionNotFound(
+            InternalFeedDirectoryController.GuestSessionNotFound e,
+            ServerWebExchange exchange) {
+        return respond(HttpStatus.NOT_FOUND, "GUEST_SESSION_NOT_FOUND", e.getMessage(), exchange);
+    }
+
     @ExceptionHandler(RateLimitExceededException.class)
     public ResponseEntity<ApiError> rateLimited(RateLimitExceededException e,
-                                                ServerWebExchange exchange) {
+                                                 ServerWebExchange exchange) {
         String traceId = (String) exchange.getAttribute(TraceIdWebFilter.TRACE_ID_ATTRIBUTE);
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
             .header(HttpHeaders.RETRY_AFTER, String.valueOf(e.retryAfterSeconds()))

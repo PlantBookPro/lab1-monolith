@@ -11,7 +11,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import java.util.function.Supplier;
 
 
 @RestController
@@ -27,8 +26,7 @@ public class GuestSessionController {
     public Mono<ResponseEntity<GuestSessionResponse>> create(ServerHttpRequest request) {
         String remoteAddress = request.getRemoteAddress() == null ? null
             : request.getRemoteAddress().getAddress().getHostAddress();
-        return Blocking.call((Supplier<CreateGuestSessionUseCase.GuestSessionIssued>)
-                () -> createGuestSession.issue(remoteAddress))
+        return Blocking.call(() -> createGuestSession.issue(remoteAddress))
             .map(issued -> ResponseEntity.status(HttpStatus.CREATED)
                 .body(new GuestSessionResponse(issued.token(), issued.expiresAt())));
     }
