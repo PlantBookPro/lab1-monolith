@@ -1777,7 +1777,7 @@ git add -A && git commit -m "feat(lab2): plants-service :8083 — Feign к media
 
 ### Task 9: moderation-service
 
-- [ ] **Step 1: Copy the context**
+- [x] **Step 1: Copy the context**
 
 ```bash
 mkdir -p moderation-service/src/main/java/com/plantarena moderation-service/src/main/resources/db/migration
@@ -1791,11 +1791,11 @@ rm -rf moderation-service/src/main/java/com/plantarena/moderation/adapter/out/me
 rm -rf moderation-service/src/main/java/com/plantarena/moderation/adapter/out/plants
 ```
 
-- [ ] **Step 2: `build.gradle.kts`** — identity's template + `libs.openfeign`, `libs.circuitbreaker`, `libs.onnxruntime`, plus the model-download task (copy verbatim from `monolith-reference/build.gradle.kts` lines for `downloadModerationModel`, adjusting the model path to `layout.buildDirectory.file("models/mobilenetv2-1.0.onnx")`) and the `-Pinference` tag logic on `integrationTest` (copy from monolith).
+- [x] **Step 2: `build.gradle.kts`** — identity's template + `libs.openfeign`, `libs.circuitbreaker`, `libs.onnxruntime`, plus the model-download task (copy verbatim from `monolith-reference/build.gradle.kts` lines for `downloadModerationModel`, adjusting the model path to `layout.buildDirectory.file("models/mobilenetv2-1.0.onnx")`) and the `-Pinference` tag logic on `integrationTest` (copy from monolith).
 
-- [ ] **Step 3: Application class** — `ModerationServiceApplication`, `scanBasePackages = {"com.plantarena.moderation", "com.plantarena.shared.web"}` (moderation has no user-facing auth — no actor provider needed), `@EnableFeignClients(basePackages = "com.plantarena.moderation.api.client")`, `@EnableScheduling` (was on monolith `ModerationWiringConfig` — put it here or on the service config).
+- [x] **Step 3: Application class** — `ModerationServiceApplication`, `scanBasePackages = {"com.plantarena.moderation", "com.plantarena.shared.web"}` (moderation has no user-facing auth — no actor provider needed), `@EnableFeignClients(basePackages = "com.plantarena.moderation.api.client")`, `@EnableScheduling` (was on monolith `ModerationWiringConfig` — put it here or on the service config).
 
-- [ ] **Step 4: Feign clients**
+- [x] **Step 4: Feign clients**
 
 `moderation-service/src/main/java/com/plantarena/moderation/api/client/PlantsDirectoryClient.java`:
 ```java
@@ -1846,7 +1846,7 @@ public interface MediaContentClient {
 ```
 NOTE: media returns raw bytes with Content-Type header, not JSON. Configure this client with a Feign `Decoder` that builds `MediaContentView` from `ResponseEntity<byte[]>` — simplest: declare the method as `org.springframework.http.ResponseEntity<byte[]> getContent(...)` and map in the adapter. Use that form.
 
-- [ ] **Step 5: HTTP adapters replacing in-process ones**
+- [x] **Step 5: HTTP adapters replacing in-process ones**
 
 `moderation-service/src/main/java/com/plantarena/moderation/adapter/out/plants/HttpPlantModerationGateway.java` (reference: `monolith-reference/.../moderation/adapter/out/plants/InProcessPlantModerationGateway.java`):
 ```java
@@ -1881,7 +1881,7 @@ public class HttpPlantModerationGateway implements PlantModerationGateway {
 
 `moderation-service/src/main/java/com/plantarena/moderation/adapter/out/media/HttpMediaContentGateway.java` — implements `MediaContentGateway`; calls `mediaContentClient.getContent(assetId)`; `FeignException.NotFound` → mirror the in-process behavior (check `InProcessMediaContentGateway`: `Optional`/null semantics) — return `null`/empty exactly as before.
 
-- [ ] **Step 6: Pending-plants poller (replaces `PlantSubmittedHandler`)**
+- [x] **Step 6: Pending-plants poller (replaces `PlantSubmittedHandler`)**
 
 `moderation-service/src/main/java/com/plantarena/moderation/adapter/in/jobs/ModerationPendingPlantPoller.java`:
 ```java
@@ -1916,7 +1916,7 @@ public class ModerationPendingPlantPoller {
 ```
 (`CreateModerationJobService` is idempotent via `findLatestByPlantId` — safe redelivery.)
 
-- [ ] **Step 7: Config + yml**
+- [x] **Step 7: Config + yml**
 
 `moderation-service/.../moderation/config/ModerationServiceConfig.java`: `@Configuration @EnableScheduling`, beans: `Clock utcClock()`, `PlantClassifier plantClassifier(@Value("${plantarena.moderation.model-path}") String modelPath)` returning `new OnnxPlantClassifier(Path.of(modelPath))` (copy from monolith `ModerationWiringConfig`), OpenAPI bean (title "Plant Arena Moderation Service API").
 
@@ -1927,14 +1927,14 @@ plantarena:
     model-path: ${MODERATION_MODEL_PATH:build/models/mobilenetv2-1.0.onnx}
 ```
 
-- [ ] **Step 8: Tests**
+- [x] **Step 8: Tests**
 
 - `application-test.yml` (`flyway.schemas: moderation`, eureka/config off) + adapted `AbstractIntegrationTest` (no actor stub needed — no auth).
 - Keep: domain tests, application tests + fakes, `JdbcModerationJobRepositoryContractIT`, `OnnxPlantClassifierIT` (inference-tagged), `DeterministicPlantClassifier` support.
 - Delete `ModerationApiIT` (cross-context: upload → submit → decide).
 - Add `architecture/ModerationLayerRulesTest`.
 
-- [ ] **Step 9: Verify and commit**
+- [x] **Step 9: Verify and commit**
 
 ```bash
 ./gradlew :moderation-service:test :moderation-service:integrationTest :moderation-service:build
