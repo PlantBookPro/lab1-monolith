@@ -13,14 +13,16 @@
   "fingerprintVersion": 1 }
 ```
 
-Ошибки: `404 ASSET_NOT_FOUND`.
+Ошибки: `404 MEDIA_ASSET_NOT_FOUND` (`MediaAssetNotFoundException`) —
+asset не найден.
 
 ## GET /internal/files/{assetId}/content
 
 Байты файла (moderation: инференс ONNX). Ответ — **не JSON**: тело —
 сырые байты, `Content-Type` — фактический MIME (JPEG/PNG).
 
-Ошибки: `404 ASSET_NOT_FOUND`.
+Ошибки: `404 MEDIA_ASSET_NOT_FOUND` (`MediaAssetNotFoundException`) —
+asset не найден.
 
 ## POST /internal/files/{assetId}/claims
 
@@ -31,11 +33,12 @@ plants в tx подачи заявки; сбой — компенсация.
 { "plantId": "9a3e...", "publiclyVisible": false }
 ```
 
-`200` с пустым телом. Ошибки: `404 ASSET_NOT_FOUND`;
-`409 ASSET_ALREADY_CLAIMED` — файл уже задействован другим
-неархивированным растением.
+`200` с пустым телом; повторный claim тем же растением — upsert
+(обновляет `publiclyVisible`). Ошибки: `409 ASSET_IN_USE`
+(`AssetInUseException`) — файл уже задействован другим растением.
 
 ## DELETE /internal/files/{assetId}/claims/{plantId}
 
 Освобождение файла (архивация растения, освобождение резерва).
-`200` с пустым телом; идемпотентен. Ошибки: `404 ASSET_NOT_FOUND`.
+`200` с пустым телом; идемпотентен — отсутствие claim (или чужое
+растение) молча игнорируется, ошибок не возвращает.
