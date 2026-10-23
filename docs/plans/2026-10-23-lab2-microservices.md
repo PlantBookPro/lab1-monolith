@@ -3095,7 +3095,7 @@ git add -A && git commit -m "feat(lab2): tournaments-service — Feign ACL (iden
 
 ### Task 14: feed-service (Reactor + JDBC)
 
-- [ ] **Step 1: Copy the context**
+- [x] **Step 1: Copy the context**
 
 ```bash
 mkdir -p feed-service/src/main/java/com/plantarena feed-service/src/main/resources/db/migration
@@ -3110,11 +3110,11 @@ rm -rf feed-service/src/main/java/com/plantarena/feed/adapter/out/plants
 rm -rf feed-service/src/main/java/com/plantarena/feed/adapter/out/tournaments
 ```
 
-- [ ] **Step 2: `build.gradle.kts`** — copy tournaments' build file (Task 11 Step 2) minus `libs.spring.boot.jpa` (feed uses JdbcClient only): `spring-boot-webflux`, `spring-boot-jdbc`, validation, actuator, eureka, config, openfeign, circuitbreaker, openapi-webflux, flyway, postgresql, tests (webflux-test, jdbc-test, testcontainers, archunit).
+- [x] **Step 2: `build.gradle.kts`** — copy tournaments' build file (Task 11 Step 2) minus `libs.spring.boot.jpa` (feed uses JdbcClient only): `spring-boot-webflux`, `spring-boot-jdbc`, validation, actuator, eureka, config, openfeign, circuitbreaker, openapi-webflux, flyway, postgresql, tests (webflux-test, jdbc-test, testcontainers, archunit).
 
-- [ ] **Step 3: Application class** — `FeedServiceApplication`, `scanBasePackages = {"com.plantarena.feed", "com.plantarena.shared.webflux"}`, `@EnableFeignClients(basePackages = "com.plantarena.feed.api.client")`.
+- [x] **Step 3: Application class** — `FeedServiceApplication`, `scanBasePackages = {"com.plantarena.feed", "com.plantarena.shared.webflux"}`, `@EnableFeignClients(basePackages = "com.plantarena.feed.api.client")`.
 
-- [ ] **Step 4: Feign clients + adapters**
+- [x] **Step 4: Feign clients + adapters**
 
 `feed-service/.../feed/api/client/IdentityDirectoryClient.java` — copy of tournaments' (Task 13 Step 1, profile + actor).
 `feed-service/.../feed/api/client/PlantsDirectoryClient.java`:
@@ -3153,7 +3153,7 @@ Adapters (reference: deleted in-process adapters):
 - Copy `ApiErrorDecoder` (Task 13 Step 2) into `com.plantarena.feed.api.client` if needed for error mapping (mostly 404-mapping here).
 - Add `DependencyUnavailableException` + fallbacks for the three clients (same pattern as Task 13 Step 4), mapped → 503 in `FeedExceptionHandler`.
 
-- [ ] **Step 5: WebFlux controller + internal projection endpoint**
+- [x] **Step 5: WebFlux controller + internal projection endpoint**
 
 `FeedController` — convert to WebFlux (single endpoint):
 ```java
@@ -3226,9 +3226,9 @@ public class InternalProjectionController {
 ```
 NOTE: match the real `WindowCardsCommand`/`CardSeed` signatures from the copied port (field order/names may differ — align exactly; also `scope` may be an enum in the command — if so, `WindowScope.valueOf(scope)`).
 
-- [ ] **Step 6: Reactive actor** — copy `ActorContextWebFilter` + `DemoHeaderReactiveCurrentActorProvider` from tournaments (Task 12 Step 1) into `com.plantarena.feed.adapter.in.web`, importing feed's `IdentityDirectoryClient`.
+- [x] **Step 6: Reactive actor** — copy `ActorContextWebFilter` + `DemoHeaderReactiveCurrentActorProvider` from tournaments (Task 12 Step 1) into `com.plantarena.feed.adapter.in.web`, importing feed's `IdentityDirectoryClient`.
 
-- [ ] **Step 7: Config + yml**
+- [x] **Step 7: Config + yml**
 
 `feed-service/.../feed/config/FeedServiceConfig.java`: `@Configuration @EnableConfigurationProperties(FeedSettings.class)`, beans: `Clock`, `FeedCursorCodec(settings)`, `FeedOrdering()` (copy from monolith `FeedWiringConfig`), OpenAPI bean.
 
@@ -3258,14 +3258,14 @@ resilience4j:
         baseConfig: default
 ```
 
-- [ ] **Step 8: Tests**
+- [x] **Step 8: Tests**
 
 - Keep: domain tests, `FeedServiceTest`, `FeedProjectionServiceTest`, `FeedCursorCodecTest`, fakes, `JdbcFeedCardRepositoryContractIT` + in-memory contract pair.
 - Delete `FeedApiIT`, `FeedCursorApiIT` (cross-context: guest tokens + tournaments).
 - `application-test.yml` + WebFlux `AbstractIntegrationTest` (RANDOM_PORT + WebTestClient) + reactive test actor stub (`TestHeaderReactiveCurrentActorProvider` — like Task 12's provider but resolving `X-Demo-User-Id` + `X-Demo-Roles` locally, no Feign).
 - Add `architecture/FeedLayerRulesTest`.
 
-- [ ] **Step 9: Verify and commit**
+- [x] **Step 9: Verify and commit**
 
 ```bash
 ./gradlew :feed-service:test :feed-service:integrationTest :feed-service:build
