@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: moderation
+eureka:
+  client:
+    enabled: false
+plantarena:
+  moderation:
+    model-path: build/models/mobilenetv2-1.0.onnx
