@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /build
 COPY . .
-RUN ./gradlew --no-daemon -q :moderation-service:bootJar :moderation-service:downloadModerationModel
+RUN ./gradlew --no-daemon -q -Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000 :moderation-service:bootJar :moderation-service:downloadModerationModel
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app

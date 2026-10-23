@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.flyway.postgresql)
     implementation(libs.spring.boot.flyway)
     implementation(libs.openfeign)
+    implementation(libs.spring.boot.http.converter)
     implementation(libs.circuitbreaker)
     runtimeOnly(libs.postgresql)
 

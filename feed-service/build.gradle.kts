@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.eureka.client)
     implementation(libs.config.client)
     implementation(libs.openfeign)
+    implementation(libs.spring.boot.http.converter)
     implementation(libs.circuitbreaker)
     implementation(libs.openapi.webflux)
     implementation(libs.flyway.core)

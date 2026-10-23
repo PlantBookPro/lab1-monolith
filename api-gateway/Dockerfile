@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /build
 COPY . .
-RUN ./gradlew --no-daemon -q :api-gateway:bootJar
+RUN ./gradlew --no-daemon -q -Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000 :api-gateway:bootJar
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
