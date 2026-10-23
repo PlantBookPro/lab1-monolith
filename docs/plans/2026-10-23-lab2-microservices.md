@@ -2896,7 +2896,7 @@ git add -A && git commit -m "feat(lab2): tournaments-service — WebFlux web-с�
 
 ### Task 13: tournaments-service, часть 3 — Feign ACL + Circuit Breaker + relay в feed
 
-- [ ] **Step 1: Feign clients** (`tournaments-service/.../tournaments/api/client/`)
+- [x] **Step 1: Feign clients** (`tournaments-service/.../tournaments/api/client/`)
 
 `IdentityDirectoryClient.java` — like media's (Task 7 Step 4) plus location:
 ```java
@@ -2974,7 +2974,7 @@ public interface FeedEventsClient {
 }
 ```
 
-- [ ] **Step 2: Error translation helper**
+- [x] **Step 2: Error translation helper**
 
 `tournaments-service/.../tournaments/api/client/ApiErrorDecoder.java` — static helper decoding a `FeignException`'s body JSON into `com.plantarena.shared.web.ApiError` (Jackson `ObjectMapper`), used by adapters:
 ```java
@@ -3002,7 +3002,7 @@ public final class ApiErrorDecoder {
 ```
 NOTE: `ApiError` may need `retryAt` handling — Jackson maps records by component name; `Instant` needs `jackson-datatype-jsr310` (present via Boot). If `ApiError` lacks a no-arg creator it's a record — fine.
 
-- [ ] **Step 3: HTTP adapters for the 6 outbound ports** (reference: the deleted in-process adapters in `monolith-reference/.../tournaments/adapter/out/` — replicate their translations exactly)
+- [x] **Step 3: HTTP adapters for the 6 outbound ports** (reference: the deleted in-process adapters in `monolith-reference/.../tournaments/adapter/out/` — replicate their translations exactly)
 
 `adapter/out/identity/HttpParticipantDirectory.java` (port `ParticipantDirectoryGateway.isKnownUser`): `getProfile(userId)` → 404 ⇒ `false`, else `active`.
 `adapter/out/identity/HttpParticipantLocations.java` (port `ParticipantLocationsGateway.findLocation`): `getLocation(userId)` → 404 ⇒ `Optional.empty()`, else map.
@@ -3012,7 +3012,7 @@ NOTE: `ApiError` may need `retryAt` handling — Jackson maps records by compone
 `adapter/out/geo/HttpClusteringGateway.java` (port `ClusteringGateway.assignClusters`): map `MemberLocation` → `GeoClustersClient.MemberView`, response → `AssignedCluster(snapshotId, clusterKey, entryIds)`.
 `adapter/out/abuse/LoggingAbuseSignals.java` — copy unchanged from monolith.
 
-- [ ] **Step 4: Circuit Breaker fallbacks (acceptance criterion 5)**
+- [x] **Step 4: Circuit Breaker fallbacks (acceptance criterion 5)**
 
 Add explicit fallbacks demonstrating the mechanism on the identity/plants/geo clients. Create `tournaments-service/.../tournaments/application/DependencyUnavailableException.java`:
 ```java
@@ -3027,7 +3027,7 @@ public class DependencyUnavailableException extends RuntimeException {
 Map it → 503 `DEPENDENCY_UNAVAILABLE` in `TournamentsExceptionHandler`. Then configure Feign fallbacks — with `feign.circuitbreaker.enabled=true` register fallback beans: for each client create a `@Component` fallback class (e.g. `IdentityDirectoryClientFallback implements IdentityDirectoryClient`) whose every method throws `new DependencyUnavailableException("identity-service", null)`, and reference it: `@FeignClient(name = "identity-service", fallback = IdentityDirectoryClientFallback.class)`. Do the same for `PlantsDirectoryClient`, `GeoClustersClient`, `FeedEventsClient`. (Fallbacks fire when the CB is open OR the call fails — observable via 503 DEPENDENCY_UNAVAILABLE and `/actuator/circuitbreakers`.)
 NOTE: fallback beans need the CB to wrap calls — verify `spring-cloud-starter-circuitbreaker-resilience4j` brings `resilience4j-spring-boot-3` (check `./gradlew :tournaments-service:dependencies --configuration runtimeClasspath | grep resilience4j`). If `resilience4j-spring-boot` is absent, add `implementation("io.github.resilience4j:resilience4j-spring-boot-3:2.3.0")` (check latest 2.x on Maven Central) so `resilience4j.circuitbreaker.instances.*` are honored.
 
-- [ ] **Step 5: Relay to feed**
+- [x] **Step 5: Relay to feed**
 
 `tournaments-service/.../tournaments/adapter/out/events/FeedProjectionRelay.java`:
 ```java
@@ -3084,7 +3084,7 @@ public class FeedProjectionRelay {
 ```
 `WindowProjectionMapper.toRequest(event)` — small mapper: `new FeedEventsClient.WindowProjectionRequest(windowId, tournamentId, scope.name(), clusterId, closesAt, participants.map(p -> new CardSeedView(p.entryId(), p.userId(), p.plantId(), p.joinedAt())))` — match the real `VotingWindowOpenedEvent.Payload` field names from the copied code (inline it in the relay if you prefer; no separate mapper file needed).
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 ```bash
 ./gradlew :tournaments-service:test :tournaments-service:integrationTest :tournaments-service:build
