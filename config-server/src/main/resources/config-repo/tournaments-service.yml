@@ -11,6 +11,12 @@ spring:
     enabled: true
     locations: classpath:db/migration
     schemas: tournaments
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
 plantarena:
   global:
     epoch-duration: 24h
@@ -19,9 +25,6 @@ plantarena:
     session-ttl: 24h
     session-creation-limit-per-minute: 10
     vote-limit-per-minute: 30
-feign:
-  circuitbreaker:
-    enabled: true
 resilience4j:
   circuitbreaker:
     configs:

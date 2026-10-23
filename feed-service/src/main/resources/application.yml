@@ -11,6 +11,12 @@ spring:
     enabled: true
     locations: classpath:db/migration
     schemas: feed
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
 server:
   port: 8087
   forward-headers-strategy: framework
@@ -29,9 +35,6 @@ plantarena:
   feed:
     cursor-secret: ${FEED_CURSOR_SECRET:dev-only-cursor-secret}
     cursor-ttl: 1h
-feign:
-  circuitbreaker:
-    enabled: true
 resilience4j:
   circuitbreaker:
     configs:

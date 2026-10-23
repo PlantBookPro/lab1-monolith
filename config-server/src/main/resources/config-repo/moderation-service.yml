@@ -7,12 +7,15 @@ spring:
     enabled: true
     locations: classpath:db/migration
     schemas: moderation
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
 plantarena:
   moderation:
     model-path: ${MODERATION_MODEL_PATH:/app/models/mobilenetv2-1.0.onnx}
-feign:
-  circuitbreaker:
-    enabled: true
 resilience4j:
   circuitbreaker:
     configs:

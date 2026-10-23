@@ -7,9 +7,12 @@ spring:
     enabled: true
     locations: classpath:db/migration
     schemas: plants
-feign:
-  circuitbreaker:
-    enabled: true
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        group:
+          enabled: true
 resilience4j:
   circuitbreaker:
     configs:
