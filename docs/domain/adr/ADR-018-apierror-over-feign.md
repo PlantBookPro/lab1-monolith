@@ -21,10 +21,14 @@ in-process. В лабе №2 поставщик отвечает HTTP-ошибк
   поставщика; свой обработчик отдаёт их клиенту как свои (409 остаётся
   409, `retryAt` доживает до ответа).
 - Недекодируемое тело (не наш формат) — общая ошибка зависимости.
-- **Circuit breaker (Resilience4j) + fallback на каждом Feign-клиенте**:
+- **Circuit breaker (Resilience4j) + fallback на Feign-клиентах
+  tournaments и feed** (наиболее нагруженные цепочки вызовов):
   fallback бросает `DependencyUnavailableException` → 503
   `DEPENDENCY_UNAVAILABLE` («сервис временно недоступен»), а не 500.
   Конфигурация инстансов — в config-repo каждого сервиса.
+  Клиенты plants/media/moderation пока без CB/fallback — отказ
+  зависимости там отдаёт 500 (как в монолите при неожиданных ошибках);
+  добавление fallback'ов — задача лабы №3.
 
 ## Последствия
 
